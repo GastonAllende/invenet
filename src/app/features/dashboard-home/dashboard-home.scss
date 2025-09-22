@@ -1,0 +1,641 @@
+// Dashboard Home Component Styles
+// Following Angular Material Azure/Blue Theme Guidelines
+
+.dashboard-page {
+  padding: 24px;
+  background: #f5f5f5; // Background color from Material Design guidelines
+  min-height: 100vh;
+}
+
+// Header Section
+.header-section {
+  margin-bottom: 32px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff; // Card background
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 120, 212, 0.1); // Elevated surface shadow
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.dashboard-icon-container {
+  background: #0078d4; // Primary Azure blue
+  border-radius: 50%;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dashboard-main-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #ffffff; // Text on primary
+}
+
+.header-text {
+  flex: 1;
+
+  h1 {
+    margin: 0 0 8px 0;
+    color: #212529; // Primary text
+    font-size: 2rem;
+    font-weight: 500;
+    font-family: Roboto, sans-serif;
+  }
+
+  p {
+    margin: 0;
+    color: #6c757d; // Secondary text
+    font-size: 1rem;
+    font-family: Roboto, sans-serif;
+  }
+}
+
+.market-status {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  mat-chip {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 8px;
+
+    mat-icon {
+      font-size: 1.2rem;
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+  }
+
+  .market-open {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+  }
+
+  .market-closed {
+    background-color: #ffebee;
+    color: #c62828;
+  }
+}
+
+// TradingView Widget Styles
+.tradingview-widget-container {
+  margin-bottom: 32px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 120, 212, 0.1);
+  overflow: hidden;
+
+  .tradingview-widget-container__widget {
+    height: 400px;
+    width: 100%;
+
+    @media (max-width: 768px) {
+      height: 300px;
+    }
+  }
+
+  .tradingview-widget-copyright {
+    text-align: center;
+    padding: 8px;
+    background: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+
+    a {
+      color: #0078d4;
+      text-decoration: none;
+      font-size: 12px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .blue-text {
+      color: #0078d4;
+    }
+  }
+}
+
+// Statistics Grid
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 120, 212, 0.1);
+  transition: box-shadow 200ms ease;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 120, 212, 0.15);
+  }
+
+  .mat-mdc-card-content {
+    padding: 24px;
+  }
+}
+
+.stat-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-info {
+  h3 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    font-family: Roboto, sans-serif;
+  }
+
+  p {
+    margin: 4px 0 0 0;
+    color: #6c757d;
+    font-size: 0.875rem;
+    font-family: Roboto, sans-serif;
+  }
+}
+
+.stat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  opacity: 0.8;
+}
+
+.change-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  &.positive {
+    color: #4caf50;
+  }
+
+  &.negative {
+    color: #f44336;
+  }
+
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+// Section Headers
+h2 {
+  color: #212529;
+  margin-bottom: 24px;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+// Section Spacing
+.portfolio-section,
+.positions-section,
+.actions-section {
+  margin-bottom: 48px;
+}
+
+// Grid Layouts
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.positions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+}
+
+// Portfolio Stats Cards
+.stat-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 4px solid transparent;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 120, 212, 0.1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 120, 212, 0.15);
+  }
+
+  &.positive {
+    border-left-color: #4caf50;
+  }
+
+  &.negative {
+    border-left-color: #f44336;
+  }
+}
+
+.stat-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background-color: rgba(0, 120, 212, 0.1);
+
+  mat-icon {
+    font-size: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+.stat-info {
+  flex: 1;
+
+  h3 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #212529;
+  }
+
+  p {
+    margin: 4px 0 0 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+}
+
+.change-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  &.positive {
+    color: #4caf50;
+  }
+
+  &.negative {
+    color: #f44336;
+  }
+
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+// Position Cards
+.position-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 120, 212, 0.1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 120, 212, 0.15);
+  }
+}
+
+.position-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.symbol-info {
+  h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #212529;
+  }
+
+  p {
+    margin: 4px 0 0 0;
+    color: #6c757d;
+    font-size: 0.8rem;
+  }
+}
+
+.position-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+
+  &.positive {
+    color: #4caf50;
+  }
+
+  &.negative {
+    color: #f44336;
+  }
+}
+
+.position-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+
+  .label {
+    color: #6c757d;
+  }
+
+  .value {
+    font-weight: 600;
+
+    &.positive {
+      color: #4caf50;
+    }
+
+    &.negative {
+      color: #f44336;
+    }
+  }
+}
+
+.allocation-progress {
+  mat-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+  }
+}
+
+.allocation-text {
+  margin: 8px 0 0 0;
+  font-size: 0.8rem;
+  color: #6c757d;
+  text-align: center;
+}
+
+// Action Cards
+.action-card {
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  padding: 0;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 120, 212, 0.1);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 120, 212, 0.2);
+  }
+
+  mat-card-content {
+    padding: 24px;
+  }
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
+  }
+
+  p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+}
+
+// Table Section
+.table-card,
+.actions-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 120, 212, 0.1);
+  margin-bottom: 32px;
+
+  .mat-mdc-card-header {
+    padding: 24px 24px 0 24px;
+  }
+
+  .mat-mdc-card-content {
+    padding: 24px;
+  }
+}
+
+.table-avatar {
+  background: #0078d4;
+  color: #ffffff;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+// Positions Grid
+.positions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.position-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 120, 212, 0.08);
+  transition: box-shadow 200ms ease;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 120, 212, 0.15);
+  }
+}
+
+.position-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.symbol-info {
+  .symbol-code {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 4px;
+  }
+
+  .company-name {
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+}
+
+.position-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+
+  &.positive {
+    color: #4caf50;
+  }
+
+  &.negative {
+    color: #f44336;
+  }
+}
+
+.position-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+
+  .label {
+    color: #6c757d;
+  }
+
+  .value {
+    font-weight: 500;
+
+    &.positive {
+      color: #4caf50;
+    }
+
+    &.negative {
+      color: #f44336;
+    }
+  }
+}
+
+.allocation-progress {
+  mat-progress-bar {
+    height: 4px;
+    border-radius: 2px;
+  }
+}
+
+.allocation-text {
+  margin: 8px 0 0 0;
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-align: center;
+}
+
+// Actions Grid
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.action-card {
+  cursor: pointer;
+  transition: all 200ms ease;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 120, 212, 0.08);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.15);
+  }
+
+  mat-card-content {
+    padding: 24px;
+  }
+
+  mat-icon {
+    font-size: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #212529;
+  }
+
+  p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+}

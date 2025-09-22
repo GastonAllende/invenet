@@ -1,0 +1,67 @@
+<mat-sidenav-container class="dashboard-container">
+  <!-- Sidebar Navigation -->
+  <mat-sidenav mode="side" opened class="sidebar" data-background-color="white" data-color="danger">
+    <div class="logo">
+      <a class="simple-text" routerLink="/dashboard">
+        <div class="logo-img">
+          <i class="material-icons angular-logo-icon">change_history</i>
+        </div>
+        <span class="app-name"> Invenet </span>
+      </a>
+    </div>
+
+    <div class="sidebar-wrapper">
+      <ul class="nav">
+        @for (item of navigationItems; track item.route) {
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <i class="material-icons">{{ item.icon }}</i>
+            <p>{{ item.label }}</p>
+          </a>
+        </li>
+        }
+      </ul>
+    </div>
+  </mat-sidenav>
+
+  <!-- Main Content Area -->
+  <mat-sidenav-content class="main-content">
+    <!-- Top Toolbar -->
+    <mat-toolbar class="top-toolbar">
+      <span class="page-title">Dashboard</span>
+
+      <div class="toolbar-spacer"></div>
+
+      <!-- User Menu -->
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-trigger">
+        <mat-icon class="notification-icon">notifications</mat-icon>
+        @if (notificationCount() > 0) {
+        <span class="notification-badge">{{ notificationCount() }}</span>
+        }
+      </button>
+
+      <button mat-icon-button [matMenuTriggerFor]="userMenu">
+        <mat-icon>person</mat-icon>
+      </button>
+
+      <mat-menu #userMenu="matMenu">
+        @for (menuItem of userMenuItems; track menuItem.action) {
+        <button mat-menu-item (click)="handleMenuAction(menuItem.action)">
+          <mat-icon>{{ menuItem.icon }}</mat-icon>
+          <span>{{ menuItem.label }}</span>
+        </button>
+        }
+      </mat-menu>
+    </mat-toolbar>
+
+    <!-- Page Content -->
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

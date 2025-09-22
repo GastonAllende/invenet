@@ -1,0 +1,159 @@
+<div class="auth-container">
+  <div class="auth-card-wrapper">
+    <mat-card class="auth-card">
+      <mat-card-content>
+        <!-- Header -->
+        <div class="auth-header">
+          <div class="auth-icon">
+            <mat-icon>rocket_launch</mat-icon>
+          </div>
+          <h1>Get Started</h1>
+          <p class="auth-subtitle">Create your trading account to begin</p>
+          <p class="auth-link-text">
+            Already have an account?
+            <a routerLink="/login" class="auth-link">Login now!</a>
+          </p>
+        </div>
+
+        <!-- Registration Form -->
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+          <!-- Name Field -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Name <span class="required">*</span></mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="name"
+              placeholder="Enter name"
+              autocomplete="name"
+            />
+            <mat-icon matSuffix>person</mat-icon>
+            @if (getFieldError('name')) {
+            <mat-error>{{ getFieldError('name') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Email Field -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email Address <span class="required">*</span></mat-label>
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              placeholder="Enter email address"
+              autocomplete="email"
+            />
+            <mat-icon matSuffix>email</mat-icon>
+            @if (getFieldError('email')) {
+            <mat-error>{{ getFieldError('email') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Password Field -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password <span class="required">*</span></mat-label>
+            <input
+              matInput
+              [type]="hidePassword() ? 'password' : 'text'"
+              formControlName="password"
+              placeholder="Enter your password"
+              autocomplete="new-password"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hidePassword()"
+            >
+              <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (getFieldError('password')) {
+            <mat-error>{{ getFieldError('password') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Confirm Password Field -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Confirm Password <span class="required">*</span></mat-label>
+            <input
+              matInput
+              [type]="hideConfirmPassword() ? 'password' : 'text'"
+              formControlName="confirmPassword"
+              placeholder="Enter your password"
+              autocomplete="new-password"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="toggleConfirmPasswordVisibility()"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hideConfirmPassword()"
+            >
+              <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (getFieldError('confirmPassword')) {
+            <mat-error>{{ getFieldError('confirmPassword') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Terms Agreement -->
+          <div class="terms-agreement">
+            <mat-checkbox formControlName="agreeToTerms">
+              I agree to the
+              <a href="#" class="terms-link">Terms of Service</a>
+              and
+              <a href="#" class="terms-link">Privacy Policy</a>
+            </mat-checkbox>
+            @if (getFieldError('agreeToTerms')) {
+            <div class="field-error">{{ getFieldError('agreeToTerms') }}</div>
+            }
+          </div>
+
+          <!-- Error Message -->
+          @if (error()) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            <span>{{ error() }}</span>
+          </div>
+          }
+
+          <!-- Submit Button -->
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="auth-submit-btn"
+            [disabled]="isLoading()"
+          >
+            @if (isLoading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Creating Account...</span>
+            } @else {
+            <span>Register</span>
+            }
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="auth-divider">
+          <span>or continue with</span>
+        </div>
+
+        <!-- Social Login Options -->
+        <div class="social-login">
+          <button mat-stroked-button class="social-btn google-btn">
+            <mat-icon svgIcon="google"></mat-icon>
+            Google
+          </button>
+          <button mat-stroked-button class="social-btn apple-btn">
+            <mat-icon>apple</mat-icon>
+            Apple
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

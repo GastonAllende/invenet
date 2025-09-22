@@ -1,0 +1,393 @@
+// Trades component styles following Material Design Azure/Blue theme
+
+.trades-page {
+  padding: 24px;
+  background: #f5f5f5; // Background color from Material Design guidelines
+  min-height: 100vh;
+}
+
+// Header Section
+.header-section {
+  margin-bottom: 32px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff; // Card background
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 120, 212, 0.1); // Elevated surface shadow
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.trades-icon-container {
+  background: #0078d4; // Primary Azure blue
+  border-radius: 50%;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.trades-main-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #ffffff; // Text on primary
+}
+
+.header-text {
+  flex: 1;
+
+  h1 {
+    margin: 0 0 8px 0;
+    color: #212529; // Primary text
+    font-size: 2rem;
+    font-weight: 500;
+    font-family: Roboto, sans-serif;
+  }
+
+  p {
+    margin: 0;
+    color: #6c757d; // Secondary text
+    font-size: 1rem;
+    font-family: Roboto, sans-serif;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+.primary-btn,
+.secondary-btn {
+  border-radius: 8px;
+  font-family: Roboto, sans-serif;
+  font-weight: 500;
+  padding: 0 24px;
+  height: 40px;
+
+  .mat-icon {
+    margin-right: 8px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Summary Grid
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.summary-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 120, 212, 0.1);
+  transition: box-shadow 200ms ease;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 120, 212, 0.15);
+  }
+
+  .mat-mdc-card-content {
+    padding: 24px;
+  }
+}
+
+.summary-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-info {
+  h3 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    font-family: Roboto, sans-serif;
+  }
+
+  p {
+    margin: 4px 0 0 0;
+    color: #6c757d;
+    font-size: 0.875rem;
+    font-family: Roboto, sans-serif;
+  }
+}
+
+.summary-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  opacity: 0.8;
+}
+
+// Table Section
+.table-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 120, 212, 0.1);
+
+  .mat-mdc-card-header {
+    padding: 24px 24px 0 24px;
+  }
+
+  .mat-mdc-card-content {
+    padding: 0 24px 24px 24px;
+  }
+}
+
+.table-avatar {
+  background: #0078d4;
+  color: #ffffff;
+}
+
+// Empty State
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: #6c757d;
+
+  .empty-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    color: #212529;
+    font-size: 1.25rem;
+    font-weight: 500;
+    font-family: Roboto, sans-serif;
+  }
+
+  p {
+    margin: 0 0 24px 0;
+    font-family: Roboto, sans-serif;
+  }
+
+  .empty-cta {
+    border-radius: 8px;
+    font-family: Roboto, sans-serif;
+    font-weight: 500;
+
+    .mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+// Table Styles
+.table-container {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.trades-table {
+  width: 100%;
+  font-family: Roboto, sans-serif;
+
+  .mat-mdc-header-cell {
+    color: #212529;
+    font-weight: 500;
+    font-size: 0.875rem;
+    background: #f9fafb;
+  }
+
+  .mat-mdc-cell {
+    color: #212529;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .table-row {
+    transition: background-color 150ms ease;
+
+    &:hover {
+      background-color: #f9fafb;
+    }
+  }
+}
+
+// Cell Styles
+.trade-id {
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: #6c757d;
+  background: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.symbol-cell {
+  .symbol-code {
+    font-weight: 600;
+    color: #0078d4;
+    font-size: 1rem;
+  }
+}
+
+.quantity-value {
+  font-weight: 500;
+  color: #212529;
+}
+
+.price-value {
+  font-weight: 500;
+  color: #212529;
+}
+
+.total-value {
+  font-weight: 600;
+  color: #212529;
+  font-size: 1rem;
+}
+
+.date-value {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+// Chip Styles
+.type-chip,
+.status-chip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: none;
+  min-height: 24px;
+  font-family: Roboto, sans-serif;
+}
+
+.buy-chip {
+  background: #d4edda !important;
+  color: #155724 !important;
+  border: 1px solid #c3e6cb !important;
+}
+
+.sell-chip {
+  background: #f8d7da !important;
+  color: #721c24 !important;
+  border: 1px solid #f5c6cb !important;
+}
+
+.completed-chip {
+  background: #d4edda !important;
+  color: #155724 !important;
+  border: 1px solid #c3e6cb !important;
+}
+
+.pending-chip {
+  background: #fff3cd !important;
+  color: #856404 !important;
+  border: 1px solid #ffeaa7 !important;
+}
+
+.cancelled-chip {
+  background: #f8d7da !important;
+  color: #721c24 !important;
+  border: 1px solid #f5c6cb !important;
+}
+
+// Actions Column
+.actions-cell {
+  display: flex;
+  gap: 4px;
+
+  .action-btn {
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+
+    .mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+}
+
+// Paginator
+.table-paginator {
+  border-top: 1px solid #e5e7eb;
+  margin-top: 16px;
+  font-family: Roboto, sans-serif;
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .trades-page {
+    padding: 16px;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .trades-page {
+    padding: 16px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .table-container {
+    // Force horizontal scroll on mobile for table
+    .trades-table {
+      min-width: 700px;
+    }
+  }
+
+  .actions-cell {
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+
+      .mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .action-buttons {
+    .primary-btn,
+    .secondary-btn {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+}

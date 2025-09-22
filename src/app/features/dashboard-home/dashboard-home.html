@@ -1,0 +1,147 @@
+<div class="dashboard-page">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="dashboard-icon-container">
+        <mat-icon class="dashboard-main-icon">dashboard</mat-icon>
+      </div>
+      <div class="header-text">
+        <h1>Dashboard</h1>
+        <p>Monitor your portfolio performance and market opportunities</p>
+      </div>
+      <div class="market-status">
+        <mat-chip [class]="marketStatus().class">
+          <mat-icon>{{ marketStatus().icon }}</mat-icon>
+          {{ marketStatus().text }}
+        </mat-chip>
+      </div>
+    </div>
+  </div>
+
+  <!-- TradingView Widget BEGIN -->
+  <div class="tradingview-widget-container">
+    <div id="tradingview_widget" class="tradingview-widget-container__widget"></div>
+    <div class="tradingview-widget-copyright">
+      <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"
+        ><span class="blue-text">Track market data with TradingView</span></a
+      >
+    </div>
+  </div>
+  <!-- TradingView Widget END -->
+
+  <!-- Portfolio Statistics -->
+  <div class="stats-grid">
+    @for (stat of portfolioStats(); track stat.title) {
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-info">
+            <h3 [style.color]="stat.color">{{ stat.value }}</h3>
+            <p>{{ stat.title }}</p>
+            @if (stat.change) {
+            <div
+              class="change-indicator"
+              [class.positive]="stat.trend === 'positive'"
+              [class.negative]="stat.trend === 'negative'"
+            >
+              <mat-icon>{{
+                stat.trend === 'positive' ? 'arrow_upward' : 'arrow_downward'
+              }}</mat-icon>
+              {{ stat.change }}
+            </div>
+            }
+          </div>
+          <mat-icon class="stat-icon" [style.color]="stat.color">{{ stat.icon }}</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    }
+  </div>
+
+  <!-- Top Positions -->
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-icon mat-card-avatar class="table-avatar">trending_up</mat-icon>
+      <mat-card-title>Top Positions</mat-card-title>
+      <mat-card-subtitle>Your best performing portfolio holdings</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="positions-grid">
+        @for (position of topPositions(); track position.symbol) {
+        <mat-card class="position-card">
+          <mat-card-content>
+            <div class="position-header">
+              <div class="symbol-info">
+                <strong class="symbol-code">{{ position.symbol }}</strong>
+                <span class="company-name">{{ position.name }}</span>
+              </div>
+              <div
+                class="position-value"
+                [class.positive]="position.trend === 'positive'"
+                [class.negative]="position.trend === 'negative'"
+              >
+                ${{ position.value }}
+              </div>
+            </div>
+
+            <div class="position-details">
+              <div class="detail-item">
+                <span class="label">Shares:</span>
+                <span class="value">{{ position.shares }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">P&L:</span>
+                <span
+                  class="value"
+                  [class.positive]="position.trend === 'positive'"
+                  [class.negative]="position.trend === 'negative'"
+                >
+                  {{ position.pnl }}
+                </span>
+              </div>
+            </div>
+
+            <div class="allocation-progress">
+              <mat-progress-bar
+                mode="determinate"
+                [value]="position.allocation"
+                [color]="position.trend === 'positive' ? 'primary' : 'warn'"
+              >
+              </mat-progress-bar>
+              <p class="allocation-text">{{ position.allocation }}% of portfolio</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Quick Actions -->
+  <mat-card class="actions-card">
+    <mat-card-header>
+      <mat-icon mat-card-avatar class="table-avatar">flash_on</mat-icon>
+      <mat-card-title>Quick Actions</mat-card-title>
+      <mat-card-subtitle>Common trading and portfolio management tasks</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="actions-grid">
+        @for (action of quickActions(); track action.action) {
+        <mat-card
+          class="action-card"
+          (click)="handleQuickAction(action.action)"
+          [attr.aria-label]="action.title + ': ' + action.description"
+        >
+          <mat-card-content>
+            <mat-icon [style.color]="action.color">{{ action.icon }}</mat-icon>
+            <h3>{{ action.title }}</h3>
+            <p>{{ action.description }}</p>
+          </mat-card-content>
+        </mat-card>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

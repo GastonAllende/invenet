@@ -1,0 +1,352 @@
+.auth-container {
+  min-height: 100vh;
+  background: #f5f5f5; // Light background from Material Design instructions
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.auth-card-wrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-card {
+  background: #ffffff; // Clean white surface
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); // Subtle shadow
+  border: 1px solid #e5e7eb; // Light border
+  overflow: hidden;
+
+  .mat-mdc-card-content {
+    padding: 40px 32px;
+
+    @media (max-width: 600px) {
+      padding: 32px 24px;
+    }
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .auth-icon {
+    width: 56px;
+    height: 56px;
+    background: #0078d4; // Clean Azure blue, no gradient
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    box-shadow: 0 2px 4px rgba(0, 120, 212, 0.2); // Much lighter shadow
+
+    mat-icon {
+      color: #ffffff;
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  h1 {
+    margin: 0 0 8px 0;
+    font-size: 28px; // Slightly smaller
+    font-weight: 600; // Lighter weight
+    color: #1f2937; // Darker gray for better readability
+    letter-spacing: -0.025em;
+    font-family: Roboto, sans-serif;
+  }
+
+  .auth-subtitle {
+    margin: 0 0 24px 0;
+    color: #6b7280; // Medium gray
+    font-size: 16px;
+    line-height: 1.5;
+    font-family: Roboto, sans-serif;
+  }
+
+  .auth-link-text {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+    font-family: Roboto, sans-serif;
+
+    .auth-link {
+      color: #0078d4;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 200ms ease; // Simpler transition
+
+      &:hover {
+        color: #005a9e;
+        text-decoration: underline;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.auth-form {
+  .full-width {
+    width: 100%;
+    margin-bottom: 16px; // 2 * 8dp
+
+    .mat-mdc-form-field-subscript-wrapper {
+      margin-top: 8px; // 1 * 8dp
+    }
+  }
+
+  .required {
+    color: #d32f2f; // Material Design error color
+  }
+
+  // Material Design form field styling following instructions
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      background-color: #ffffff; // Surface color
+      border-radius: 8px; // Material Design border radius
+
+      .mat-mdc-form-field-outline {
+        color: rgba(0, 0, 0, 0.12); // Default outline color
+      }
+
+      &:hover .mat-mdc-form-field-outline {
+        color: rgba(0, 120, 212, 0.4); // Azure blue hover
+      }
+
+      &.mdc-text-field--focused .mat-mdc-form-field-outline {
+        color: #0078d4; // Azure blue focus state
+      }
+    }
+
+    .mat-mdc-form-field-input-control input {
+      padding: 16px 14px; // Consistent padding
+      font-size: 16px;
+      line-height: 1.5;
+      font-family: Roboto, sans-serif;
+    }
+
+    .mat-mdc-form-field-error {
+      color: #d32f2f; // Material Design error color
+      font-size: 12px;
+      font-weight: 500;
+      font-family: Roboto, sans-serif;
+    }
+  }
+
+  .auth-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px; // 3 * 8dp
+
+    .remember-me {
+      .mat-mdc-checkbox-label {
+        color: #6c757d; // Secondary text
+        font-size: 0.9rem;
+        font-family: Roboto, sans-serif;
+      }
+
+      .mat-mdc-checkbox {
+        .mdc-checkbox__background {
+          border-color: #d1d5db; // Default border
+        }
+
+        &.mat-mdc-checkbox-checked .mdc-checkbox__background {
+          background-color: #0078d4; // Azure blue when checked
+          border-color: #0078d4;
+        }
+      }
+    }
+
+    .forgot-password {
+      color: #0078d4; // Primary blue
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      font-family: Roboto, sans-serif;
+      transition: color 200ms cubic-bezier(0.4, 0, 0.2, 1); // Material Design transition
+
+      &:hover {
+        color: #005a9e; // Primary dark
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px; // 1 * 8dp
+    padding: 12px 16px; // 1.5 * 8dp and 2 * 8dp
+    background: rgba(211, 47, 47, 0.1); // Error background with Material Design error color
+    border: 1px solid rgba(211, 47, 47, 0.3);
+    border-radius: 8px; // Material Design border radius
+    margin-bottom: 24px; // 3 * 8dp
+    color: #d32f2f; // Material Design error color
+    font-family: Roboto, sans-serif;
+
+    .mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+// Clean, minimal button styling
+.auth-submit-btn {
+  width: 100%;
+  height: 44px; // Clean height
+  background-color: #0078d4; // Azure blue
+  color: #ffffff;
+  border: none;
+  border-radius: 6px; // Smaller radius
+  font-size: 15px;
+  font-weight: 500; // Lighter weight
+  font-family: Roboto, sans-serif;
+  transition: all 150ms ease; // Simpler transition
+  margin-bottom: 24px;
+
+  &:hover:not(:disabled) {
+    background-color: #106ebe; // Lighter hover
+    transform: none; // No transform for cleaner look
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #9ca3af;
+  }
+
+  .mat-mdc-progress-spinner {
+    margin-right: 8px;
+
+    circle {
+      stroke: #ffffff;
+    }
+  }
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+}
+
+.auth-divider {
+  position: relative;
+  margin: 28px 0;
+  text-align: center;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e5e7eb; // Simple gray line
+  }
+
+  span {
+    background: #ffffff;
+    color: #9ca3af;
+    padding: 0 16px;
+    font-size: 14px;
+    font-family: Roboto, sans-serif;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.social-login {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  .social-btn {
+    height: 44px; // Clean height
+    border-radius: 6px; // Smaller radius
+    font-weight: 500;
+    font-family: Roboto, sans-serif;
+    text-transform: none;
+    border: 1px solid #e5e7eb; // Thinner border
+    background: #ffffff;
+    transition: all 150ms ease; // Simpler transition
+
+    &:hover {
+      background: #f9fafb; // Light gray on hover
+      border-color: #d1d5db;
+    }
+
+    &.google-btn {
+      color: #000;
+    }
+
+    &.apple-btn {
+      color: #000;
+    }
+
+    mat-icon {
+      margin-right: 8px;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// Clean responsive design
+@media (max-width: 600px) {
+  .auth-container {
+    padding: 16px;
+  }
+
+  .auth-card {
+    .mat-mdc-card-content {
+      padding: 32px 24px;
+    }
+  }
+
+  .auth-header {
+    margin-bottom: 24px;
+
+    .auth-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    h1 {
+      font-size: 24px;
+    }
+  }
+
+  .social-login {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-form .auth-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    .forgot-password {
+      align-self: flex-end;
+    }
+  }
+}

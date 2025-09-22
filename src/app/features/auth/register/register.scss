@@ -1,0 +1,706 @@
+// Force light theme overrides for register page
+:host {
+  background: #f5f5f5 !important;
+  color: #1f2937 !important;
+}
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5 !important; // Light background matching login - force override
+  padding: 16px;
+}
+
+.auth-card-wrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-card {
+  max-width: 480px;
+  width: 100%;
+  padding: 40px;
+  background: #ffffff !important; // Clean white surface - force override
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); // Very subtle shadow
+  border-radius: 12px;
+  border: 1px solid #e5e7eb; // Light border
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .auth-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: #0078d4; // Clean Azure blue
+    border-radius: 8px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0, 120, 212, 0.2); // Subtle shadow
+
+    .mat-icon {
+      color: #ffffff;
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1f2937; // Darker gray for better readability
+    margin: 0 0 8px 0;
+    letter-spacing: -0.025em;
+    font-family: Roboto, sans-serif;
+  }
+
+  .auth-subtitle {
+    font-size: 16px;
+    color: #6b7280; // Medium gray
+    margin: 0 0 24px 0;
+    font-weight: 400;
+    line-height: 1.5;
+    font-family: Roboto, sans-serif;
+  }
+
+  .auth-link-text {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+    font-family: Roboto, sans-serif;
+
+    .auth-link {
+      color: #0078d4;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 200ms ease;
+
+      &:hover {
+        color: #005a9e;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.auth-form {
+  .full-width {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .required {
+    color: #ef4444;
+  }
+
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      background-color: #f9fafb; // Very light gray background
+      border-radius: 6px;
+
+      .mat-mdc-form-field-outline {
+        color: #d1d5db; // Light gray border
+      }
+
+      &:hover .mat-mdc-form-field-outline {
+        color: #9ca3af;
+      }
+
+      &.mdc-text-field--focused .mat-mdc-form-field-outline {
+        color: #0078d4; // Azure blue focus
+      }
+    }
+
+    .mat-mdc-form-field-input-control input {
+      padding: 14px 16px;
+      font-size: 15px;
+      color: #374151;
+      font-family: Roboto, sans-serif;
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      margin-top: 8px;
+    }
+
+    .mat-mdc-form-field-error {
+      color: #ef4444;
+      font-size: 13px;
+      font-family: Roboto, sans-serif;
+    }
+  }
+}
+
+.terms-agreement {
+  margin-bottom: 24px;
+
+  .mat-mdc-checkbox {
+    .mdc-form-field {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+      font-family: Roboto, sans-serif;
+    }
+
+    .mdc-checkbox__background {
+      border-color: #d1d5db;
+    }
+
+    &.mat-mdc-checkbox-checked .mdc-checkbox__background {
+      background-color: #0078d4;
+      border-color: #0078d4;
+    }
+  }
+
+  .terms-link {
+    color: #0078d4;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      color: #005a9e;
+      text-decoration: underline;
+    }
+  }
+
+  .field-error {
+    color: #ef4444;
+    font-size: 13px;
+    font-family: Roboto, sans-serif;
+    margin-top: 8px;
+    display: block;
+  }
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  margin-bottom: 24px;
+  color: #dc2626;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+
+  .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Clean, minimal button styling
+.auth-submit-btn {
+  width: 100%;
+  height: 44px; // Clean height
+  background-color: #0078d4; // Azure blue
+  color: #ffffff;
+  border: none;
+  border-radius: 6px; // Smaller radius
+  font-size: 15px;
+  font-weight: 500; // Lighter weight
+  font-family: Roboto, sans-serif;
+  transition: all 150ms ease; // Simpler transition
+  margin-bottom: 24px;
+
+  &:hover:not(:disabled) {
+    background-color: #106ebe; // Lighter hover
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #9ca3af;
+  }
+
+  .mat-mdc-progress-spinner {
+    margin-right: 8px;
+
+    circle {
+      stroke: #ffffff;
+    }
+  }
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+}
+
+.auth-divider {
+  position: relative;
+  margin: 28px 0;
+  text-align: center;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e5e7eb; // Simple gray line
+  }
+
+  span {
+    background: #ffffff;
+    color: #9ca3af;
+    padding: 0 16px;
+    font-size: 14px;
+    font-family: Roboto, sans-serif;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.social-login {
+  display: flex;
+  gap: 12px;
+
+  .social-btn {
+    flex: 1;
+    height: 44px; // Clean height
+    border-radius: 6px; // Smaller radius
+    font-size: 14px;
+    font-weight: 500;
+    font-family: Roboto, sans-serif;
+    transition: all 150ms ease; // Simpler transition
+    background: #ffffff;
+    border: 1px solid #e5e7eb; // Thinner border
+
+    &:hover {
+      background: #f9fafb; // Light gray on hover
+      border-color: #d1d5db;
+    }
+
+    .mat-icon {
+      margin-right: 8px;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &.google-btn {
+      color: #4285f4;
+    }
+
+    &.apple-btn {
+      color: #000;
+    }
+  }
+}
+
+// Clean responsive design
+@media (max-width: 600px) {
+  .auth-container {
+    padding: 16px;
+  }
+
+  .auth-card {
+    .mat-mdc-card-content {
+      padding: 32px 24px;
+    }
+  }
+
+  .auth-header {
+    margin-bottom: 24px;
+
+    .auth-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+
+      .mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    h1 {
+      font-size: 24px;
+    }
+  }
+
+  .social-login {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    .mat-mdc-card-content {
+      padding: 24px 20px;
+    }
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px; // 4 * 8dp
+
+  .auth-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px; // 8 * 8dp
+    height: 64px;
+    background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%); // Azure Blue
+    border-radius: 8px; // Material Design border radius
+    margin-bottom: 24px; // 3 * 8dp
+    box-shadow: 0 4px 8px rgba(0, 120, 212, 0.3); // Azure shadow with 6dp elevation
+
+    .mat-icon {
+      color: #ffffff; // Text on primary
+      font-size: 32px; // 4 * 8dp
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #212529; // Primary text color
+    margin: 0 0 8px 0; // Bottom margin 1 * 8dp
+    letter-spacing: -0.02em;
+    font-family: Roboto, sans-serif; // Material Design font
+  }
+
+  .auth-subtitle {
+    font-size: 16px;
+    color: #6c757d; // Secondary text color
+    margin: 0 0 24px 0; // Bottom margin 3 * 8dp
+    font-weight: 400;
+    line-height: 1.5;
+    font-family: Roboto, sans-serif;
+  }
+
+  .auth-link-text {
+    font-size: 14px;
+    color: #6c757d; // Secondary text
+    margin: 0;
+    font-family: Roboto, sans-serif;
+
+    .auth-link {
+      color: #0078d4; // Primary blue
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 200ms cubic-bezier(0.4, 0, 0.2, 1); // Material Design transition
+
+      &:hover {
+        color: #005a9e; // Primary dark
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.auth-form {
+  .full-width {
+    width: 100%;
+    margin-bottom: 16px; // 2 * 8dp
+  }
+
+  // Material Design form field styling following instructions
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      background-color: #ffffff; // Surface color
+      border-radius: 8px; // Material Design border radius
+
+      .mat-mdc-form-field-outline {
+        color: rgba(0, 0, 0, 0.12); // Default outline color
+      }
+
+      &:hover .mat-mdc-form-field-outline {
+        color: rgba(0, 120, 212, 0.4); // Azure blue hover
+      }
+
+      &.mdc-text-field--focused .mat-mdc-form-field-outline {
+        color: #0078d4; // Azure blue focus state
+      }
+    }
+
+    .mat-mdc-form-field-input-control input {
+      padding: 16px 14px; // Consistent padding
+      font-size: 16px;
+      line-height: 1.5;
+      font-family: Roboto, sans-serif;
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      margin-top: 8px; // 1 * 8dp
+    }
+
+    .mat-mdc-form-field-error {
+      color: #d32f2f; // Material Design error color
+      font-size: 12px;
+      font-weight: 500;
+      font-family: Roboto, sans-serif;
+    }
+  }
+
+  .required {
+    color: #d32f2f; // Material Design error color
+  }
+}
+
+.terms-agreement {
+  margin-bottom: 24px; // 3 * 8dp
+
+  .mat-mdc-checkbox {
+    .mdc-form-field {
+      color: #6c757d; // Secondary text
+      font-size: 14px;
+      line-height: 1.5;
+      font-family: Roboto, sans-serif;
+    }
+
+    .mdc-checkbox__background {
+      border-color: #d1d5db; // Default border
+    }
+
+    &.mat-mdc-checkbox-checked .mdc-checkbox__background {
+      background-color: #0078d4; // Azure blue when checked
+      border-color: #0078d4;
+    }
+  }
+
+  .terms-link {
+    color: #0078d4; // Primary blue
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      color: #005a9e; // Primary dark
+      text-decoration: underline;
+    }
+  }
+
+  .field-error {
+    color: #d32f2f; // Material Design error color
+    font-size: 12px;
+    font-weight: 500;
+    font-family: Roboto, sans-serif;
+    margin-top: 8px; // 1 * 8dp
+    display: block;
+  }
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px; // 1 * 8dp
+  background-color: rgba(211, 47, 47, 0.1); // Error background with Material Design error color
+  color: #d32f2f; // Material Design error color
+  padding: 12px 16px; // 1.5 * 8dp and 2 * 8dp
+  border-radius: 8px; // Material Design border radius
+  margin-bottom: 24px; // 3 * 8dp
+  font-size: 14px;
+  font-weight: 500;
+  font-family: Roboto, sans-serif;
+
+  .mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Primary button styling following Material Design instructions
+.auth-submit-btn {
+  width: 100%;
+  height: 48px; // Minimum 44px touch target + padding
+  background-color: #0078d4; // Azure primary blue
+  color: #ffffff; // Text on primary
+  border: none;
+  border-radius: 8px; // Material Design border radius
+  font-size: 16px;
+  font-weight: 600;
+  font-family: Roboto, sans-serif;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 120, 212, 0.3); // 2dp elevation
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1); // Material Design transition
+  margin-bottom: 24px; // 3 * 8dp
+
+  &:hover:not(:disabled) {
+    background-color: #005a9e; // Primary dark
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 120, 212, 0.4); // 6dp elevation on hover
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background-color: #adb5bd; // Disabled color
+  }
+
+  .mat-mdc-progress-spinner {
+    margin-right: 8px; // 1 * 8dp
+
+    circle {
+      stroke: #ffffff; // White spinner on primary button
+    }
+  }
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; // 1 * 8dp
+  }
+}
+.auth-divider {
+  text-align: center;
+  margin: 32px 0 24px; // 4 * 8dp and 3 * 8dp
+  position: relative;
+  color: #6c757d; // Secondary text
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #e5e7eb 20%,
+      #e5e7eb 80%,
+      transparent
+    ); // Neutral gradient
+  }
+
+  span {
+    background: #ffffff; // Surface color
+    padding: 0 16px; // 2 * 8dp
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.social-login {
+  display: flex;
+  gap: 12px; // 1.5 * 8dp
+
+  .social-btn {
+    flex: 1;
+    height: 48px; // Minimum 44px touch target
+    border-radius: 8px; // Material Design border radius
+    font-size: 14px;
+    font-weight: 500;
+    font-family: Roboto, sans-serif;
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1); // Material Design transition
+    background: #ffffff; // Surface color
+    border: 2px solid rgba(0, 0, 0, 0.08); // Subtle border
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // 2dp elevation on hover
+    }
+
+    .mat-icon {
+      margin-right: 8px; // 1 * 8dp
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    &.google-btn {
+      color: #4285f4;
+
+      &:hover {
+        background: rgba(66, 133, 244, 0.05);
+        border-color: rgba(66, 133, 244, 0.2);
+      }
+    }
+
+    &.apple-btn {
+      color: #000;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.05);
+        border-color: rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+}
+
+// Responsive Design following Material Design breakpoints
+@media (max-width: 600px) {
+  // Material Design sm breakpoint
+  .auth-container {
+    padding: 16px; // 2 * 8dp
+  }
+
+  .auth-card {
+    margin: 16px;
+    border-radius: 8px; // Reduced border radius for mobile
+    .mat-mdc-card-content {
+      padding: 24px; // 3 * 8dp for mobile
+    }
+  }
+
+  .auth-header {
+    margin-bottom: 24px; // 3 * 8dp
+
+    h1 {
+      font-size: 28px;
+    }
+
+    .auth-subtitle {
+      font-size: 15px;
+    }
+  }
+
+  .social-login {
+    flex-direction: column;
+    gap: 8px; // 1 * 8dp
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 16px; // 2 * 8dp
+  }
+
+  .auth-card {
+    .mat-mdc-card-content {
+      padding: 20px; // Reduced padding for very small screens
+    }
+  }
+
+  .auth-header {
+    margin-bottom: 24px; // 3 * 8dp
+
+    .auth-icon {
+      width: 56px; // 7 * 8dp
+      height: 56px;
+      margin-bottom: 16px; // 2 * 8dp
+
+      .mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    h1 {
+      font-size: 24px;
+    }
+  }
+}

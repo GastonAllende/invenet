@@ -1,0 +1,113 @@
+<div class="auth-container">
+  <div class="auth-card-wrapper">
+    <mat-card class="auth-card">
+      <mat-card-content>
+        <!-- Header -->
+        <div class="auth-header">
+          <div class="auth-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <h1>Welcome Back</h1>
+          <p class="auth-subtitle">Sign in to your trading account</p>
+          <p class="auth-link-text">
+            Don't have an account?
+            <a routerLink="/register" class="auth-link">Create one now!</a>
+          </p>
+        </div>
+
+        <!-- Login Form -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+          <!-- Email Field -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email Address </mat-label>
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              placeholder="Enter your email address"
+              autocomplete="email"
+            />
+            <mat-icon matSuffix>email</mat-icon>
+            @if (getFieldError('email')) {
+            <mat-error>{{ getFieldError('email') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Password Field -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password </mat-label>
+            <input
+              matInput
+              [type]="hidePassword() ? 'password' : 'text'"
+              formControlName="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hidePassword()"
+            >
+              <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (getFieldError('password')) {
+            <mat-error>{{ getFieldError('password') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Remember Me & Forgot Password -->
+          <div class="auth-options">
+            <mat-checkbox formControlName="rememberMe" class="remember-me">
+              Remember me
+            </mat-checkbox>
+            <a href="#" class="forgot-password">Forgot password?</a>
+          </div>
+
+          <!-- Error Message -->
+          @if (error()) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            <span>{{ error() }}</span>
+          </div>
+          }
+
+          <!-- Submit Button -->
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="auth-submit-btn"
+            [disabled]="isLoading()"
+          >
+            @if (isLoading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Signing in...</span>
+            } @else {
+            <span>Sign In</span>
+            }
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="auth-divider">
+          <span>or continue with</span>
+        </div>
+
+        <!-- Social Login Options -->
+        <div class="social-login">
+          <button mat-stroked-button class="social-btn google-btn">
+            <mat-icon svgIcon="google"></mat-icon>
+            Google
+          </button>
+          <button mat-stroked-button class="social-btn apple-btn">
+            <mat-icon>apple</mat-icon>
+            Apple
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
