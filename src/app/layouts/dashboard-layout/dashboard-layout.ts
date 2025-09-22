@@ -10,7 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-dashboard-layout',
   imports: [
     CommonModule,
     RouterOutlet,
@@ -24,10 +24,10 @@ import { CommonModule } from '@angular/common';
     MatInputModule,
     MatFormFieldModule,
   ],
-  templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss',
+  templateUrl: './dashboard-layout.html',
+  styleUrl: './dashboard-layout.scss',
 })
-export class Dashboard {
+export class DashboardLayout {
   protected readonly title = signal('CREATIVE TIM');
   protected readonly notificationCount = signal(3);
 

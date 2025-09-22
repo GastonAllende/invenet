@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { Dashboard } from './dashboard/dashboard';
+import { DashboardLayout } from './layouts';
 
 export const routes: Routes = [
   // Authentication routes (public)
@@ -20,7 +20,7 @@ export const routes: Routes = [
   // Dashboard routes (protected)
   {
     path: 'dashboard',
-    component: Dashboard,
+    component: DashboardLayout,
     children: [
       {
         path: '',
