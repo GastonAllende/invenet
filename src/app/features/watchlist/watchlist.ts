@@ -109,7 +109,7 @@ export class Watchlist {
     if (!query) return this.symbols();
 
     return this.symbols().filter(
-      (symbol) =>
+      symbol =>
         symbol.symbol.toLowerCase().includes(query) ||
         symbol.name.toLowerCase().includes(query) ||
         symbol.sector.toLowerCase().includes(query)
@@ -132,11 +132,11 @@ export class Watchlist {
   });
 
   protected readonly positiveCount = computed(() => {
-    return this.symbols().filter((symbol) => symbol.change > 0).length;
+    return this.symbols().filter(symbol => symbol.change > 0).length;
   });
 
   protected readonly negativeCount = computed(() => {
-    return this.symbols().filter((symbol) => symbol.change < 0).length;
+    return this.symbols().filter(symbol => symbol.change < 0).length;
   });
 
   addSymbol(): void {
@@ -144,7 +144,7 @@ export class Watchlist {
     if (!symbolToAdd) return;
 
     // Check if symbol already exists
-    const exists = this.symbols().some((s) => s.symbol === symbolToAdd);
+    const exists = this.symbols().some(s => s.symbol === symbolToAdd);
     if (exists) {
       console.log('Symbol already in watchlist');
       return;
@@ -166,12 +166,12 @@ export class Watchlist {
     // Calculate change percent
     newWatchlistSymbol.changePercent = (newWatchlistSymbol.change / newWatchlistSymbol.price) * 100;
 
-    this.symbols.update((symbols) => [...symbols, newWatchlistSymbol]);
+    this.symbols.update(symbols => [...symbols, newWatchlistSymbol]);
     this.newSymbol = '';
   }
 
   removeSymbol(symbolToRemove: string): void {
-    this.symbols.update((symbols) => symbols.filter((symbol) => symbol.symbol !== symbolToRemove));
+    this.symbols.update(symbols => symbols.filter(symbol => symbol.symbol !== symbolToRemove));
   }
 
   getChangeColor(change: number): string {

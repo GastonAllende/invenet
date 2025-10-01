@@ -49,7 +49,7 @@ const initialAuthState: AuthState = {
 export const AuthStore = signalStore(
   { providedIn: 'root' },
   withState(initialAuthState),
-  withComputed((store) => ({
+  withComputed(store => ({
     userDisplayName: computed(() => {
       const user = store.currentUser();
       return user ? `${user.firstName} ${user.lastName}` : '';
@@ -110,10 +110,10 @@ export const AuthStore = signalStore(
           refreshToken: generateMockToken(),
           expiresIn: 3600,
         }).pipe(
-          tap((response) => {
+          tap(response => {
             handleSuccessfulAuth(response, credentials.rememberMe);
           }),
-          catchError((error) => {
+          catchError(error => {
             patchState(store, {
               isLoading: false,
               error: error.message || 'Login failed',
@@ -149,7 +149,7 @@ export const AuthStore = signalStore(
           refreshToken: generateMockToken(),
           expiresIn: 3600,
         }).pipe(
-          tap((response) => {
+          tap(response => {
             storeToken(response.token);
             storeRefreshToken(response.refreshToken);
           })
@@ -178,14 +178,14 @@ export const AuthStore = signalStore(
         const updatedUser = { ...store.currentUser()!, ...updates };
 
         return simulateApiCall<User>(updatedUser).pipe(
-          tap((user) => {
+          tap(user => {
             patchState(store, {
               currentUser: user,
               isLoading: false,
             });
             storeUser(user);
           }),
-          catchError((error) => {
+          catchError(error => {
             patchState(store, {
               isLoading: false,
               error: error.message || 'Profile update failed',
@@ -203,7 +203,7 @@ export const AuthStore = signalStore(
           tap(() => {
             patchState(store, { isLoading: false });
           }),
-          catchError((error) => {
+          catchError(error => {
             patchState(store, {
               isLoading: false,
               error: error.message || 'Password change failed',
@@ -276,7 +276,7 @@ export const AuthStore = signalStore(
     }
 
     function clearStoredAuth(): void {
-      [localStorage, sessionStorage].forEach((storage) => {
+      [localStorage, sessionStorage].forEach(storage => {
         storage.removeItem(tokenKey);
         storage.removeItem(refreshTokenKey);
         storage.removeItem(userKey);

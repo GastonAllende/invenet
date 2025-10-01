@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  signal,
-  OnInit,
-  afterNextRender,
-  Injector,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, OnInit, afterNextRender, Injector } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';

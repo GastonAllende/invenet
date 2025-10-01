@@ -25,17 +25,17 @@
   <!-- Summary Cards -->
   <div class="summary-grid">
     @for (summary of tradeSummary(); track summary.label) {
-    <mat-card class="summary-card">
-      <mat-card-content>
-        <div class="summary-content">
-          <div class="summary-info">
-            <h3 [style.color]="summary.color">{{ summary.value }}</h3>
-            <p>{{ summary.label }}</p>
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-info">
+              <h3 [style.color]="summary.color">{{ summary.value }}</h3>
+              <p>{{ summary.label }}</p>
+            </div>
+            <mat-icon class="summary-icon" [style.color]="summary.color">{{ summary.icon }}</mat-icon>
           </div>
-          <mat-icon class="summary-icon" [style.color]="summary.color">{{ summary.icon }}</mat-icon>
-        </div>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-content>
+      </mat-card>
     }
   </div>
 
@@ -49,143 +49,142 @@
 
     <mat-card-content>
       @if (trades().length === 0) {
-      <div class="empty-state">
-        <mat-icon class="empty-icon">inbox</mat-icon>
-        <h3>No trades yet</h3>
-        <p>Start trading to see your transaction history here</p>
-        <button mat-raised-button color="primary" (click)="addNewTrade()" class="empty-cta">
-          <mat-icon>add</mat-icon>
-          Create First Trade
-        </button>
-      </div>
+        <div class="empty-state">
+          <mat-icon class="empty-icon">inbox</mat-icon>
+          <h3>No trades yet</h3>
+          <p>Start trading to see your transaction history here</p>
+          <button mat-raised-button color="primary" (click)="addNewTrade()" class="empty-cta">
+            <mat-icon>add</mat-icon>
+            Create First Trade
+          </button>
+        </div>
       } @else {
-      <div class="table-container">
-        <table mat-table [dataSource]="trades()" class="trades-table" matSort>
-          <!-- Trade ID Column -->
-          <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Trade ID</th>
-            <td mat-cell *matCellDef="let trade">
-              <span class="trade-id">{{ trade.id }}</span>
-            </td>
-          </ng-container>
+        <div class="table-container">
+          <table mat-table [dataSource]="trades()" class="trades-table" matSort>
+            <!-- Trade ID Column -->
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Trade ID</th>
+              <td mat-cell *matCellDef="let trade">
+                <span class="trade-id">{{ trade.id }}</span>
+              </td>
+            </ng-container>
 
-          <!-- Symbol Column -->
-          <ng-container matColumnDef="symbol">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Symbol</th>
-            <td mat-cell *matCellDef="let trade">
-              <div class="symbol-cell">
-                <strong class="symbol-code">{{ trade.symbol }}</strong>
-              </div>
-            </td>
-          </ng-container>
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="symbol">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Symbol</th>
+              <td mat-cell *matCellDef="let trade">
+                <div class="symbol-cell">
+                  <strong class="symbol-code">{{ trade.symbol }}</strong>
+                </div>
+              </td>
+            </ng-container>
 
-          <!-- Type Column -->
-          <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef>Type</th>
-            <td mat-cell *matCellDef="let trade">
-              <mat-chip
-                class="type-chip"
-                [class.buy-chip]="trade.type === 'buy'"
-                [class.sell-chip]="trade.type === 'sell'"
-              >
-                {{ trade.type | uppercase }}
-              </mat-chip>
-            </td>
-          </ng-container>
-
-          <!-- Quantity Column -->
-          <ng-container matColumnDef="quantity">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantity</th>
-            <td mat-cell *matCellDef="let trade">
-              <span class="quantity-value">{{ trade.quantity | number }}</span>
-            </td>
-          </ng-container>
-
-          <!-- Price Column -->
-          <ng-container matColumnDef="price">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
-            <td mat-cell *matCellDef="let trade">
-              <span class="price-value">{{ trade.price | currency }}</span>
-            </td>
-          </ng-container>
-
-          <!-- Total Column -->
-          <ng-container matColumnDef="total">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
-            <td mat-cell *matCellDef="let trade">
-              <strong class="total-value">{{ trade.total | currency }}</strong>
-            </td>
-          </ng-container>
-
-          <!-- Date Column -->
-          <ng-container matColumnDef="date">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
-            <td mat-cell *matCellDef="let trade">
-              <span class="date-value">{{ trade.date | date : 'short' }}</span>
-            </td>
-          </ng-container>
-
-          <!-- Status Column -->
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef>Status</th>
-            <td mat-cell *matCellDef="let trade">
-              <mat-chip
-                class="status-chip"
-                [class.completed-chip]="trade.status === 'completed'"
-                [class.pending-chip]="trade.status === 'pending'"
-                [class.cancelled-chip]="trade.status === 'cancelled'"
-              >
-                {{ trade.status | uppercase }}
-              </mat-chip>
-            </td>
-          </ng-container>
-
-          <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let trade">
-              <div class="actions-cell">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  matTooltip="View Details"
-                  (click)="viewTrade(trade)"
-                  class="action-btn"
+            <!-- Type Column -->
+            <ng-container matColumnDef="type">
+              <th mat-header-cell *matHeaderCellDef>Type</th>
+              <td mat-cell *matCellDef="let trade">
+                <mat-chip
+                  class="type-chip"
+                  [class.buy-chip]="trade.type === 'buy'"
+                  [class.sell-chip]="trade.type === 'sell'"
                 >
-                  <mat-icon>visibility</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="accent"
-                  matTooltip="Edit Trade"
-                  (click)="editTrade(trade)"
-                  class="action-btn"
-                  [disabled]="trade.status === 'completed'"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                @if (trade.status === 'pending') {
-                <button
-                  mat-icon-button
-                  color="warn"
-                  matTooltip="Cancel Trade"
-                  (click)="cancelTrade(trade)"
-                  class="action-btn"
-                >
-                  <mat-icon>cancel</mat-icon>
-                </button>
-                }
-              </div>
-            </td>
-          </ng-container>
+                  {{ trade.type | uppercase }}
+                </mat-chip>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="table-row"></tr>
-        </table>
-      </div>
+            <!-- Quantity Column -->
+            <ng-container matColumnDef="quantity">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantity</th>
+              <td mat-cell *matCellDef="let trade">
+                <span class="quantity-value">{{ trade.quantity | number }}</span>
+              </td>
+            </ng-container>
 
-      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons class="table-paginator">
-      </mat-paginator>
+            <!-- Price Column -->
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+              <td mat-cell *matCellDef="let trade">
+                <span class="price-value">{{ trade.price | currency }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Total Column -->
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
+              <td mat-cell *matCellDef="let trade">
+                <strong class="total-value">{{ trade.total | currency }}</strong>
+              </td>
+            </ng-container>
+
+            <!-- Date Column -->
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+              <td mat-cell *matCellDef="let trade">
+                <span class="date-value">{{ trade.date | date: 'short' }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let trade">
+                <mat-chip
+                  class="status-chip"
+                  [class.completed-chip]="trade.status === 'completed'"
+                  [class.pending-chip]="trade.status === 'pending'"
+                  [class.cancelled-chip]="trade.status === 'cancelled'"
+                >
+                  {{ trade.status | uppercase }}
+                </mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let trade">
+                <div class="actions-cell">
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    matTooltip="View Details"
+                    (click)="viewTrade(trade)"
+                    class="action-btn"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    color="accent"
+                    matTooltip="Edit Trade"
+                    (click)="editTrade(trade)"
+                    class="action-btn"
+                    [disabled]="trade.status === 'completed'"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  @if (trade.status === 'pending') {
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      matTooltip="Cancel Trade"
+                      (click)="cancelTrade(trade)"
+                      class="action-btn"
+                    >
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  }
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns" class="table-row"></tr>
+          </table>
+        </div>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons class="table-paginator"> </mat-paginator>
       }
     </mat-card-content>
   </mat-card>

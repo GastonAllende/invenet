@@ -21,17 +21,17 @@
   <!-- AI Features Summary -->
   <div class="summary-grid">
     @for (feature of aiFeatures(); track feature.title) {
-    <mat-card class="summary-card">
-      <mat-card-content>
-        <div class="summary-content">
-          <div class="summary-info">
-            <h3 [style.color]="feature.color">{{ feature.title }}</h3>
-            <p>{{ feature.description }}</p>
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-info">
+              <h3 [style.color]="feature.color">{{ feature.title }}</h3>
+              <p>{{ feature.description }}</p>
+            </div>
+            <mat-icon class="summary-icon" [style.color]="feature.color">{{ feature.icon }}</mat-icon>
           </div>
-          <mat-icon class="summary-icon" [style.color]="feature.color">{{ feature.icon }}</mat-icon>
-        </div>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-content>
+      </mat-card>
     }
   </div>
 
@@ -46,58 +46,59 @@
     <mat-card-content>
       <!-- Quick Actions -->
       @if (chatHistory().length === 0) {
-      <div class="quick-actions">
-        <h4>Quick Questions:</h4>
-        <div class="quick-buttons">
-          @for (quickQuestion of quickQuestions(); track quickQuestion) {
-          <mat-chip (click)="askQuickQuestion(quickQuestion)" class="quick-chip">
-            {{ quickQuestion }}
-          </mat-chip>
-          }
+        <div class="quick-actions">
+          <h4>Quick Questions:</h4>
+          <div class="quick-buttons">
+            @for (quickQuestion of quickQuestions(); track quickQuestion) {
+              <mat-chip (click)="askQuickQuestion(quickQuestion)" class="quick-chip">
+                {{ quickQuestion }}
+              </mat-chip>
+            }
+          </div>
         </div>
-      </div>
       }
 
       <!-- Chat Messages -->
       @if (chatHistory().length > 0) {
-      <div class="chat-messages">
-        @for (message of chatHistory(); track message.id) {
-        <div
-          class="message"
-          [class.user-message]="message.type === 'user'"
-          [class.ai-message]="message.type === 'ai'"
-        >
-          <div class="message-content">
-            <div class="message-header">
-              <mat-icon class="message-icon">
-                {{ message.type === 'user' ? 'person' : 'smart_toy' }}
-              </mat-icon>
-              <span class="message-time">{{ message.timestamp | date : 'short' }}</span>
+        <div class="chat-messages">
+          @for (message of chatHistory(); track message.id) {
+            <div
+              class="message"
+              [class.user-message]="message.type === 'user'"
+              [class.ai-message]="message.type === 'ai'"
+            >
+              <div class="message-content">
+                <div class="message-header">
+                  <mat-icon class="message-icon">
+                    {{ message.type === 'user' ? 'person' : 'smart_toy' }}
+                  </mat-icon>
+                  <span class="message-time">{{ message.timestamp | date: 'short' }}</span>
+                </div>
+                <div class="message-text">
+                  @if (message.type === 'user') {
+                    <strong>You:</strong> {{ message.question }}
+                  } @else {
+                    <strong>AI:</strong> {{ message.answer }}
+                  }
+                </div>
+              </div>
             </div>
-            <div class="message-text">
-              @if (message.type === 'user') {
-              <strong>You:</strong> {{ message.question }}
-              } @else {
-              <strong>AI:</strong> {{ message.answer }}
-              }
+          }
+          @if (isLoading()) {
+            <div class="message ai-message">
+              <div class="message-content">
+                <div class="message-header">
+                  <mat-icon class="message-icon">smart_toy</mat-icon>
+                  <span class="message-time">Thinking...</span>
+                </div>
+                <div class="message-text">
+                  <mat-spinner diameter="24"></mat-spinner>
+                  <span style="margin-left: 12px">AI is processing your request...</span>
+                </div>
+              </div>
             </div>
-          </div>
+          }
         </div>
-        } @if (isLoading()) {
-        <div class="message ai-message">
-          <div class="message-content">
-            <div class="message-header">
-              <mat-icon class="message-icon">smart_toy</mat-icon>
-              <span class="message-time">Thinking...</span>
-            </div>
-            <div class="message-text">
-              <mat-spinner diameter="24"></mat-spinner>
-              <span style="margin-left: 12px">AI is processing your request...</span>
-            </div>
-          </div>
-        </div>
-        }
-      </div>
       }
 
       <!-- Chat Input -->
@@ -112,12 +113,7 @@
           />
           <mat-icon matSuffix>chat</mat-icon>
         </mat-form-field>
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="sendMessage()"
-          [disabled]="!currentMessage || isLoading()"
-        >
+        <button mat-raised-button color="primary" (click)="sendMessage()" [disabled]="!currentMessage || isLoading()">
           <mat-icon>send</mat-icon>
           Send
         </button>

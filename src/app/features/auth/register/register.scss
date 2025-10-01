@@ -243,7 +243,7 @@
   text-align: center;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 0;
@@ -570,19 +570,13 @@
   font-family: Roboto, sans-serif;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      #e5e7eb 20%,
-      #e5e7eb 80%,
-      transparent
-    ); // Neutral gradient
+    background: linear-gradient(90deg, transparent, #e5e7eb 20%, #e5e7eb 80%, transparent); // Neutral gradient
   }
 
   span {

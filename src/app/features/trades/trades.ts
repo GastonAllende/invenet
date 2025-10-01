@@ -98,17 +98,7 @@ export class Trades {
     },
   ]);
 
-  displayedColumns: string[] = [
-    'id',
-    'symbol',
-    'type',
-    'quantity',
-    'price',
-    'total',
-    'date',
-    'status',
-    'actions',
-  ];
+  displayedColumns: string[] = ['id', 'symbol', 'type', 'quantity', 'price', 'total', 'date', 'status', 'actions'];
 
   addNewTrade(): void {
     console.log('Add new trade');
@@ -133,9 +123,7 @@ export class Trades {
   cancelTrade(trade: Trade): void {
     console.log('Cancel trade:', trade);
     // In a real app, this would send a cancel request to the API
-    this.trades.update((trades) =>
-      trades.map((t) => (t.id === trade.id ? { ...t, status: 'cancelled' as const } : t))
-    );
+    this.trades.update(trades => trades.map(t => (t.id === trade.id ? { ...t, status: 'cancelled' as const } : t)));
   }
 
   getStatusColor(status: string): string {

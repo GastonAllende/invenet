@@ -20,16 +20,10 @@
           <!-- Name Field -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Name <span class="required">*</span></mat-label>
-            <input
-              matInput
-              type="text"
-              formControlName="name"
-              placeholder="Enter name"
-              autocomplete="name"
-            />
+            <input matInput type="text" formControlName="name" placeholder="Enter name" autocomplete="name" />
             <mat-icon matSuffix>person</mat-icon>
             @if (getFieldError('name')) {
-            <mat-error>{{ getFieldError('name') }}</mat-error>
+              <mat-error>{{ getFieldError('name') }}</mat-error>
             }
           </mat-form-field>
 
@@ -45,7 +39,7 @@
             />
             <mat-icon matSuffix>email</mat-icon>
             @if (getFieldError('email')) {
-            <mat-error>{{ getFieldError('email') }}</mat-error>
+              <mat-error>{{ getFieldError('email') }}</mat-error>
             }
           </mat-form-field>
 
@@ -70,7 +64,7 @@
               <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
             @if (getFieldError('password')) {
-            <mat-error>{{ getFieldError('password') }}</mat-error>
+              <mat-error>{{ getFieldError('password') }}</mat-error>
             }
           </mat-form-field>
 
@@ -95,7 +89,7 @@
               <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
             @if (getFieldError('confirmPassword')) {
-            <mat-error>{{ getFieldError('confirmPassword') }}</mat-error>
+              <mat-error>{{ getFieldError('confirmPassword') }}</mat-error>
             }
           </mat-form-field>
 
@@ -108,31 +102,25 @@
               <a href="#" class="terms-link">Privacy Policy</a>
             </mat-checkbox>
             @if (getFieldError('agreeToTerms')) {
-            <div class="field-error">{{ getFieldError('agreeToTerms') }}</div>
+              <div class="field-error">{{ getFieldError('agreeToTerms') }}</div>
             }
           </div>
 
           <!-- Error Message -->
           @if (error()) {
-          <div class="error-message">
-            <mat-icon>error</mat-icon>
-            <span>{{ error() }}</span>
-          </div>
+            <div class="error-message">
+              <mat-icon>error</mat-icon>
+              <span>{{ error() }}</span>
+            </div>
           }
 
           <!-- Submit Button -->
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            class="auth-submit-btn"
-            [disabled]="isLoading()"
-          >
+          <button mat-raised-button color="primary" type="submit" class="auth-submit-btn" [disabled]="isLoading()">
             @if (isLoading()) {
-            <mat-spinner diameter="20"></mat-spinner>
-            <span>Creating Account...</span>
+              <mat-spinner diameter="20"></mat-spinner>
+              <span>Creating Account...</span>
             } @else {
-            <span>Register</span>
+              <span>Register</span>
             }
           </button>
         </form>

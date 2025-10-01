@@ -70,11 +70,7 @@
         <!-- Search -->
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Search symbols...</mat-label>
-          <input
-            matInput
-            [(ngModel)]="searchQuery"
-            placeholder="Search by symbol, name, or sector"
-          />
+          <input matInput [(ngModel)]="searchQuery" placeholder="Search by symbol, name, or sector" />
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
 
@@ -112,131 +108,133 @@
       <mat-icon mat-card-avatar class="table-avatar">list</mat-icon>
       <mat-card-title>Your Watchlist</mat-card-title>
       <mat-card-subtitle>
-        {{ filteredSymbols().length }} symbol@if (filteredSymbols().length !== 1) {s} @if
-        (searchQuery()) { (filtered from {{ symbols().length }}) }
+        {{ filteredSymbols().length }} symbol
+        @if (filteredSymbols().length !== 1) {
+          s
+        }
+        @if (searchQuery()) {
+          (filtered from {{ symbols().length }})
+        }
       </mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content>
       @if (filteredSymbols().length === 0) {
-      <div class="empty-state">
-        <mat-icon class="empty-icon">inbox</mat-icon>
-        <h3>
-          @if (searchQuery()) { No symbols match your search } @else { Your watchlist is empty }
-        </h3>
-        <p>
-          @if (searchQuery()) { Try adjusting your search terms } @else { Add some symbols to start
-          tracking their performance }
-        </p>
-      </div>
+        <div class="empty-state">
+          <mat-icon class="empty-icon">inbox</mat-icon>
+          <h3>
+            @if (searchQuery()) {
+              No symbols match your search
+            } @else {
+              Your watchlist is empty
+            }
+          </h3>
+          <p>
+            @if (searchQuery()) {
+              Try adjusting your search terms
+            } @else {
+              Add some symbols to start tracking their performance
+            }
+          </p>
+        </div>
       } @else {
-      <div class="table-container">
-        <table mat-table [dataSource]="filteredSymbols()" class="watchlist-table">
-          <!-- Symbol Column -->
-          <ng-container matColumnDef="symbol">
-            <th mat-header-cell *matHeaderCellDef>Symbol</th>
-            <td mat-cell *matCellDef="let symbol">
-              <div class="symbol-cell">
-                <strong class="symbol-code">{{ symbol.symbol }}</strong>
-              </div>
-            </td>
-          </ng-container>
-
-          <!-- Name Column -->
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Company</th>
-            <td mat-cell *matCellDef="let symbol">
-              <div class="name-cell">
-                <span class="company-name">{{ symbol.name }}</span>
-                <span class="sector-tag">{{ symbol.sector }}</span>
-              </div>
-            </td>
-          </ng-container>
-
-          <!-- Price Column -->
-          <ng-container matColumnDef="price">
-            <th mat-header-cell *matHeaderCellDef>Price</th>
-            <td mat-cell *matCellDef="let symbol">
-              <strong class="price-value">{{ formatCurrency(symbol.price) }}</strong>
-            </td>
-          </ng-container>
-
-          <!-- Change Column -->
-          <ng-container matColumnDef="change">
-            <th mat-header-cell *matHeaderCellDef>Change</th>
-            <td mat-cell *matCellDef="let symbol">
-              <div class="change-cell" [style.color]="getChangeColor(symbol.change)">
-                <mat-icon class="change-icon">{{ getChangeIcon(symbol.change) }}</mat-icon>
-                <div class="change-values">
-                  <span class="change-amount">{{ formatCurrency(symbol.change) }}</span>
-                  <span class="change-percent">{{ formatPercent(symbol.changePercent) }}</span>
+        <div class="table-container">
+          <table mat-table [dataSource]="filteredSymbols()" class="watchlist-table">
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="symbol">
+              <th mat-header-cell *matHeaderCellDef>Symbol</th>
+              <td mat-cell *matCellDef="let symbol">
+                <div class="symbol-cell">
+                  <strong class="symbol-code">{{ symbol.symbol }}</strong>
                 </div>
-              </div>
-            </td>
-          </ng-container>
+              </td>
+            </ng-container>
 
-          <!-- Volume Column -->
-          <ng-container matColumnDef="volume">
-            <th mat-header-cell *matHeaderCellDef>Volume</th>
-            <td mat-cell *matCellDef="let symbol">
-              <span class="volume-value">{{ formatNumber(symbol.volume) }}</span>
-            </td>
-          </ng-container>
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Company</th>
+              <td mat-cell *matCellDef="let symbol">
+                <div class="name-cell">
+                  <span class="company-name">{{ symbol.name }}</span>
+                  <span class="sector-tag">{{ symbol.sector }}</span>
+                </div>
+              </td>
+            </ng-container>
 
-          <!-- Market Cap Column -->
-          <ng-container matColumnDef="marketCap">
-            <th mat-header-cell *matHeaderCellDef>Market Cap</th>
-            <td mat-cell *matCellDef="let symbol">
-              <span class="market-cap-value">{{ symbol.marketCap }}</span>
-            </td>
-          </ng-container>
+            <!-- Price Column -->
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef>Price</th>
+              <td mat-cell *matCellDef="let symbol">
+                <strong class="price-value">{{ formatCurrency(symbol.price) }}</strong>
+              </td>
+            </ng-container>
 
-          <!-- Sector Column -->
-          <ng-container matColumnDef="sector">
-            <th mat-header-cell *matHeaderCellDef>Sector</th>
-            <td mat-cell *matCellDef="let symbol">
-              <mat-chip class="sector-chip">{{ symbol.sector }}</mat-chip>
-            </td>
-          </ng-container>
+            <!-- Change Column -->
+            <ng-container matColumnDef="change">
+              <th mat-header-cell *matHeaderCellDef>Change</th>
+              <td mat-cell *matCellDef="let symbol">
+                <div class="change-cell" [style.color]="getChangeColor(symbol.change)">
+                  <mat-icon class="change-icon">{{ getChangeIcon(symbol.change) }}</mat-icon>
+                  <div class="change-values">
+                    <span class="change-amount">{{ formatCurrency(symbol.change) }}</span>
+                    <span class="change-percent">{{ formatPercent(symbol.changePercent) }}</span>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
 
-          <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let symbol">
-              <div class="actions-cell">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  matTooltip="View Details"
-                  class="action-btn"
-                >
-                  <mat-icon>info</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="accent"
-                  matTooltip="Add to Portfolio"
-                  class="action-btn"
-                >
-                  <mat-icon>add_shopping_cart</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="warn"
-                  matTooltip="Remove from Watchlist"
-                  (click)="removeSymbol(symbol.symbol)"
-                  class="action-btn"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
+            <!-- Volume Column -->
+            <ng-container matColumnDef="volume">
+              <th mat-header-cell *matHeaderCellDef>Volume</th>
+              <td mat-cell *matCellDef="let symbol">
+                <span class="volume-value">{{ formatNumber(symbol.volume) }}</span>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
-      </div>
+            <!-- Market Cap Column -->
+            <ng-container matColumnDef="marketCap">
+              <th mat-header-cell *matHeaderCellDef>Market Cap</th>
+              <td mat-cell *matCellDef="let symbol">
+                <span class="market-cap-value">{{ symbol.marketCap }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Sector Column -->
+            <ng-container matColumnDef="sector">
+              <th mat-header-cell *matHeaderCellDef>Sector</th>
+              <td mat-cell *matCellDef="let symbol">
+                <mat-chip class="sector-chip">{{ symbol.sector }}</mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let symbol">
+                <div class="actions-cell">
+                  <button mat-icon-button color="primary" matTooltip="View Details" class="action-btn">
+                    <mat-icon>info</mat-icon>
+                  </button>
+                  <button mat-icon-button color="accent" matTooltip="Add to Portfolio" class="action-btn">
+                    <mat-icon>add_shopping_cart</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    matTooltip="Remove from Watchlist"
+                    (click)="removeSymbol(symbol.symbol)"
+                    class="action-btn"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
       }
     </mat-card-content>
   </mat-card>

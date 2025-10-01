@@ -32,29 +32,27 @@
   <!-- Portfolio Statistics -->
   <div class="stats-grid">
     @for (stat of portfolioStats(); track stat.title) {
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-content">
-          <div class="stat-info">
-            <h3 [style.color]="stat.color">{{ stat.value }}</h3>
-            <p>{{ stat.title }}</p>
-            @if (stat.change) {
-            <div
-              class="change-indicator"
-              [class.positive]="stat.trend === 'positive'"
-              [class.negative]="stat.trend === 'negative'"
-            >
-              <mat-icon>{{
-                stat.trend === 'positive' ? 'arrow_upward' : 'arrow_downward'
-              }}</mat-icon>
-              {{ stat.change }}
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-info">
+              <h3 [style.color]="stat.color">{{ stat.value }}</h3>
+              <p>{{ stat.title }}</p>
+              @if (stat.change) {
+                <div
+                  class="change-indicator"
+                  [class.positive]="stat.trend === 'positive'"
+                  [class.negative]="stat.trend === 'negative'"
+                >
+                  <mat-icon>{{ stat.trend === 'positive' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                  {{ stat.change }}
+                </div>
+              }
             </div>
-            }
+            <mat-icon class="stat-icon" [style.color]="stat.color">{{ stat.icon }}</mat-icon>
           </div>
-          <mat-icon class="stat-icon" [style.color]="stat.color">{{ stat.icon }}</mat-icon>
-        </div>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-content>
+      </mat-card>
     }
   </div>
 
@@ -69,50 +67,50 @@
     <mat-card-content>
       <div class="positions-grid">
         @for (position of topPositions(); track position.symbol) {
-        <mat-card class="position-card">
-          <mat-card-content>
-            <div class="position-header">
-              <div class="symbol-info">
-                <strong class="symbol-code">{{ position.symbol }}</strong>
-                <span class="company-name">{{ position.name }}</span>
-              </div>
-              <div
-                class="position-value"
-                [class.positive]="position.trend === 'positive'"
-                [class.negative]="position.trend === 'negative'"
-              >
-                ${{ position.value }}
-              </div>
-            </div>
-
-            <div class="position-details">
-              <div class="detail-item">
-                <span class="label">Shares:</span>
-                <span class="value">{{ position.shares }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">P&L:</span>
-                <span
-                  class="value"
+          <mat-card class="position-card">
+            <mat-card-content>
+              <div class="position-header">
+                <div class="symbol-info">
+                  <strong class="symbol-code">{{ position.symbol }}</strong>
+                  <span class="company-name">{{ position.name }}</span>
+                </div>
+                <div
+                  class="position-value"
                   [class.positive]="position.trend === 'positive'"
                   [class.negative]="position.trend === 'negative'"
                 >
-                  {{ position.pnl }}
-                </span>
+                  ${{ position.value }}
+                </div>
               </div>
-            </div>
 
-            <div class="allocation-progress">
-              <mat-progress-bar
-                mode="determinate"
-                [value]="position.allocation"
-                [color]="position.trend === 'positive' ? 'primary' : 'warn'"
-              >
-              </mat-progress-bar>
-              <p class="allocation-text">{{ position.allocation }}% of portfolio</p>
-            </div>
-          </mat-card-content>
-        </mat-card>
+              <div class="position-details">
+                <div class="detail-item">
+                  <span class="label">Shares:</span>
+                  <span class="value">{{ position.shares }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">P&L:</span>
+                  <span
+                    class="value"
+                    [class.positive]="position.trend === 'positive'"
+                    [class.negative]="position.trend === 'negative'"
+                  >
+                    {{ position.pnl }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="allocation-progress">
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="position.allocation"
+                  [color]="position.trend === 'positive' ? 'primary' : 'warn'"
+                >
+                </mat-progress-bar>
+                <p class="allocation-text">{{ position.allocation }}% of portfolio</p>
+              </div>
+            </mat-card-content>
+          </mat-card>
         }
       </div>
     </mat-card-content>
@@ -129,17 +127,17 @@
     <mat-card-content>
       <div class="actions-grid">
         @for (action of quickActions(); track action.action) {
-        <mat-card
-          class="action-card"
-          (click)="handleQuickAction(action.action)"
-          [attr.aria-label]="action.title + ': ' + action.description"
-        >
-          <mat-card-content>
-            <mat-icon [style.color]="action.color">{{ action.icon }}</mat-icon>
-            <h3>{{ action.title }}</h3>
-            <p>{{ action.description }}</p>
-          </mat-card-content>
-        </mat-card>
+          <mat-card
+            class="action-card"
+            (click)="handleQuickAction(action.action)"
+            [attr.aria-label]="action.title + ': ' + action.description"
+          >
+            <mat-card-content>
+              <mat-icon [style.color]="action.color">{{ action.icon }}</mat-icon>
+              <h3>{{ action.title }}</h3>
+              <p>{{ action.description }}</p>
+            </mat-card-content>
+          </mat-card>
         }
       </div>
     </mat-card-content>

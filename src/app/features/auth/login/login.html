@@ -29,7 +29,7 @@
             />
             <mat-icon matSuffix>email</mat-icon>
             @if (getFieldError('email')) {
-            <mat-error>{{ getFieldError('email') }}</mat-error>
+              <mat-error>{{ getFieldError('email') }}</mat-error>
             }
           </mat-form-field>
 
@@ -54,39 +54,31 @@
               <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
             @if (getFieldError('password')) {
-            <mat-error>{{ getFieldError('password') }}</mat-error>
+              <mat-error>{{ getFieldError('password') }}</mat-error>
             }
           </mat-form-field>
 
           <!-- Remember Me & Forgot Password -->
           <div class="auth-options">
-            <mat-checkbox formControlName="rememberMe" class="remember-me">
-              Remember me
-            </mat-checkbox>
+            <mat-checkbox formControlName="rememberMe" class="remember-me"> Remember me </mat-checkbox>
             <a href="#" class="forgot-password">Forgot password?</a>
           </div>
 
           <!-- Error Message -->
           @if (error()) {
-          <div class="error-message">
-            <mat-icon>error</mat-icon>
-            <span>{{ error() }}</span>
-          </div>
+            <div class="error-message">
+              <mat-icon>error</mat-icon>
+              <span>{{ error() }}</span>
+            </div>
           }
 
           <!-- Submit Button -->
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            class="auth-submit-btn"
-            [disabled]="isLoading()"
-          >
+          <button mat-raised-button color="primary" type="submit" class="auth-submit-btn" [disabled]="isLoading()">
             @if (isLoading()) {
-            <mat-spinner diameter="20"></mat-spinner>
-            <span>Signing in...</span>
+              <mat-spinner diameter="20"></mat-spinner>
+              <span>Signing in...</span>
             } @else {
-            <span>Sign In</span>
+              <span>Sign In</span>
             }
           </button>
         </form>

@@ -1,12 +1,6 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-  AbstractControl,
-} from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -107,9 +101,7 @@ export class Register {
       }
       if (field.errors['minlength']) {
         const requiredLength = field.errors['minlength'].requiredLength;
-        return `${this.getFieldDisplayName(
-          fieldName
-        )} must be at least ${requiredLength} characters`;
+        return `${this.getFieldDisplayName(fieldName)} must be at least ${requiredLength} characters`;
       }
       if (field.errors['requiredTrue']) {
         return 'You must agree to the terms and conditions';
@@ -117,11 +109,7 @@ export class Register {
     }
 
     // Check for password mismatch
-    if (
-      fieldName === 'confirmPassword' &&
-      this.registerForm.errors?.['passwordMismatch'] &&
-      field?.touched
-    ) {
+    if (fieldName === 'confirmPassword' && this.registerForm.errors?.['passwordMismatch'] && field?.touched) {
       return 'Passwords do not match';
     }
 
@@ -139,7 +127,7 @@ export class Register {
   }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.registerForm.controls).forEach((key) => {
+    Object.keys(this.registerForm.controls).forEach(key => {
       this.registerForm.get(key)?.markAsTouched();
     });
   }

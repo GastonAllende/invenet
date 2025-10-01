@@ -51,7 +51,7 @@ export class Login {
         next: () => {
           this.router.navigate(['/dashboard']);
         },
-        error: (error) => {
+        error: error => {
           console.error('Login failed:', error);
         },
       });
@@ -91,7 +91,7 @@ export class Login {
   }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.loginForm.controls).forEach((key) => {
+    Object.keys(this.loginForm.controls).forEach(key => {
       this.loginForm.get(key)?.markAsTouched();
     });
   }

@@ -40,8 +40,7 @@ export class AI {
   protected readonly aiFeatures = signal([
     {
       title: 'Market Analysis',
-      description:
-        'Get AI-powered insights on market trends, price movements, and technical indicators.',
+      description: 'Get AI-powered insights on market trends, price movements, and technical indicators.',
       icon: 'analytics',
       color: '#2196f3',
       action: 'Analyze Markets',
@@ -101,7 +100,7 @@ export class AI {
       type: 'user',
     };
 
-    this.chatHistory.update((history) => [...history, userMessage]);
+    this.chatHistory.update(history => [...history, userMessage]);
     this.currentMessage = '';
     this.isLoading.set(true);
 
@@ -115,7 +114,7 @@ export class AI {
         type: 'ai',
       };
 
-      this.chatHistory.update((history) => [...history, aiResponse]);
+      this.chatHistory.update(history => [...history, aiResponse]);
       this.isLoading.set(false);
     }, 2000);
   }

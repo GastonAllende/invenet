@@ -31,7 +31,7 @@ import { Auth } from '@core';
       <p>Loading: {{ auth.isLoading() }}</p>
 
       @if (auth.error()) {
-      <p class="error">{{ auth.error() }}</p>
+        <p class="error">{{ auth.error() }}</p>
       }
 
       <button (click)="login()">Login</button>
@@ -50,7 +50,7 @@ export class MyComponent {
       })
       .subscribe({
         next: () => console.log('Login successful'),
-        error: (err) => console.error('Login failed', err),
+        error: err => console.error('Login failed', err),
       });
   }
 
@@ -171,11 +171,7 @@ export class MyService {
   }
 
   logCustomError(): void {
-    const error = this.errorHandler.createError(
-      'Custom error message',
-      500,
-      'MyService.someMethod'
-    );
+    const error = this.errorHandler.createError('Custom error message', 500, 'MyService.someMethod');
     this.errorHandler.logError(error);
   }
 }
