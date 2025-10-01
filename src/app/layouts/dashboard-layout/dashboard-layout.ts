@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -26,12 +26,13 @@ import { CommonModule } from '@angular/common';
   ],
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardLayout {
   protected readonly title = signal('CREATIVE TIM');
   protected readonly notificationCount = signal(3);
 
-  navigationItems = [
+  protected readonly navigationItems = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
     { label: 'Watchlist', icon: 'visibility', route: '/dashboard/watchlist' },
     { label: 'Trades', icon: 'trending_up', route: '/dashboard/trades' },
@@ -40,7 +41,7 @@ export class DashboardLayout {
     { label: 'Profile', icon: 'person', route: '/dashboard/user-profile' },
   ];
 
-  userMenuItems = [
+  protected readonly userMenuItems = [
     { label: 'Profile', icon: 'person', action: 'profile' },
     { label: 'Settings', icon: 'settings', action: 'settings' },
     { label: 'Logout', icon: 'logout', action: 'logout' },

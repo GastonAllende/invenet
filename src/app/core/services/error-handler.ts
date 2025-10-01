@@ -14,7 +14,7 @@ export interface AppError {
 @Injectable({
   providedIn: 'root',
 })
-export class ErrorHandler implements AngularErrorHandler {
+export class AppErrorHandler implements AngularErrorHandler {
   private router = inject(Router);
 
   handleError(error: any): void {
