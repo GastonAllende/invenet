@@ -1,10 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "WkwgHRIB1ZY=",
+  "dgSpecHash": "oOSibe/vtSY=",
   "success": true,
   "projectFilePath": "/Users/gastonsaavedra/Desktop/Projects/invenet/apps/api/Invenet.Api/Invenet.Api.csproj",
   "expectedPackageFiles": [
     "/Users/gastonsaavedra/.nuget/packages/microsoft.aspnetcore.openapi/10.0.2/microsoft.aspnetcore.openapi.10.0.2.nupkg.sha512",
+    "/Users/gastonsaavedra/.nuget/packages/microsoft.entityframeworkcore/10.0.2/microsoft.entityframeworkcore.10.0.2.nupkg.sha512",
+    "/Users/gastonsaavedra/.nuget/packages/microsoft.entityframeworkcore.abstractions/10.0.2/microsoft.entityframeworkcore.abstractions.10.0.2.nupkg.sha512",
+    "/Users/gastonsaavedra/.nuget/packages/microsoft.entityframeworkcore.analyzers/10.0.2/microsoft.entityframeworkcore.analyzers.10.0.2.nupkg.sha512",
     "/Users/gastonsaavedra/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512",
     "/Users/gastonsaavedra/.nuget/packages/namotion.reflection/3.4.3/namotion.reflection.3.4.3.nupkg.sha512",
     "/Users/gastonsaavedra/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
