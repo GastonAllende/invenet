@@ -43,4 +43,7 @@ Thumbs.db
 
 .angular
 
+# api bin
+apps/api/Invenet.Api/bin
+
 __screenshots__/

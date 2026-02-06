@@ -2,7 +2,9 @@
   "name": "@invenet/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev": "npx nx run-many -t serve -p invenet invenet-api --parallel"
+  },
   "private": true,
   "dependencies": {
     "@angular/common": "~21.1.0",
