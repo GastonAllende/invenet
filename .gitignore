@@ -52,3 +52,5 @@ Thumbs.db
 .vs/
 
 __screenshots__/
+
+vitest.config.*.timestamp*

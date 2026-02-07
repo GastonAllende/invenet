@@ -47,7 +47,6 @@
       "defaultConfiguration": "production"
     },
     "serve": {
-      "proxyConfig": "apps/invenet/proxy.conf.json",
       "continuous": true,
       "executor": "@angular/build:dev-server",
       "configurations": {

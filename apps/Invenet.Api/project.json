@@ -1,24 +1,24 @@
 {
   "name": "invenet-api",
   "projectType": "application",
-  "sourceRoot": "apps/api/Invenet.Api",
+  "sourceRoot": "apps/Invenet.Api",
   "targets": {
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet build apps/api/Invenet.Api/Invenet.Api.csproj"
+        "command": "dotnet build apps/Invenet.Api/Invenet.Api.csproj"
       }
     },
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet test apps/api/Invenet.Api/Invenet.Api.csproj"
+        "command": "dotnet test apps/Invenet.Api/Invenet.Api.csproj"
       }
     },
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet watch --project apps/api/Invenet.Api/Invenet.Api.csproj run --launch-profile https"
+        "command": "dotnet watch --project apps/Invenet.Api/Invenet.Api.csproj run --launch-profile https"
       }
     }
   }
