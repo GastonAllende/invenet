@@ -1,0 +1,41 @@
+<div class="page-center">
+  <p-card class="auth-card" header="Welcome back">
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          pInputText
+          formControlName="email"
+          placeholder="you@example.com"
+        />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <small> Enter a valid email address. </small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <p-password
+          id="password"
+          formControlName="password"
+          [feedback]="false"
+          [toggleMask]="true"
+          placeholder="••••••••"
+        ></p-password>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <small> Password is required. </small>
+        }
+      </div>
+
+      @if (errorMessage) {
+        <p-message severity="error" [text]="errorMessage"></p-message>
+      }
+      <div class="auth-actions">
+        <button pButton type="submit" [loading]="isLoading()">Sign in</button>
+        <a routerLink="/register">Create account</a>
+      </div>
+    </form>
+  </p-card>
+</div>

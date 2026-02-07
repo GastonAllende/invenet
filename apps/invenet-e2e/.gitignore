@@ -1,0 +1,15 @@
+# Playwright test artifacts
+test-results/
+playwright-report/
+playwright/.cache/
+.playwright-mcp/
+
+# Screenshots and videos
+*.png
+*.jpg
+*.jpeg
+*.webm
+*.mp4
+
+# Keep example screenshots if needed
+!docs/screenshots/

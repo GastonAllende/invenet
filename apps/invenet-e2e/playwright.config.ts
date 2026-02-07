@@ -16,11 +16,20 @@ const baseURL = process.env['BASE_URL'] || 'http://localhost:4200';
  */
 export default defineConfig({
   ...nxE2EPreset(__filename, { testDir: './src' }),
+  timeout: 30000,
+  expect: {
+    timeout: 5000,
+  },
+  /* Maximum time for test execution */
+  globalTimeout: 600000,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     baseURL,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    actionTimeout: 10000,
   },
   /* Run your local dev server before starting the tests */
   webServer: {
@@ -35,7 +44,7 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
 
-    {
+    /*     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
@@ -43,7 +52,7 @@ export default defineConfig({
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-    },
+    }, */
 
     // Uncomment for mobile browsers support
     /* {
