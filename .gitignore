@@ -43,7 +43,12 @@ Thumbs.db
 
 .angular
 
-# api bin
-apps/api/Invenet.Api/bin
+# .NET build artifacts
+**/obj/
+**/bin/
+**/bin\\Debug/
+*.user
+*.suo
+.vs/
 
 __screenshots__/
