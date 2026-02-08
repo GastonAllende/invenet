@@ -12,6 +12,12 @@ public sealed class RefreshToken
     public DateTimeOffset? RevokedAt { get; set; }
     public string? CreatedByIp { get; set; }
     public string? RevokedByIp { get; set; }
+    
+    /// <summary>
+    /// Token family ID for detecting token reuse attacks.
+    /// All tokens in a refresh chain share the same family ID.
+    /// </summary>
+    public Guid TokenFamily { get; set; }
 
     public ApplicationUser User { get; set; } = null!;
 

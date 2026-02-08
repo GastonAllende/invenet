@@ -88,11 +88,20 @@ export class RegisterComponent {
       .subscribe({
         next: () => {
           this.isLoading.set(false);
-          void this.router.navigateByUrl('/');
+          this.errorMessage = '';
+          this.errorDetails = [];
+          // Show success message and redirect to login
+          alert(
+            'Registration successful! Please check your email to verify your account.',
+          );
+          void this.router.navigateByUrl('/login');
         },
         error: (error) => {
           this.isLoading.set(false);
-          this.errorMessage = 'Unable to create account. Check your details.';
+          console.error('Registration failed:', error);
+          this.errorMessage =
+            error?.error?.message ||
+            'Unable to create account. Check your details.';
           const errors = error?.error;
           if (Array.isArray(errors)) {
             this.errorDetails = errors

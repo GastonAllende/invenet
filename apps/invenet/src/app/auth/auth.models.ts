@@ -10,9 +10,14 @@ export type AuthResponse = {
   refreshToken: string;
 };
 
+export type MessageResponse = {
+  message: string;
+};
+
 export type LoginRequest = {
   email: string;
   password: string;
+  rememberMe?: boolean;
 };
 
 export type RegisterRequest = {
@@ -23,4 +28,27 @@ export type RegisterRequest = {
 
 export type LogoutRequest = {
   refreshToken: string;
+};
+
+export type RefreshRequest = {
+  refreshToken: string;
+};
+
+export type ForgotPasswordRequest = {
+  email: string;
+};
+
+export type ResetPasswordRequest = {
+  email: string;
+  token: string;
+  newPassword: string;
+};
+
+export type ConfirmEmailRequest = {
+  email: string;
+  token: string;
+};
+
+export type ResendVerificationRequest = {
+  email: string;
 };

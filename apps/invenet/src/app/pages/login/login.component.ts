@@ -35,6 +35,7 @@ export class LoginComponent {
       validators: [Validators.required, Validators.email],
     }),
     password: this.fb.control('', { validators: [Validators.required] }),
+    rememberMe: this.fb.control(false),
   });
 
   errorMessage = '';

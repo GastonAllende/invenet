@@ -37,6 +37,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
             builder.Property(token => token.TokenHash)
                 .HasMaxLength(256)
                 .IsRequired();
+            builder.Property(token => token.TokenFamily)
+                .IsRequired();
             builder.Property(token => token.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .IsRequired();
@@ -50,6 +52,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
             builder.HasIndex(token => token.TokenHash)
                 .IsUnique();
             builder.HasIndex(token => token.UserId);
+            builder.HasIndex(token => token.TokenFamily);
 
             builder.HasOne(token => token.User)
                 .WithMany(user => user.RefreshTokens)

@@ -4,6 +4,22 @@
   gap: 0.5rem;
 }
 
+.field-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+
+  input[type='checkbox'] {
+    cursor: pointer;
+  }
+
+  label {
+    cursor: pointer;
+    user-select: none;
+  }
+}
+
 small {
   color: #b42318;
 }
@@ -11,4 +27,14 @@ small {
 a {
   color: #2563eb;
   text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.auth-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
 }
