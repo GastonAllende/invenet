@@ -34,11 +34,7 @@ import { AuthService } from '../../auth/auth.service';
             text="Password reset link sent! Please check your email."
           ></p-message>
           <div class="mt-4">
-            <button
-              pButton
-              label="Back to login"
-              (click)="goToLogin()"
-            ></button>
+            <button pButton (click)="goToLogin()">Back to login</button>
           </div>
         } @else {
           <form [formGroup]="form" (ngSubmit)="submit()">

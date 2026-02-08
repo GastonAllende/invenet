@@ -4,6 +4,7 @@ import {
   provideRouter,
   Router,
   RouterStateSnapshot,
+  UrlTree,
 } from '@angular/router';
 import { authGuard } from './auth.guard';
 import { AuthService } from './auth.service';
@@ -43,7 +44,7 @@ describe('authGuard', () => {
   it('redirects to /login when not authenticated', () => {
     authService.authenticated = false;
     const result = TestBed.runInInjectionContext(() => authGuard(route, state));
-    const tree = router.parseUrl('/login');
-    expect(JSON.stringify(result)).toBe(JSON.stringify(tree));
+    expect(result instanceof UrlTree).toBe(true);
+    expect(router.serializeUrl(result as UrlTree)).toBe('/login');
   });
 });

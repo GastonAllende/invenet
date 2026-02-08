@@ -15,6 +15,7 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
@@ -29,6 +30,7 @@ describe('AuthService', () => {
   afterEach(() => {
     httpMock.verify();
     localStorage.clear();
+    sessionStorage.clear();
   });
 
   it('stores tokens on login', () => {
@@ -41,7 +43,8 @@ describe('AuthService', () => {
       refreshToken: 'refresh-token',
     });
 
-    const stored = localStorage.getItem('invenet.auth');
+    const stored = sessionStorage.getItem('invenet.auth');
+    expect(localStorage.getItem('invenet.auth')).toBeNull();
     expect(stored).toContain('access-token');
     expect(stored).toContain('refresh-token');
   });

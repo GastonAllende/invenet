@@ -9,15 +9,33 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
 import { authInterceptor } from './auth.interceptor';
 import { AuthService } from './auth.service';
 
 class AuthServiceStub {
   token: string | null = 'token-123';
+  refreshTokenValue: string | null = null;
   cleared = false;
 
   getAccessToken() {
     return this.token;
+  }
+
+  getRefreshToken() {
+    return this.refreshTokenValue;
+  }
+
+  isAuthenticated() {
+    return !!this.token;
+  }
+
+  shouldRefreshToken() {
+    return false;
+  }
+
+  refreshToken(): Observable<unknown> {
+    return of({});
   }
 
   clearTokens() {
