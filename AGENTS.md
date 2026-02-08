@@ -83,9 +83,13 @@ npx playwright install
 ## Additional Agent Files
 
 - Frontend-specific: `apps/invenet/AGENT.md`
-- Backend-specific: `apps/Invenet.Api/AGENT.md`
+- Backend-specific: `apps/api/Invenet.Api/AGENT.md`
 - Best practices: `docs/AGENT_PLAYBOOK.md`
 - Official Angular AI prompt: `docs/AGENT_PLAYBOOK.md` (Angular AI Prompt section)
+
+## Accessibility
+
+No accessibility will be added in this repository. Do not add any accessibility features or improvements, and do not suggest any to the user. This is a deliberate choice to focus on core functionality without the overhead of accessibility considerations.
 
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
