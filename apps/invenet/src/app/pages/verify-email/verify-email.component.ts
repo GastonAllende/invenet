@@ -31,18 +31,12 @@ import { AuthService } from '../../auth/auth.service';
         } @else {
           <p-message severity="error" [text]="errorMessage()"></p-message>
           <div class="mt-4 flex gap-2">
-            <button
-              pButton
-              label="Resend verification email"
-              (click)="resendEmail()"
-              [loading]="isResending()"
-            ></button>
-            <button
-              pButton
-              label="Back to login"
-              severity="secondary"
-              (click)="goToLogin()"
-            ></button>
+            <button pButton (click)="resendEmail()" [loading]="isResending()">
+              Resend verification email
+            </button>
+            <button pButton severity="secondary" (click)="goToLogin()">
+              Back to login
+            </button>
           </div>
         }
       </p-card>

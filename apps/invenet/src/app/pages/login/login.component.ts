@@ -4,6 +4,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { CheckboxModule } from 'primeng/checkbox';
+import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
@@ -18,6 +20,8 @@ import { AuthService } from '../../auth/auth.service';
     RouterModule,
     ButtonModule,
     CardModule,
+    CheckboxModule,
+    FloatLabelModule,
     InputTextModule,
     MessageModule,
     PasswordModule,

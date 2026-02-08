@@ -1,47 +1,65 @@
 <div class="page-center">
   <p-card class="auth-card" header="Welcome back">
     <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
-      <div class="field">
-        <label for="email">Email</label>
+      <p-floatlabel variant="on">
         <input
           id="email"
           type="email"
           pInputText
+          fluid="true"
           formControlName="email"
-          placeholder="you@example.com"
+          [invalid]="form.controls.email.touched && form.controls.email.invalid"
+          autocomplete="email"
         />
-        @if (form.controls.email.touched && form.controls.email.invalid) {
-          <small> Enter a valid email address. </small>
-        }
-      </div>
+        <label for="email">Email</label>
+      </p-floatlabel>
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+        <p-message severity="error" variant="simple" size="small">
+          Enter a valid email address.
+        </p-message>
+      }
 
-      <div class="field">
-        <label for="password">Password</label>
+      <p-floatlabel variant="on">
         <p-password
-          id="password"
+          inputId="password"
+          fluid="true"
           formControlName="password"
           [feedback]="false"
           [toggleMask]="true"
-          placeholder="••••••••"
+          [invalid]="
+            form.controls.password.touched && form.controls.password.invalid
+          "
+          autocomplete="current-password"
         ></p-password>
-        @if (form.controls.password.touched && form.controls.password.invalid) {
-          <small> Password is required. </small>
-        }
-      </div>
+        <label for="password">Password</label>
+      </p-floatlabel>
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <p-message severity="error" variant="simple" size="small">
+          Password is required.
+        </p-message>
+      }
 
-      <div class="field-checkbox">
-        <input type="checkbox" id="rememberMe" formControlName="rememberMe" />
-        <label for="rememberMe">Remember me</label>
+      <div class="flex items-center gap-2">
+        <p-checkbox
+          inputId="rememberMe"
+          formControlName="rememberMe"
+          [binary]="true"
+        />
+        <label for="rememberMe" class="cursor-pointer">Remember me</label>
       </div>
 
       @if (errorMessage) {
-        <p-message severity="error" [text]="errorMessage"></p-message>
+        <p-message severity="error" icon="pi pi-times-circle">
+          {{ errorMessage }}
+        </p-message>
       }
       <div class="auth-actions">
-        <button pButton type="submit" [loading]="isLoading()">Sign in</button>
+        <button pButton type="submit" [loading]="isLoading()" class="w-full">
+          Sign in
+        </button>
         <div class="auth-links">
-          <a routerLink="/register">Create account</a>
-          <a routerLink="/forgot-password">Forgot password?</a>
+          <a routerLink="/register" class="link">Create account</a>
+          <a routerLink="/forgot-password" class="link">Forgot password?</a>
         </div>
       </div>
     </form>

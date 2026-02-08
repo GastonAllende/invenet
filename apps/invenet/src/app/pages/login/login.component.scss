@@ -1,34 +1,14 @@
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+// Component-specific styling for login page
 
-.field-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 1rem 0;
-
-  input[type='checkbox'] {
-    cursor: pointer;
-  }
-
-  label {
-    cursor: pointer;
-    user-select: none;
-  }
-}
-
-small {
-  color: #b42318;
-}
-
-a {
-  color: #2563eb;
+a.link {
+  color: #667eea;
   text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
 
   &:hover {
+    color: #5568d3;
     text-decoration: underline;
   }
 }
@@ -37,4 +17,11 @@ a {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+  user-select: none;
 }

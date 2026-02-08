@@ -10,6 +10,7 @@ import {
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
@@ -35,6 +36,7 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
     RouterModule,
     ButtonModule,
     CardModule,
+    FloatLabelModule,
     InputTextModule,
     MessageModule,
     PasswordModule,

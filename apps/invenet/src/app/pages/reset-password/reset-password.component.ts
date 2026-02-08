@@ -43,11 +43,7 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
         @if (!token() || !email()) {
           <p-message severity="error" text="Invalid reset link."></p-message>
           <div class="mt-4">
-            <button
-              pButton
-              label="Back to login"
-              (click)="goToLogin()"
-            ></button>
+            <button pButton (click)="goToLogin()">Back to login</button>
           </div>
         } @else if (isSuccess()) {
           <p-message

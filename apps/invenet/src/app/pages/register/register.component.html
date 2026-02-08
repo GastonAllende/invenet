@@ -1,75 +1,107 @@
 <div class="page-center">
   <p-card class="auth-card" header="Create your account">
     <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
-      <div class="field">
-        <label for="email">Email</label>
+      <p-floatlabel variant="on">
         <input
           id="email"
           type="email"
           pInputText
+          fluid="true"
           formControlName="email"
-          placeholder="you@example.com"
+          [invalid]="form.controls.email.touched && form.controls.email.invalid"
+          autocomplete="email"
         />
-        @if (form.controls.email.touched && form.controls.email.invalid) {
-          <small> Enter a valid email address. </small>
-        }
-      </div>
+        <label for="email">Email</label>
+      </p-floatlabel>
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+        <p-message severity="error" variant="simple" size="small">
+          Enter a valid email address.
+        </p-message>
+      }
 
-      <div class="field">
-        <label for="username">Username</label>
+      <p-floatlabel variant="on">
         <input
           id="username"
           type="text"
           pInputText
+          fluid="true"
           formControlName="username"
-          placeholder="yourname"
+          [invalid]="
+            form.controls.username.touched && form.controls.username.invalid
+          "
+          autocomplete="username"
         />
-        @if (form.controls.username.touched && form.controls.username.invalid) {
-          <small> Username must be at least 3 characters. </small>
-        }
-      </div>
+        <label for="username">Username</label>
+      </p-floatlabel>
+      @if (form.controls.username.touched && form.controls.username.invalid) {
+        <p-message severity="error" variant="simple" size="small">
+          Username must be at least 3 characters.
+        </p-message>
+      }
 
-      <div class="field">
-        <label for="password">Password</label>
+      <p-floatlabel variant="on">
         <p-password
-          id="password"
+          inputId="password"
+          fluid="true"
           formControlName="password"
           [toggleMask]="true"
+          [invalid]="
+            form.controls.password.touched && form.controls.password.invalid
+          "
+          autocomplete="new-password"
         ></p-password>
-        @if (form.controls.password.touched && form.controls.password.invalid) {
-          <small> Password must be at least 10 characters. </small>
-        }
-      </div>
+        <label for="password">Password</label>
+      </p-floatlabel>
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <p-message severity="error" variant="simple" size="small">
+          Password must be at least 10 characters.
+        </p-message>
+      }
 
-      <div class="field">
-        <label for="confirmPassword">Confirm password</label>
+      <p-floatlabel variant="on">
         <p-password
-          id="confirmPassword"
+          inputId="confirmPassword"
+          fluid="true"
           formControlName="confirmPassword"
           [feedback]="false"
           [toggleMask]="true"
+          [invalid]="
+            form.controls.confirmPassword.touched &&
+            (form.controls.confirmPassword.invalid ||
+              form.errors?.['passwordsMismatch'])
+          "
+          autocomplete="new-password"
         ></p-password>
-        @if (form.touched && form.errors?.['passwordsMismatch']) {
-          <small> Passwords do not match. </small>
-        }
-      </div>
+        <label for="confirmPassword">Confirm password</label>
+      </p-floatlabel>
+      @if (form.touched && form.errors?.['passwordsMismatch']) {
+        <p-message severity="error" variant="simple" size="small">
+          Passwords do not match.
+        </p-message>
+      }
 
       @if (errorMessage) {
-        <p-message severity="error" [text]="errorMessage"></p-message>
+        <p-message severity="error" icon="pi pi-times-circle">
+          {{ errorMessage }}
+        </p-message>
       }
       @if (errorDetails.length) {
-        <ul>
+        <div class="flex flex-col gap-2">
           @for (detail of errorDetails; track detail) {
-            <li>{{ detail }}</li>
+            <p-message severity="error" variant="simple" size="small">
+              {{ detail }}
+            </p-message>
           }
-        </ul>
+        </div>
       }
 
       <div class="auth-actions">
-        <button pButton type="submit" [loading]="isLoading()">
+        <button pButton type="submit" [loading]="isLoading()" class="w-full">
           Create account
         </button>
-        <a routerLink="/login">Already have an account?</a>
+        <a routerLink="/login" class="link text-center w-full">
+          Already have an account?
+        </a>
       </div>
     </form>
   </p-card>

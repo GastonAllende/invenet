@@ -1,14 +1,14 @@
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+// Component-specific styling for register page
 
-small {
-  color: #b42318;
-}
-
-a {
-  color: #2563eb;
+a.link {
+  color: #667eea;
   text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #5568d3;
+    text-decoration: underline;
+  }
 }
