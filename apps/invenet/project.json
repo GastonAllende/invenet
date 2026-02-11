@@ -20,7 +20,10 @@
             "input": "apps/invenet/public"
           }
         ],
-        "styles": ["apps/invenet/src/styles.scss"]
+        "styles": [
+          "apps/invenet/src/styles.scss",
+          "apps/invenet/src/tailwind.css"
+        ]
       },
       "configurations": {
         "production": {

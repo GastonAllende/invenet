@@ -10,14 +10,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 import { AuthService } from '../../auth/auth.service';
-import { AuthTailwindExampleComponent } from '@invenet/auth';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
-    //TASK:  import AuthTailwindExampleComponent from libs/auth to demonstrate Tailwind CSS integration
-    AuthTailwindExampleComponent,
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
