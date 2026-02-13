@@ -8,7 +8,7 @@ import {
   timer,
   switchMap,
 } from 'rxjs';
-import { API_BASE_URL } from '../core/api.config';
+import { API_BASE_URL } from '@invenet/core';
 import type {
   AuthResponse,
   AuthTokens,

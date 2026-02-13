@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService } from '@invenet/auth';
 
 @Component({
   selector: 'app-home',

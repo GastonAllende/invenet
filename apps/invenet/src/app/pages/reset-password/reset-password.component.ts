@@ -12,7 +12,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService } from '@invenet/auth';
 
 function matchPasswords(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;

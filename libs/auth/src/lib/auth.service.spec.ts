@@ -5,7 +5,7 @@ import {
 } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { AuthService } from './auth.service';
-import { API_BASE_URL } from '../core/api.config';
+import { API_BASE_URL } from '@invenet/core';
 
 const baseUrl = 'http://localhost:5256';
 
@@ -34,7 +34,9 @@ describe('AuthService', () => {
   });
 
   it('stores tokens on login', () => {
-    service.login({ email: 'user@example.com', password: 'Password123!' }).subscribe();
+    service
+      .login({ email: 'user@example.com', password: 'Password123!' })
+      .subscribe();
 
     const req = httpMock.expectOne(`${baseUrl}/api/auth/login`);
     req.flush({

@@ -9,7 +9,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService } from '@invenet/auth';
 
 @Component({
   selector: 'app-login',
