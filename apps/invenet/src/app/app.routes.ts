@@ -6,6 +6,7 @@ import { RegisterComponent } from './pages/register/register.component';
 import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { AppLayout } from './layout/component/app.layout';
 
 export const appRoutes: Route[] = [
   { path: 'login', component: LoginComponent },
@@ -13,6 +14,21 @@ export const appRoutes: Route[] = [
   { path: 'verify-email', component: VerifyEmailComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
-  { path: '', component: HomeComponent, canActivate: [authGuard] },
+  /*  { path: '', component: HomeComponent, canActivate: [authGuard] }, */
+  {
+    path: '',
+    component: AppLayout,
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('@invenet/dashboard').then((m) => m.Dashboard),
+      },
+      {
+        path: 'trades',
+        loadComponent: () => import('@invenet/trades').then((m) => m.Trades),
+      },
+    ],
+  },
   { path: '**', redirectTo: '' },
 ];

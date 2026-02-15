@@ -21,8 +21,8 @@
           }
         ],
         "styles": [
-          "apps/invenet/src/styles.scss",
-          "apps/invenet/src/tailwind.css"
+          "apps/invenet/src/assets/styles.scss",
+          "apps/invenet/src/assets/tailwind.css"
         ]
       },
       "configurations": {

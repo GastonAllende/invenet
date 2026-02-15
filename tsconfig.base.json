@@ -20,7 +20,8 @@
       "@invenet/accounts": ["libs/accounts/src/index.ts"],
       "@invenet/strategies": ["libs/strategies/src/index.ts"],
       "@invenet/core": ["libs/core/src/index.ts"],
-      "@invenet/dashboard": ["libs/dashboard/src/index.ts"]
+      "@invenet/dashboard": ["libs/dashboard/src/index.ts"],
+      "@invenet/analytics": ["libs/analytics/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

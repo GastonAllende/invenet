@@ -18,17 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideRouter(appRoutes),
     providePrimeNG({
-      theme: {
-        preset: Aura,
-        options: {
-          darkModeSelector: 'none', // Disable dark mode
-          cssLayer: {
-            name: 'primeng',
-            order: 'theme, base, primeng',
-          },
-        },
-      },
-      ripple: true,
+      theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } },
     }),
     { provide: API_BASE_URL, useValue: 'http://localhost:5256' },
   ],
