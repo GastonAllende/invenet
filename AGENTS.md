@@ -27,7 +27,9 @@ cd apps/Invenet.Api
 - Frontend: Angular 21.1 (Nx workspace)
 - UI library: PrimeNG
 - State management: NgRx SignalStore (`@ngrx/signals`)
-- Backend: ASP.NET Core (.NET) + Entity Framework Core
+- Backend: ASP.NET Core (.NET 10) + Entity Framework Core
+  - **Architecture**: Modular Monolith (see `apps/api/MODULAR_MONOLITH.md`)
+  - **Modules**: Auth, Trades, Health, Shared
 - Database: PostgreSQL
 
 ## Common Tasks
@@ -57,7 +59,8 @@ npx playwright install
 | App config      | apps/invenet/src/app/app.config.ts |
 | Routes          | apps/invenet/src/app/app.routes.ts |
 | API entry       | apps/Invenet.Api/Program.cs        |
-| API controllers | apps/Invenet.Api/Controllers/\*    |
+| API modules     | apps/Invenet.Api/Modules/\*        |
+| API controllers | apps/Invenet.Api/Modules/\*/API/\* |
 
 ## Workflow & Constraints
 
@@ -83,9 +86,15 @@ npx playwright install
 ## Additional Agent Files
 
 - Frontend-specific: `apps/invenet/AGENT.md`
+- Backend architecture: `apps/api/MODULAR_MONOLITH.md`
+- Module template: `apps/api/MODULE_TEMPLATE.md`
 - Backend-specific: `apps/api/Invenet.Api/AGENT.md`
 - Best practices: `docs/AGENT_PLAYBOOK.md`
 - Official Angular AI prompt: `docs/AGENT_PLAYBOOK.md` (Angular AI Prompt section)
+- Angular best practices: `docs/ANGULAR_BEST_PRACTICES.md`
+- NgRx SignalStore guide: `docs/NGRX_SIGNALSTORE_GUIDE.md`
+- Code review checklist: `docs/CODE_REVIEW_CHECKLIST.md`
+- Dependency updates: `docs/DEPENDENCY_UPDATE_GUIDE.md`
 
 ## Accessibility
 

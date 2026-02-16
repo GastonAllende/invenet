@@ -1,12 +1,17 @@
+using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
 namespace Invenet.Api.Data;
 
-public sealed class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
+/// <summary>
+/// Factory for creating ModularDbContext instances at design time.
+/// This is required for EF Core tools (migrations, scaffolding, etc.).
+/// </summary>
+public sealed class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<ModularDbContext>
 {
-    public AppDbContext CreateDbContext(string[] args)
+    public ModularDbContext CreateDbContext(string[] args)
     {
         var basePath = Directory.GetCurrentDirectory();
         var configuration = new ConfigurationBuilder()
@@ -22,13 +27,13 @@ public sealed class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<App
             throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
-        var options = new DbContextOptionsBuilder<AppDbContext>()
+        var options = new DbContextOptionsBuilder<ModularDbContext>()
             .UseNpgsql(connectionString, npgsqlOptions =>
             {
                 npgsqlOptions.CommandTimeout(60);
             })
             .Options;
 
-        return new AppDbContext(options);
+        return new ModularDbContext(options);
     }
 }

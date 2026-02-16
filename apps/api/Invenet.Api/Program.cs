@@ -1,17 +1,11 @@
-using Invenet.Api.Data;
-using Invenet.Api.Models;
-using Invenet.Api.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
+using Invenet.Api.Modules.Shared.Infrastructure;
+using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddDbContext<AppDbContext>(options =>
+// Register shared infrastructure
+builder.Services.AddDbContext<ModularDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         npgsqlOptions =>
@@ -23,49 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
             npgsqlOptions.CommandTimeout(60);
         }));
 
-builder.Services.AddIdentityCore<ApplicationUser>(options =>
-    {
-        options.User.RequireUniqueEmail = true;
-        options.SignIn.RequireConfirmedEmail = true; // Email verification required
-        options.Password.RequireDigit = true;
-        options.Password.RequireLowercase = true;
-        options.Password.RequireUppercase = true;
-        options.Password.RequireNonAlphanumeric = true;
-        options.Password.RequiredLength = 10;
-    })
-    .AddRoles<IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders(); // Required for email confirmation and password reset tokens
-
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        var jwtKey = builder.Configuration["Jwt:Key"];
-        var issuer = builder.Configuration["Jwt:Issuer"];
-        var audience = builder.Configuration["Jwt:Audience"];
-
-        if (!string.IsNullOrWhiteSpace(jwtKey))
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-                ValidateIssuer = true,
-                ValidIssuer = issuer,
-                ValidateAudience = true,
-                ValidAudience = audience,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromSeconds(30)
-            };
-        }
-    });
-
-builder.Services.AddAuthorization();
+// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevCors", policy =>
@@ -77,13 +29,18 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Add controllers
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument(config =>
 {
-    config.Title = "Invenet API";
+    config.Title = "Invenet API - Modular Monolith";
     config.Version = "v1";
+    config.Description = "API organized using modular monolith architecture";
 });
+
+// Register all modules (discovers and registers automatically)
+builder.Services.RegisterModules(builder.Configuration);
 
 var app = builder.Build();
 
@@ -107,5 +64,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Map module endpoints
+app.MapModules();
 
 app.Run();
