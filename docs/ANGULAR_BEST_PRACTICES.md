@@ -206,41 +206,25 @@ import { DashboardStore } from '@invenet/dashboard/data-access'; // In trades-fe
 
 Configured in `tsconfig.base.json`:
 
-````json
+```json
 {
   "compilerOptions": {
     "paths": {
-      "@invenet/trades-feature": ["libs/trades/trades-feature/src/index.ts"],
-      "@invenet/trades-data-access": ["libs/trades/trades-data-access/src/index.ts"],
-      "@invenet/trades-ui": ["libs/trades/trades-ui/src/index.ts"],
-      "@invenet/trades-util": ["libs/trades/trades-util/src/index.ts"],
+      "@invenet/trades/feature": ["libs/trades/feature/src/index.ts"],
+      "@invenet/trades/data-access": ["libs/trades/data-access/src/index.ts"],
+      "@invenet/trades/ui": ["libs/trades/ui/src/index.ts"],
+      "@invenet/trades/util": ["libs/trades/util/src/index.ts"],
 
-      "@invenet/dashboard-feature": ["libs/dashboard/dashboard-feature/src/index.ts"],
-      "@invenet/dashboard-data-access": ["libs/dashboard/dashboard-data-access/src/index.ts"],
-      "@invenet/dashboard-ui": ["libs/dashboard/dashboard-ui/src/index.ts"],
-      "@invenet/dashboard-util": ["libs/dashboard/dashboard-util/src/index.ts"],
+      "@invenet/dashboard/feature": ["libs/dashboard/feature/src/index.ts"],
+      "@invenet/dashboard/data-access": ["libs/dashboard/data-access/src/index.ts"],
+      "@invenet/dashboard/ui": ["libs/dashboard/ui/src/index.ts"],
+      "@invenet/dashboard/util": ["libs/dashboard/util/src/index.ts"],
 
-      "@invenet/core-util": ["libs/core/core-util
-  - API service for backend calls
-  - Repository pattern implementations
-  - Data caching logic
-- **Can depend on**: Own domain's util + shared core
-
-```typescript
-// libs/trades/data-access/src/lib/trades.store.ts
-export const TradesStore = signalStore(
-  withEntities<Trade>(),
-  withMethods((store, api = inject(TradesApiService)) => ({
-    loadTrades: rxMethod<void>(/* ... */)
-  }))
-);
-
-// libs/trades/data-access/src/lib/trades-api.service.ts
-@Injectable({ providedIn: 'root' })
-export class TradesApiService {
-  getTrades(): Observable<Trade[]> { /* ... */ }
+      "@invenet/core/util": ["libs/core/util/src/index.ts"]
+    }
+  }
 }
-````
+```
 
 #### 3. **UI Libraries** (`ui`)
 
@@ -306,28 +290,31 @@ export function formatTradeStatus(status: TradeStatus): string {
 - **Contains**: Global configs, models, utilities used across domains
 - **Example**: `libs/core/util`
 - **No dependencies** on any domain libraries
-  Domain:\*\*
+
+### Nx Best Practices
+
+**Creating New Domain:**
 
 ```bash
 # Create all 4 libraries for a new domain (e.g., "orders")
 npx nx generate @nx/angular:library feature \
-  --directory=libs/orders/orders-feature \
-  --importPath=@invenet/orders-feature \
+  --directory=libs/orders/feature \
+  --importPath=@invenet/orders/feature \
   --standalone
 
 npx nx generate @nx/angular:library data-access \
-  --directory=libs/orders/orders-data-access \
-  --importPath=@invenet/orders-data-access \
+  --directory=libs/orders/data-access \
+  --importPath=@invenet/orders/data-access \
   --standalone
 
 npx nx generate @nx/angular:library ui \
-  --directory=libs/orders/orders-ui \
-  --importPath=@invenet/orders-ui \
+  --directory=libs/orders/ui \
+  --importPath=@invenet/orders/ui \
   --standalone
 
 npx nx generate @nx/angular:library util \
-  --directory=libs/orders/orders-util \
-  --importPath=@invenet/orders-util \
+  --directory=libs/orders/util \
+  --importPath=@invenet/orders/util \
   --standalone
 ```
 
@@ -347,12 +334,7 @@ Add to `.eslintrc.json`:
             "depConstraints": [
               {
                 "sourceTag": "type:feature",
-                "onlyDependOnLibsWithTags": [
-                  "type:data-access",
-                  "type:ui",
-                  "type:util",
-                  "scope:shared"
-                ]
+                "onlyDependOnLibsWithTags": ["type:data-access", "type:ui", "type:util", "scope:shared"]
               },
               {
                 "sourceTag": "type:data-access",
@@ -366,12 +348,69 @@ Add to `.eslintrc.json`:
                 "sourceTag": "type:util",
                 "onlyDependOnLibsWithTags": ["scope:shared"]
               }
-
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
 ```
 
-# Feature library structure
+**Tag Libraries in project.json:**
 
-libs/trades/trades-feature/src/lib/
+```json
+{
+  "name": "feature",
+  "tags": ["scope:trades", "type:feature"]
+}
+```
+
+**Run Commands:**
+
+```bash
+# Serve the app
+npx nx serve invenet
+
+# Test a specific library
+npx nx test trades-data-access
+
+# Build a library
+npx nx build trades-feature
+
+# Lint a library
+npx nx lint trades-ui
+
+# Run affected commands (only what changed)
+npx nx affected:test
+npx nx affected:build
+npx nx affected:lint
+```
+
+**Nx Graph Visualization:**
+
+```bash
+# View project dependencies
+npx nx graph
+```
+
+**Library Public API (index.ts):**
+
+```typescript
+// libs/trades/feature/src/index.ts
+// Only export what consumers need
+export * from './lib/trades-page.component';
+export { TRADES_ROUTES } from './lib/trades.routes';
+
+// Don't export internal implementation details
+// ❌ export * from './lib/internal-helper.service';
+```
+
+**Organizing Library Code:**
+
+```
+# Feature library structure
+libs/trades/feature/src/lib/
 ├── trades-page.component.ts
 ├── trades-page.component.html
 ├── trades-container.component.ts
@@ -379,8 +418,39 @@ libs/trades/trades-feature/src/lib/
 └── index.ts (optional internal barrel)
 
 # Data-access library structure
+libs/trades/data-access/src/lib/
+├── stores/
+│   └── trades.store.ts
+├── services/
+│   └── trades-api.service.ts
+└── models/
+    └── trade.model.ts
 
-libs/trades/trades-data-access/src/lib/
+# UI library structure
+libs/trades/ui/src/lib/
+├── trade-table/
+│   ├── trade-table.component.ts
+│   └── trade-table.component.html
+├── trade-card/
+│   ├── trade-card.component.ts
+│   └── trade-card.component.html
+└── trade-form/
+    ├── trade-form.component.ts
+    └── trade-form.component.html
+
+# Util library structure
+libs/trades/util/src/lib/
+├── calculators/
+│   └── profit-calculator.ts
+├── formatters/
+│   └── trade-formatters.ts
+├── validators/
+│   └── trade-validators.ts
+└── mappers/
+    └── trade-mappers.ts
+```
+
+**When to Create a New Domain:**
 ├── stores/
 │ └── trades.store.ts
 ├── services/
@@ -390,7 +460,7 @@ libs/trades/trades-data-access/src/lib/
 
 # UI library structure
 
-libs/trades/trades-ui/src/lib/
+libs/trades/ui/src/lib/
 ├── trade-table/
 │ ├── trade-table.component.ts
 │ └── trade-table.component.html
@@ -403,7 +473,7 @@ libs/trades/trades-ui/src/lib/
 
 # Util library structure
 
-libs/trades/trades-util/src/lib/
+libs/trades/util/src/lib/
 ├── calculators/
 │ └── profit-calculator.ts
 ├── formatters/
@@ -424,17 +494,28 @@ libs/trades/trades-util/src/lib/
 **When to Add to Existing Domain:**
 - Feature extends existing domain logic
 - Shares the same data models
-- Would create circular dependencies if separatedag Libraries in project.json:**
-```json
-{
-  "name": "trades-feature",
-  "tags": ["scope:trades", "type:feature"]
-}
-````
+- Would create circular dependencies if separated
 
-{Each domain has 4 libraries: feature, data-access, ui, util
+### Naming Conventions
 
-- Keep library-specific code in `libs/{domain}/{domain-type}/src/lib/`
+- **Components**: `user-profile.component.ts`
+- **Services**: `user.service.ts`
+- **Directives**: `highlight.directive.ts`
+- **Pipes**: `currency-format.pipe.ts`
+- **Guards**: `auth.guard.ts`
+- **Interfaces**: `user.interface.ts` or `user.model.ts`
+
+### File Organization
+
+**General Rules:**
+- Keep related files close (component, template, styles, spec)
+- Extract large templates to separate `.html` files
+- One component/service per file
+- Max 400 lines per file (split if larger)
+
+**Nx Library Organization:**
+- Each domain has 4 libraries: feature, data-access, ui, util
+- Keep library-specific code in `libs/{domain}/{library-type}/src/lib/`
 - Use folders within `lib/` for logical grouping
 - Export only public API through `src/index.ts`
 - Co-locate tests next to the code they test (`.spec.ts` files)
@@ -450,12 +531,12 @@ libs/trades/trades-util/src/lib/
 
 ```
 libs/trades/
-├── trades-feature/src/lib/
+├── feature/src/lib/
 │   ├── trades-page.component.ts
 │   ├── trades-page.component.spec.ts
 │   └── trades.routes.ts
 │
-├── trades-data-access/src/lib/
+├── data-access/src/lib/
 │   ├── stores/
 │   │   ├── trades.store.ts
 │   │   └── trades.store.spec.ts
@@ -463,7 +544,7 @@ libs/trades/
 │       ├── trades-api.service.ts
 │       └── trades-api.service.spec.ts
 │
-├── trades-ui/src/lib/
+├── ui/src/lib/
 │   ├── trade-table/
 │   │   ├── trade-table.component.ts
 │   │   └── trade-table.component.spec.ts
@@ -471,7 +552,7 @@ libs/trades/
 │       ├── trade-card.component.ts
 │       └── trade-card.component.spec.ts
 │
-└── trades-util/src/lib/
+└── util/src/lib/
     ├── calculators.ts
     ├── calculators.spec.ts
     └── formatters.ts
@@ -479,24 +560,26 @@ libs/trades/
 
 **Public API Exports (index.ts examples):**
 
-````typescript
-// libs/trades/trades-feature/src/index.ts
+```typescript
+// libs/trades/feature/src/index.ts
 export * from './lib/trades-page.component';
 export { TRADES_ROUTES } from './lib/trades.routes';
 
-// libs/trades/trades-data-access/src/index.ts
+// libs/trades/data-access/src/index.ts
 export * from './lib/stores/trades.store';
 export * from './lib/services/trades-api.service';
 export * from './lib/models/trade.model';
 
-// libs/trades/trades-ui/src/index.ts
+// libs/trades/ui/src/index.ts
 export * from './lib/trade-table/trade-table.component';
 export * from './lib/trade-card/trade-card.component';
 
-// libs/trades/trades-util/src/index.ts
+// libs/trades/util/src/index.ts
 export * from './lib/calculators';
 export * from './lib/formatters';
-**Library Dependency Rules:**
+```
+
+## Components
 - Feature libs can depend on utility libs (e.g., `auth` → `core`)
 - Feature libs should NOT depend on other feature libs
 - Utility libs should NOT depend on feature libs
