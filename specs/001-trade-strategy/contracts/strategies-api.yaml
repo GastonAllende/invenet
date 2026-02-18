@@ -1,0 +1,600 @@
+openapi: 3.0.3
+info:
+  title: Invenet Strategies API
+  description: API for managing trading strategies and associating them with trades
+  version: 1.0.0
+  contact:
+    name: Invenet API Support
+
+servers:
+  - url: https://api.invenet.com/api
+    description: Production server
+  - url: http://localhost:5000/api
+    description: Local development server
+
+tags:
+  - name: Strategies
+    description: Trading strategy management endpoints
+  - name: Trades
+    description: Trade endpoints (modified to include strategy support)
+
+paths:
+  /strategies:
+    get:
+      tags:
+        - Strategies
+      summary: List all strategies for the authenticated user's account
+      description: Returns all active (non-deleted) strategies owned by the user's account, ordered by name
+      operationId: listStrategies
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: includeDeleted
+          in: query
+          description: Include soft-deleted strategies in the response
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StrategyResponse'
+              examples:
+                multipleStrategies:
+                  summary: Multiple strategies
+                  value:
+                    - id: 550e8400-e29b-41d4-a716-446655440001
+                      name: Breakout Momentum
+                      description: Trade on strong breakouts above resistance with volume confirmation
+                      isDeleted: false
+                      createdAt: '2026-02-01T10:00:00Z'
+updated At: '2026-02-01T10:00:00Z'
+                    - id: 550e8400-e29b-41d4-a716-446655440002
+                      name: Mean Reversion
+                      description: Buy oversold conditions using RSI
+                      isDeleted: false
+                      createdAt: '2026-02-02T14:30:00Z'
+                      updatedAt: '2026-02-05T09:15:00Z'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Strategies
+      summary: Create a new strategy
+      description: Creates a new trading strategy for the authenticated user's account
+      operationId: createStrategy
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStrategyRequest'
+            examples:
+              withDescription:
+                summary: Strategy with description
+                value:
+                  name: Breakout Momentum
+                  description: Trade on strong breakouts above resistance with volume confirmation
+              withoutDescription:
+                summary: Strategy without description
+                value:
+                  name: Scalping
+      responses:
+        '201':
+          description: Strategy created successfully
+          headers:
+            Location:
+              description: URL of the created strategy
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StrategyResponse'
+              example:
+                id: 550e8400-e29b-41d4-a716-446655440001
+                name: Breakout Momentum
+                description: Trade on strong breakouts above resistance with volume confirmation
+                isDeleted: false
+                createdAt: '2026-02-15T10:30:00Z'
+                updatedAt: '2026-02-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          description: Conflict - Strategy with this name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://api.invenet.com/errors/duplicate-strategy
+                title: Duplicate Strategy
+                status: 409
+                detail: A strategy with the name 'Breakout Momentum' already exists for your account
+                instance: /api/strategies
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /strategies/{id}:
+    get:
+      tags:
+        - Strategies
+      summary: Get a single strategy by ID
+      description: Returns details of a specific strategy owned by the user's account
+      operationId: getStrategy
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Strategy ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StrategyResponse'
+              example:
+                id: 550e8400-e29b-41d4-a716-446655440001
+                name: Breakout Momentum
+                description: Trade on strong breakouts above resistance
+                isDeleted: false
+                createdAt: '2026-02-15T10:30:00Z'
+                updatedAt: '2026-02-15T10:30:00Z'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Strategies
+      summary: Update an existing strategy
+      description: Updates the name and/or description of a strategy owned by the user's account
+      operationId: updateStrategy
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Strategy ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStrategyRequest'
+            example:
+              name: Advanced Breakout Strategy
+              description: Updated description with more details
+      responses:
+        '200':
+          description: Strategy updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StrategyResponse'
+              example:
+                id: 550e8400-e29b-41d4-a716-446655440001
+                name: Advanced Breakout Strategy
+                description: Updated description with more details
+                isDeleted: false
+                createdAt: '2026-02-15T10:30:00Z'
+                updatedAt: '2026-02-18T14:20:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Strategies
+      summary: Delete a strategy (soft delete)
+      description: Marks a strategy as deleted. It remains in the database for historical trade references but is no longer visible in strategy lists.
+      operationId: deleteStrategy
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Strategy ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Strategy deleted successfully (soft delete)
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /trades:
+    post:
+      tags:
+        - Trades
+      summary: Create a new trade (with optional strategy)
+      description: Creates a new trade entry. The strategyId field is optional and can be used to associate a strategy with the trade.
+      operationId: createTrade
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTradeRequest'
+            example:
+              symbol: AAPL
+              entryPrice: 150.00
+              exitPrice: 155.00
+              strategyId: 550e8400-e29b-41d4-a716-446655440001
+      responses:
+        '201':
+          description: Trade created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Strategy not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /trades/{id}:
+    put:
+      tags:
+        - Trades
+      summary: Update an existing trade (with optional strategy)
+      description: Updates a trade entry. The strategyId field can be added, changed, or set to null.
+      operationId: updateTrade
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTradeRequest'
+            example:
+              strategyId: 550e8400-e29b-41d4-a716-446655440002
+      responses:
+        '200':
+          description: Trade updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    StrategyResponse:
+      type: object
+      required:
+        - id
+        - name
+        - isDeleted
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the strategy
+          example: 550e8400-e29b-41d4-a716-446655440001
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Strategy name
+          example: Breakout Momentum
+        description:
+          type: string
+          nullable: true
+          maxLength: 2000
+          description: Optional strategy description
+          example: Trade on strong breakouts above resistance with volume confirmation
+        isDeleted:
+          type: boolean
+          description: Soft delete flag
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when strategy was created
+          example: '2026-02-15T10:30:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when strategy was last updated
+          example: '2026-02-15T10:30:00Z'
+
+    CreateStrategyRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Strategy name (leading/trailing whitespace will be trimmed)
+          example: Breakout Momentum
+        description:
+          type: string
+          nullable: true
+          maxLength: 2000
+          description: Optional strategy description
+          example: Trade on strong breakouts above resistance with volume confirmation
+
+    UpdateStrategyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Updated strategy name (optional)
+          example: Advanced Breakout Strategy
+        description:
+          type: string
+          nullable: true
+          maxLength: 2000
+          description: Updated strategy description (optional, null to clear)
+          example: Updated description with more details
+
+    CreateTradeRequest:
+      type: object
+      required:
+        - symbol
+        - entryPrice
+      properties:
+        symbol:
+          type: string
+          example: AAPL
+        entryPrice:
+          type: number
+          format: double
+          example: 150.00
+        exitPrice:
+          type: number
+          format: double
+          nullable: true
+          example: 155.00
+        strategyId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional strategy to associate with this trade
+          example: 550e8400-e29b-41d4-a716-446655440001
+
+    UpdateTradeRequest:
+      type: object
+      properties:
+        symbol:
+          type: string
+          example: AAPL
+        entryPrice:
+          type: number
+          format: double
+          example: 150.00
+        exitPrice:
+          type: number
+          format: double
+          nullable: true
+          example: 155.00
+        strategyId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Strategy to associate with this trade (null to remove)
+          example: 550e8400-e29b-41d4-a716-446655440002
+
+    TradeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        symbol:
+          type: string
+        entryPrice:
+          type: number
+          format: double
+        exitPrice:
+          type: number
+          format: double
+          nullable: true
+        strategyId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Associated strategy ID (if any)
+        strategyName:
+          type: string
+          nullable: true
+          description: Denormalized strategy name for display convenience
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ProblemDetails:
+      type: object
+      description: RFC 7807 Problem Details
+      properties:
+        type:
+          type: string
+          format: uri
+          description: A URI reference that identifies the problem type
+          example: https://api.invenet.com/errors/duplicate-strategy
+        title:
+          type: string
+          description: A short, human-readable summary of the problem
+          example: Duplicate Strategy
+        status:
+          type: integer
+          description: The HTTP status code
+          example: 409
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence
+          example: A strategy with the name 'Breakout Momentum' already exists for your account
+        instance:
+          type: string
+          format: uri
+          description: A URI reference that identifies the specific occurrence
+          example: /api/strategies
+
+  responses:
+    BadRequestError:
+      description: Bad Request - Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.invenet.com/errors/validation
+            title: Validation Error
+            status: 400
+            detail: Name is required and cannot be empty
+            instance: /api/strategies
+
+    UnauthorizedError:
+      description: Unauthorized - Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.invenet.com/errors/unauthorized
+            title: Unauthorized
+            status: 401
+            detail: Authentication required
+            instance: /api/strategies
+
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.invenet.com/errors/forbidden
+            title: Forbidden
+            status: 403
+            detail: This strategy belongs to a different account
+            instance: /api/strategies/550e8400-e29b-41d4-a716-446655440001
+
+    NotFoundError:
+      description: Not Found - Resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.invenet.com/errors/not-found
+            title: Not Found
+            status: 404
+            detail: Strategy with ID 550e8400-e29b-41d4-a716-446655440001 not found
+            instance: /api/strategies/550e8400-e29b-41d4-a716-446655440001
+
+    ConflictError:
+      description: Conflict - Request conflicts with current state
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.invenet.com/errors/conflict
+            title: Conflict
+            status: 409
+            detail: A strategy with this name already exists
+            instance: /api/strategies
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.invenet.com/errors/internal
+            title: Internal Server Error
+            status: 500
+            detail: An unexpected error occurred. Please try again later.
+            instance: /api/strategies
+
+security:
+  - BearerAuth: []
