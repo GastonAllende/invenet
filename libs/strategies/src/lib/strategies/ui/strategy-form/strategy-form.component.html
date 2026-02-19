@@ -1,0 +1,67 @@
+<form [formGroup]="strategyForm" (ngSubmit)="onSubmit()" class="strategy-form">
+  <div class="form-field">
+    <label for="name" class="form-label">
+      Strategy Name <span class="required">*</span>
+    </label>
+    <input
+      pInputText
+      id="name"
+      formControlName="name"
+      placeholder="Enter strategy name"
+      class="w-full"
+      [class.ng-invalid]="nameControl?.invalid && nameControl?.touched"
+    />
+    @if (nameControl?.invalid && nameControl?.touched) {
+      <small class="error-message">
+        @if (nameControl?.errors?.['required']) {
+          Strategy name is required
+        }
+        @if (nameControl?.errors?.['maxlength']) {
+          Strategy name must be 200 characters or less
+        }
+        @if (nameControl?.errors?.['pattern']) {
+          Strategy name can only contain letters, numbers, spaces, hyphens, and
+          underscores
+        }
+      </small>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="description" class="form-label"> Description </label>
+    <textarea
+      pInputTextarea
+      id="description"
+      formControlName="description"
+      placeholder="Enter strategy description (optional)"
+      rows="4"
+      class="w-full"
+      [class.ng-invalid]="
+        descriptionControl?.invalid && descriptionControl?.touched
+      "
+    ></textarea>
+    @if (descriptionControl?.invalid && descriptionControl?.touched) {
+      <small class="error-message">
+        @if (descriptionControl?.errors?.['maxlength']) {
+          Description must be 2000 characters or less
+        }
+      </small>
+    }
+  </div>
+
+  <div class="form-actions">
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="onCancel()"
+      [disabled]="isLoading()"
+    ></p-button>
+    <p-button
+      [label]="isEditMode ? 'Update Strategy' : 'Create Strategy'"
+      type="submit"
+      [disabled]="!strategyForm.valid || isLoading()"
+      [loading]="isLoading()"
+    ></p-button>
+  </div>
+</form>

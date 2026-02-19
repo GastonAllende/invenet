@@ -1,0 +1,46 @@
+.strategy-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--surface-card);
+  border-radius: var(--border-radius);
+}
+
+.list-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.strategy-name {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.strategy-description {
+  color: var(--text-color-secondary);
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-color-secondary);
+}

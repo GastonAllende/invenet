@@ -31,12 +31,6 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = inject(API_BASE_URL);
   private refreshInProgress = signal(false);
-  private autoRefreshTimer: ReturnType<typeof setInterval> | undefined;
-
-  constructor() {
-    // Start auto-refresh timer on service initialization
-    this.startAutoRefresh();
-  }
 
   login(payload: LoginRequest) {
     return this.http
@@ -153,15 +147,12 @@ export class AuthService {
   }
 
   clearTokens(): void {
-    if (this.autoRefreshTimer) {
-      clearInterval(this.autoRefreshTimer);
-    }
     localStorage.removeItem(STORAGE_KEY);
     sessionStorage.removeItem(STORAGE_KEY);
   }
 
   private storeTokens(response: AuthResponse, useLocalStorage = false): void {
-    const expiresAt = Date.now() + response.expiresInSeconds * 1000;
+    const expiresAt = new Date(response.expiresAt).getTime();
     const tokens: AuthTokens = {
       accessToken: response.accessToken,
       refreshToken: response.refreshToken,
@@ -192,16 +183,5 @@ export class AuthService {
 
   private isUsingLocalStorage(): boolean {
     return localStorage.getItem(STORAGE_KEY) !== null;
-  }
-
-  private startAutoRefresh(): void {
-    // Check every minute if token needs refresh
-    this.autoRefreshTimer = setInterval(() => {
-      if (this.shouldRefreshToken() && !this.refreshInProgress()) {
-        this.refreshToken().subscribe({
-          error: (err: unknown) => console.error('Auto-refresh failed:', err),
-        });
-      }
-    }, 60000); // Check every minute
   }
 }

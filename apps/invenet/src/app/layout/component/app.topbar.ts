@@ -1,15 +1,23 @@
 import { Component, inject } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
+import { MenuModule } from 'primeng/menu';
+import { AuthService } from '@invenet/auth';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator],
+  imports: [
+    RouterModule,
+    CommonModule,
+    StyleClassModule,
+    MenuModule,
+    AppConfigurator,
+  ],
   template: ` <div class="layout-topbar">
     <div class="layout-topbar-logo-container">
       <button
@@ -104,10 +112,22 @@ import { LayoutService } from '../service/layout.service';
             <i class="pi pi-inbox"></i>
             <span>Messages</span>
           </button>
-          <button type="button" class="layout-topbar-action">
-            <i class="pi pi-user"></i>
-            <span>Profile</span>
-          </button>
+          <div class="relative">
+            <button
+              type="button"
+              class="layout-topbar-action"
+              (click)="profileMenu.toggle($event)"
+            >
+              <i class="pi pi-user"></i>
+              <span>Profile</span>
+            </button>
+          </div>
+          <p-menu
+            #profileMenu
+            [popup]="true"
+            [model]="profileMenuItems"
+            styleClass="w-44"
+          />
         </div>
       </div>
     </div>
@@ -115,13 +135,32 @@ import { LayoutService } from '../service/layout.service';
 })
 export class AppTopbar {
   items!: MenuItem[];
+  profileMenuItems: MenuItem[] = [
+    {
+      label: 'Logout',
+      icon: 'pi pi-sign-out',
+      command: () => this.onLogout(),
+    },
+  ];
 
   layoutService = inject(LayoutService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({
       ...state,
       darkTheme: !state.darkTheme,
     }));
+  }
+
+  onLogout() {
+    this.authService.logout().subscribe({
+      next: () => void this.router.navigateByUrl('/login'),
+      error: () => {
+        this.authService.clearTokens();
+        void this.router.navigateByUrl('/login');
+      },
+    });
   }
 }

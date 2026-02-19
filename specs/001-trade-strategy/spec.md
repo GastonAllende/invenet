@@ -20,7 +20,7 @@ Traders can create, view, edit, and delete their own custom trading strategies. 
 1. **Given** a trader wants to create a new strategy, **When** they access the strategy creation form in the strategies library, **Then** they can add a new strategy with a name (required) and optional description
 2. **Given** a trader has created multiple strategies, **When** they view their strategy list, **Then** they see all their defined strategies with names and descriptions
 3. **Given** a trader wants to modify a strategy, **When** they edit the strategy name or description and save, **Then** the changes are persisted
-4. **Given** a trader wants to remove a strategy, **When** they delete it, **Then** the system either prevents deletion if trades use it OR handles orphaned trade associations appropriately
+4. **Given** a trader wants to remove a strategy, **When** they delete it, **Then** the system soft-deletes the strategy (sets isDeleted=true), preserving historical trade references while hiding it from active strategy lists
 5. **Given** a trader tries to create a strategy with a duplicate name, **When** they save it, **Then** the system prevents creation and shows an error
 
 ---
@@ -77,11 +77,13 @@ Traders can filter their trade journal to view only trades that used a specific 
 
 ### Edge Cases
 
-- What happens when a trader deletes a strategy that is assigned to existing trades?
-- How does the system handle very long strategy names (200+ characters)?
-- What if a trader tries to create duplicate strategy names?
-- Can strategies be shared between different trading accounts, or are they account-specific?
-- What happens if a trader has hundreds of strategies - how is the selection UI handled?
+- **Deleting strategy with trades**: System performs soft delete (sets isDeleted=true), preserving historical references. Strategy hidden from active lists but visible in historical trade data.
+- **Long strategy names**: System enforces 200 character maximum; frontend validates before submission; backend returns 400 Bad Request if exceeded.
+- **Long strategy descriptions**: System enforces 2000 character maximum; frontend validates before submission; backend returns 400 Bad Request if exceeded.
+- **Duplicate strategy names**: System prevents creation with database unique constraint; returns 409 Conflict with clear error message.
+- **Cross-account sharing**: Strategies are account-specific only; no sharing between accounts. Enforced by account-scoped queries and foreign key constraints.
+- **Hundreds of strategies**: Strategy selector uses PrimeNG p-dropdown with virtual scrolling to handle 100+ strategies efficiently. Performance testing validates no UI degradation up to 100 strategies per account.
+- **Assigning deleted strategy**: Backend validation prevents assignment of soft-deleted strategies; returns 400 Bad Request with clear error message.
 
 ## Requirements _(mandatory)_
 
@@ -111,12 +113,21 @@ Traders can filter their trade journal to view only trades that used a specific 
 
 ### Measurable Outcomes
 
-- **SC-001**: Users can create and assign a strategy to a trade in under 30 seconds
-- **SC-002**: Users can filter their trade journal by strategy and see results within 2 seconds
-- **SC-003**: 80% of active traders create at least one custom strategy within their first week of using the feature
-- **SC-004**: Users successfully associate strategies with at least 60% of their new trades
-- **SC-005**: No data loss when editing or deleting strategies (trades either maintain reference or are safely updated)
-- **SC-006**: System supports at least 100 custom strategies per account without UI degradation
+**Note**: Success criteria will be validated through manual testing and post-deployment monitoring. Automated performance tests included for technical metrics only.
+
+- **SC-001**: System supports at least 100 custom strategies per account with strategy list loading in under 500ms
+- **SC-002**: Trade journal filtering by strategy completes in under 2 seconds for up to 1000 trades
+- **SC-003**: Strategy creation API responds in under 200ms (database round-trip)
+- **SC-004**: No data loss when editing or deleting strategies (soft delete preserves historical trade references)
+- **SC-005**: Duplicate strategy names are prevented with clear error messages to users
+
+### Post-Deployment Metrics (Observational)
+
+These will be monitored after launch but are not automated acceptance criteria:
+
+- 80% of active traders create at least one custom strategy within their first week
+- Users associate strategies with at least 60% of their new trades
+- Users complete strategy creation and assignment workflow in under 30 seconds
 
 ## Assumptions _(optional)_
 

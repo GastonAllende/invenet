@@ -70,6 +70,7 @@ public class IdentityUserRoleConfiguration : IEntityTypeConfiguration<IdentityUs
     public void Configure(EntityTypeBuilder<IdentityUserRole<Guid>> builder)
     {
         builder.ToTable("AspNetUserRoles");
+        builder.HasKey(ur => new { ur.UserId, ur.RoleId });
     }
 }
 
@@ -86,6 +87,7 @@ public class IdentityUserLoginConfiguration : IEntityTypeConfiguration<IdentityU
     public void Configure(EntityTypeBuilder<IdentityUserLogin<Guid>> builder)
     {
         builder.ToTable("AspNetUserLogins");
+        builder.HasKey(l => new { l.LoginProvider, l.ProviderKey });
     }
 }
 
@@ -102,5 +104,6 @@ public class IdentityUserTokenConfiguration : IEntityTypeConfiguration<IdentityU
     public void Configure(EntityTypeBuilder<IdentityUserToken<Guid>> builder)
     {
         builder.ToTable("AspNetUserTokens");
+        builder.HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
     }
 }

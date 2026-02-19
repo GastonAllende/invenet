@@ -3,7 +3,6 @@ using System;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,11 +11,9 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Invenet.Api.Migrations
 {
     [DbContext(typeof(ModularDbContext))]
-    [Migration("20260208000256_AddTokenFamilyToRefreshTokens")]
-    partial class AddTokenFamilyToRefreshTokens
+    partial class ModularDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,7 +22,7 @@ namespace Invenet.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Invenet.Api.Models.ApplicationUser", b =>
+            modelBuilder.Entity("Invenet.Api.Modules.Auth.Domain.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,17 +32,13 @@ namespace Invenet.Api.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
                         .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("now()");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
@@ -60,12 +53,10 @@ namespace Invenet.Api.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
@@ -83,72 +74,144 @@ namespace Invenet.Api.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("now()");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Invenet.Api.Models.RefreshToken", b =>
+            modelBuilder.Entity("Invenet.Api.Modules.Auth.Domain.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<string>("CreatedByIp")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTimeOffset?>("RevokedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("RevokedByIp")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
-                    b.Property<Guid>("TokenFamily")
+                    b.Property<Guid?>("TokenFamily")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TokenFamily");
-
-                    b.HasIndex("TokenHash")
+                    b.HasIndex("Token")
                         .IsUnique();
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("refresh_tokens", (string)null);
+                    b.ToTable("RefreshTokens", "auth");
+                });
+
+            modelBuilder.Entity("Invenet.Api.Modules.Strategies.Domain.Strategy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId")
+                        .HasDatabaseName("ix_strategies_account_id");
+
+                    b.HasIndex("AccountId", "IsDeleted")
+                        .HasDatabaseName("ix_strategies_account_active");
+
+                    b.HasIndex("AccountId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_strategies_account_name_unique")
+                        .HasFilter("\"IsDeleted\" = FALSE");
+
+                    b.ToTable("strategies", "strategies");
+                });
+
+            modelBuilder.Entity("Invenet.Api.Modules.Trades.Domain.Trade", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("EntryPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("ExitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid?>("StrategyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId")
+                        .HasDatabaseName("ix_trades_account_id");
+
+                    b.HasIndex("StrategyId")
+                        .HasDatabaseName("ix_trades_strategy_id");
+
+                    b.HasIndex("AccountId", "StrategyId")
+                        .HasDatabaseName("ix_trades_account_strategy");
+
+                    b.ToTable("trades", "trades");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -158,22 +221,15 @@ namespace Invenet.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
                 });
@@ -197,8 +253,6 @@ namespace Invenet.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
-
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
@@ -221,8 +275,6 @@ namespace Invenet.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
@@ -242,8 +294,6 @@ namespace Invenet.Api.Migrations
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
@@ -256,8 +306,6 @@ namespace Invenet.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
@@ -281,9 +329,9 @@ namespace Invenet.Api.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Invenet.Api.Models.RefreshToken", b =>
+            modelBuilder.Entity("Invenet.Api.Modules.Auth.Domain.RefreshToken", b =>
                 {
-                    b.HasOne("Invenet.Api.Models.ApplicationUser", "User")
+                    b.HasOne("Invenet.Api.Modules.Auth.Domain.ApplicationUser", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -292,60 +340,24 @@ namespace Invenet.Api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+            modelBuilder.Entity("Invenet.Api.Modules.Trades.Domain.Trade", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Invenet.Api.Modules.Strategies.Domain.Strategy", "Strategy")
+                        .WithMany("Trades")
+                        .HasForeignKey("StrategyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Strategy");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
-                {
-                    b.HasOne("Invenet.Api.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
-                {
-                    b.HasOne("Invenet.Api.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Invenet.Api.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
-                {
-                    b.HasOne("Invenet.Api.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Invenet.Api.Models.ApplicationUser", b =>
+            modelBuilder.Entity("Invenet.Api.Modules.Auth.Domain.ApplicationUser", b =>
                 {
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Invenet.Api.Modules.Strategies.Domain.Strategy", b =>
+                {
+                    b.Navigation("Trades");
                 });
 #pragma warning restore 612, 618
         }

@@ -259,7 +259,7 @@ public sealed class AuthController : ControllerBase
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expiresAt = DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpiryMinutes"]));
+        var expiresAt = DateTimeOffset.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenMinutes"]));
 
         var claims = new[]
         {
@@ -291,7 +291,7 @@ public sealed class AuthController : ControllerBase
         {
             Token = token,
             UserId = userId,
-            ExpiresAt = DateTimeOffset.UtcNow.AddDays(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpiryDays"])),
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(Convert.ToDouble(_configuration["Jwt:RefreshTokenDays"])),
             TokenFamily = tokenFamily ?? Guid.NewGuid(),
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
@@ -333,10 +333,10 @@ public sealed class AuthController : ControllerBase
     }
 }
 
-public sealed record ResendConfirmationRequest([property: Required, EmailAddress] string Email);
-public sealed record ForgotPasswordRequest([property: Required, EmailAddress] string Email);
+public sealed record ResendConfirmationRequest([Required, EmailAddress] string Email);
+public sealed record ForgotPasswordRequest([Required, EmailAddress] string Email);
 public sealed record ResetPasswordRequest(
-    [property: Required, EmailAddress] string Email,
-    [property: Required] string Token,
-    [property: Required, MinLength(10)] string NewPassword);
-public sealed record RefreshTokenRequest([property: Required] string RefreshToken);
+    [Required, EmailAddress] string Email,
+    [Required] string Token,
+    [Required, MinLength(10)] string NewPassword);
+public sealed record RefreshTokenRequest([Required] string RefreshToken);

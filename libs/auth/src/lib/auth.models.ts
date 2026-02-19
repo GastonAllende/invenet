@@ -6,7 +6,7 @@ export type AuthTokens = {
 
 export type AuthResponse = {
   accessToken: string;
-  expiresInSeconds: number;
+  expiresAt: string; // ISO 8601 datetime string
   refreshToken: string;
 };
 
