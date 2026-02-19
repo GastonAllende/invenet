@@ -1,0 +1,29 @@
+<div class="strategy-shell">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <lib-strategy-list
+    [strategies]="strategies()"
+    [isLoading]="isLoading()"
+    (create)="onCreateStrategy()"
+    (edit)="onEditStrategy($event)"
+    (delete)="onDeleteStrategy($event)"
+  ></lib-strategy-list>
+
+  <p-dialog
+    [header]="selectedStrategy() ? 'Edit Strategy' : 'Create Strategy'"
+    [(visible)]="showFormDialog"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '500px' }"
+  >
+    <lib-strategy-form
+      [strategy]="selectedStrategy()"
+      [isLoading]="isLoading()"
+      (save)="onSaveStrategy($event)"
+      (formCancel)="onCancelForm()"
+    ></lib-strategy-form>
+  </p-dialog>
+</div>

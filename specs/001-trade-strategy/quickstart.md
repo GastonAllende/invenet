@@ -40,6 +40,7 @@ dotnet ef migrations add AddStrategiesAndTradeStrategyRelation
 ```
 
 The migration should include:
+
 - Create `strategies.strategies` table
 - Add `strategy_id` column to `trades.trades` table
 - Add indexes and constraints (see [data-model.md](./data-model.md#database-schema-postgresql))
@@ -62,7 +63,7 @@ public class Strategy : BaseEntity
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    
+
     // Navigation properties
     public Account Account { get; set; } = null!;
     public ICollection<Trade> Trades { get; set; } = new List<Trade>();
@@ -85,31 +86,31 @@ public class StrategyConfiguration : IEntityTypeConfiguration<Strategy>
     public void Configure(EntityTypeBuilder<Strategy> builder)
     {
         builder.ToTable("strategies", schema: "strategies");
-        
+
         builder.HasKey(s => s.Id);
-        
+
         builder.Property(s => s.Name)
                .IsRequired()
                .HasMaxLength(200);
-        
+
         builder.Property(s => s.Description)
                .HasMaxLength(2000);
-        
+
         builder.Property(s => s.IsDeleted)
                .IsRequired()
                .HasDefaultValue(false);
-        
+
         builder.Property(s => s.CreatedAt)
                .IsRequired();
-        
+
         builder.Property(s => s.UpdatedAt)
                .IsRequired();
-        
+
         // Unique constraint for active strategy names per account
         builder.HasIndex(s => new { s.AccountId, s.Name })
                .IsUnique()
                .HasFilter("is_deleted = FALSE");
-        
+
         // Foreign key to Account
         builder.HasOne(s => s.Account)
                .WithMany()
@@ -154,6 +155,7 @@ dotnet ef database update
 Create feature request/response files in `apps/api/Invenet.Api/Modules/Strategies/Features/`:
 
 **CreateStrategy/CreateStrategyRequest.cs**:
+
 ```csharp
 namespace Invenet.Api.Modules.Strategies.Features.CreateStrategy;
 
@@ -161,6 +163,7 @@ public record CreateStrategyRequest(string Name, string? Description = null);
 ```
 
 **CreateStrategy/CreateStrategyResponse.cs**:
+
 ```csharp
 namespace Invenet.Api.Modules.Strategies.Features.CreateStrategy;
 
@@ -212,14 +215,14 @@ public class StrategiesController : ControllerBase
         [FromQuery] bool includeDeleted = false)
     {
         var accountId = _currentUserService.AccountId;
-        
+
         var query = _context.Strategies.Where(s => s.AccountId == accountId);
-        
+
         if (!includeDeleted)
         {
             query = query.Where(s => !s.IsDeleted);
         }
-        
+
         var strategies = await query
             .OrderBy(s => s.Name)
             .Select(s => new StrategyResponse(
@@ -231,7 +234,7 @@ public class StrategiesController : ControllerBase
                 s.UpdatedAt
             ))
             .ToListAsync();
-        
+
         return Ok(strategies);
     }
 
@@ -239,7 +242,7 @@ public class StrategiesController : ControllerBase
     public async Task<ActionResult<StrategyResponse>> Get(Guid id)
     {
         var accountId = _currentUserService.AccountId;
-        
+
         var strategy = await _context.Strategies
             .Where(s => s.Id == id && s.AccountId == accountId)
             .Select(s => new StrategyResponse(
@@ -251,12 +254,12 @@ public class StrategiesController : ControllerBase
                 s.UpdatedAt
             ))
             .FirstOrDefaultAsync();
-        
+
         if (strategy == null)
         {
             return NotFound();
         }
-        
+
         return Ok(strategy);
     }
 
@@ -265,25 +268,25 @@ public class StrategiesController : ControllerBase
         [FromBody] CreateStrategyRequest request)
     {
         var accountId = _currentUserService.AccountId;
-        
+
         // Validate
         var trimmedName = request.Name?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(trimmedName))
         {
             return BadRequest("Name is required");
         }
-        
+
         // Check for duplicate
         var exists = await _context.Strategies
-            .AnyAsync(s => s.AccountId == accountId 
-                        && s.Name == trimmedName 
+            .AnyAsync(s => s.AccountId == accountId
+                        && s.Name == trimmedName
                         && !s.IsDeleted);
-        
+
         if (exists)
         {
             return Conflict($"A strategy with the name '{trimmedName}' already exists");
         }
-        
+
         var strategy = new Strategy
         {
             Id = Guid.NewGuid(),
@@ -294,10 +297,10 @@ public class StrategiesController : ControllerBase
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-        
+
         _context.Strategies.Add(strategy);
         await _context.SaveChangesAsync();
-        
+
         var response = new StrategyResponse(
             strategy.Id,
             strategy.Name,
@@ -306,7 +309,7 @@ public class StrategiesController : ControllerBase
             strategy.CreatedAt,
             strategy.UpdatedAt
         );
-        
+
         return CreatedAtAction(nameof(Get), new { id = strategy.Id }, response);
     }
 
@@ -316,39 +319,39 @@ public class StrategiesController : ControllerBase
         [FromBody] UpdateStrategyRequest request)
     {
         var accountId = _currentUserService.AccountId;
-        
+
         var strategy = await _context.Strategies
             .FirstOrDefaultAsync(s => s.Id == id && s.AccountId == accountId);
-        
+
         if (strategy == null)
         {
             return NotFound();
         }
-        
+
         if (!string.IsNullOrWhiteSpace(request.Name))
         {
             var trimmedName = request.Name.Trim();
-            
+
             // Check for duplicate (excluding current strategy)
             var exists = await _context.Strategies
-                .AnyAsync(s => s.AccountId == accountId 
-                            && s.Name == trimmedName 
+                .AnyAsync(s => s.AccountId == accountId
+                            && s.Name == trimmedName
                             && s.Id != id
                             && !s.IsDeleted);
-            
+
             if (exists)
             {
                 return Conflict($"A strategy with the name '{trimmedName}' already exists");
             }
-            
+
             strategy.Name = trimmedName;
         }
-        
+
         strategy.Description = request.Description?.Trim();
         strategy.UpdatedAt = DateTime.UtcNow;
-        
+
         await _context.SaveChangesAsync();
-        
+
         var response = new StrategyResponse(
             strategy.Id,
             strategy.Name,
@@ -357,7 +360,7 @@ public class StrategiesController : ControllerBase
             strategy.CreatedAt,
             strategy.UpdatedAt
         );
-        
+
         return Ok(response);
     }
 
@@ -365,21 +368,21 @@ public class StrategiesController : ControllerBase
     public async Task<ActionResult> Delete(Guid id)
     {
         var accountId = _currentUserService.AccountId;
-        
+
         var strategy = await _context.Strategies
             .FirstOrDefaultAsync(s => s.Id == id && s.AccountId == accountId);
-        
+
         if (strategy == null)
         {
             return NotFound();
         }
-        
+
         // Soft delete
         strategy.IsDeleted = true;
         strategy.UpdatedAt = DateTime.UtcNow;
-        
+
         await _context.SaveChangesAsync();
-        
+
         return NoContent();
     }
 }
@@ -531,14 +534,14 @@ export const StrategiesStore = signalStore(
         patchState(store, { error: 'Failed to load strategies', loading: false });
       }
     },
-    
+
     async createStrategy(dto: CreateStrategyDto) {
       patchState(store, { loading: true, error: null });
       try {
         const strategy = await firstValueFrom(strategiesService.create(dto));
-        patchState(store, { 
+        patchState(store, {
           strategies: [...store.strategies(), strategy],
-          loading: false 
+          loading: false,
         });
         return strategy;
       } catch (error) {
@@ -546,9 +549,9 @@ export const StrategiesStore = signalStore(
         throw error;
       }
     },
-    
+
     // Add update, delete methods similarly
-  }))
+  })),
 );
 ```
 
@@ -593,7 +596,7 @@ import { StrategiesStore } from '../../data-access/strategies.store';
         </tr>
       </ng-template>
     </p-table>
-  `
+  `,
 })
 export class StrategyListComponent implements OnInit {
   readonly store = inject(StrategiesStore);
@@ -625,17 +628,7 @@ Create `libs/strategies/src/lib/strategies/ui/strategy-selector/strategy-selecto
   selector: 'app-strategy-selector',
   standalone: true,
   imports: [CommonModule, DropdownModule, FormsModule],
-  template: `
-    <p-dropdown
-      [options]="store.strategies()"
-      [(ngModel)]="selectedStrategyId"
-      (ngModelChange)="strategyChange.emit($event)"
-      optionLabel="name"
-      optionValue="id"
-      [placeholder]="placeholder"
-      [showClear]="!required"
-    />
-  `
+  template: ` <p-dropdown [options]="store.strategies()" [(ngModel)]="selectedStrategyId" (ngModelChange)="strategyChange.emit($event)" optionLabel="name" optionValue="id" [placeholder]="placeholder" [showClear]="!required" /> `,
 })
 export class StrategySelectorComponent implements OnInit {
   @Input() selectedStrategyId?: string | null;
@@ -682,11 +675,7 @@ Modify `libs/trades/src/lib/trades/ui/trade-form/trade-form.component.html`:
 <!-- Add after existing form fields -->
 <div class="field">
   <label for="strategy">Strategy (Optional)</label>
-  <app-strategy-selector
-    [selectedStrategyId]="tradeForm.get('strategyId')?.value"
-    (strategyChange)="tradeForm.patchValue({ strategyId: $event })"
-    placeholder="Select a trading strategy"
-  />
+  <app-strategy-selector [selectedStrategyId]="tradeForm.get('strategyId')?.value" (strategyChange)="tradeForm.patchValue({ strategyId: $event })" placeholder="Select a trading strategy" />
 </div>
 ```
 
@@ -734,7 +723,7 @@ test.describe('Strategy Management', () => {
     await page.fill('[name="name"]', 'Test Strategy');
     await page.fill('[name="description"]', 'Test description');
     await page.click('text=Save');
-    
+
     await expect(page.locator('text=Test Strategy')).toBeVisible();
   });
 
@@ -744,7 +733,7 @@ test.describe('Strategy Management', () => {
     await page.click('[placeholder="Select a trading strategy"]');
     await page.click('text=Test Strategy');
     await page.click('text=Save');
-    
+
     await expect(page.locator('text=Test Strategy')).toBeVisible();
   });
 });
@@ -802,13 +791,13 @@ git revert <commit-sha>
 
 ## Common Issues & Solutions
 
-| Issue | Solution |
-|-------|----------|
-| Migration fails | Check PostgreSQL version, schema permissions |
-| Duplicate name error | Verify unique index created correctly |
-| Strategy not appearing in dropdown | Check isDeleted filter in query |
-| Orphaned strategy references | Verify soft delete implementation |
-| Strategy selector empty | Check authentication, API CORS settings |
+| Issue                              | Solution                                     |
+| ---------------------------------- | -------------------------------------------- |
+| Migration fails                    | Check PostgreSQL version, schema permissions |
+| Duplicate name error               | Verify unique index created correctly        |
+| Strategy not appearing in dropdown | Check isDeleted filter in query              |
+| Orphaned strategy references       | Verify soft delete implementation            |
+| Strategy selector empty            | Check authentication, API CORS settings      |
 
 ---
 

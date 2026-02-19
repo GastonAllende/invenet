@@ -1,0 +1,96 @@
+<div class="strategy-list-container">
+  <div class="list-header">
+    <h2 class="list-title">Strategies</h2>
+    <p-button
+      label="New Strategy"
+      icon="pi pi-plus"
+      severity="primary"
+      (onClick)="onCreate()"
+      [disabled]="isLoading()"
+    ></p-button>
+  </div>
+
+  <p-table
+    [value]="strategies()"
+    [loading]="isLoading()"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 20, 50]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} strategies"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    styleClass="p-datatable-sm"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="name" style="width: 25%">
+          Name <p-sortIcon field="name" />
+        </th>
+        <th style="width: 40%">Description</th>
+        <th pSortableColumn="createdAt" style="width: 15%">
+          Created <p-sortIcon field="createdAt" />
+        </th>
+        <th pSortableColumn="updatedAt" style="width: 15%">
+          Updated <p-sortIcon field="updatedAt" />
+        </th>
+        @if (showDeleted()) {
+          <th style="width: 10%">Status</th>
+        }
+        <th style="width: 10%">Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-strategy>
+      <tr>
+        <td class="strategy-name">{{ strategy.name }}</td>
+        <td class="strategy-description">
+          {{ strategy.description || '—' }}
+        </td>
+        <td>{{ strategy.createdAt | date: 'short' }}</td>
+        <td>{{ strategy.updatedAt | date: 'short' }}</td>
+        @if (showDeleted()) {
+          <td>
+            <p-tag
+              [value]="getStatusLabel(strategy.isDeleted)"
+              [severity]="getStatusSeverity(strategy.isDeleted)"
+            />
+          </td>
+        }
+        <td>
+          <div class="action-buttons">
+            @if (!strategy.isDeleted) {
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                severity="info"
+                (onClick)="onEdit(strategy)"
+                pTooltip="Edit strategy"
+                tooltipPosition="top"
+              ></p-button>
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                (onClick)="onDelete(strategy.id)"
+                pTooltip="Delete strategy"
+                tooltipPosition="top"
+              ></p-button>
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="showDeleted() ? 6 : 5" class="empty-message">
+          @if (isLoading()) {
+            Loading strategies...
+          } @else {
+            No strategies found. Create your first strategy to get started.
+          }
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

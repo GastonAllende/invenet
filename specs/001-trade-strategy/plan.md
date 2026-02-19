@@ -11,29 +11,34 @@ Enable traders to create custom trading strategies and associate them with trade
 
 **Frontend Language/Version**: TypeScript 5.x / Angular 21.1  
 **Backend Language/Version**: C# / .NET 10  
-**Primary Dependencies**: 
+**Primary Dependencies**:
+
 - Frontend: Angular 21.1, PrimeNG (UI components), NgRx SignalStore (state management), RxJS
 - Backend: ASP.NET Core, Entity Framework Core, PostgreSQL provider
 
 **Storage**: PostgreSQL (existing database, new tables/relationships required)  
-**Testing**: 
+**Testing**:
+
 - Frontend: Vitest (unit tests), Playwright (E2E)
 - Backend: xUnit or NUnit (unit tests), integration tests with test database
 
 **Target Platform**: Web application (browser-based)  
 **Project Type**: Web application with separate frontend and backend  
-**Performance Goals**: 
+**Performance Goals**:
+
 - Strategy list loading: <500ms for up to 100 strategies per account
 - Strategy filter application: <2 seconds for trade journal filtering
 - Strategy creation: <200ms database round-trip
 
-**Constraints**: 
+**Constraints**:
+
 - Strategy names limited to 200 characters (prevent UI overflow)
 - Duplicate strategy names per account not allowed
 - Soft delete required for strategies referenced by trades
 - Account-scoped data (no cross-account strategy visibility)
 
-**Scale/Scope**: 
+**Scale/Scope**:
+
 - Support 100+ custom strategies per account without UI degradation
 - Expected average: 3-10 strategies per active trader
 - No pagination needed for strategy selection (dropdown/combobox handles 100 items)
@@ -41,10 +46,9 @@ Enable traders to create custom trading strategies and associate them with trade
 
 ## Constitution Check
 
-*No project constitution currently defined. Proceeding with standard Nx monorepo and modular monolith best practices.*
+_No project constitution currently defined. Proceeding with standard Nx monorepo and modular monolith best practices._
 
 **Structure Decision**: Web application using Nx monorepo with separate frontend (Angular) and backend (.NET) structure. Frontend uses library-based architecture with strategies in dedicated lib, trades lib extended for strategy integration. Backend follows modular monolith pattern with new Strategies module alongside existing Auth, Trades, Health modules. Both frontend and backend maintain test directories colocated with source code.
-
 
 ### Documentation (this feature)
 
@@ -68,7 +72,7 @@ libs/strategies/                    # Strategy management library
 │   ├── index.ts                   # Public API exports
 │   └── lib/
 │       ├── strategies/            # Feature module
-│       │   ├── data-access/      # NgRx SignalStore + API services  
+│       │   ├── data-access/      # NgRx SignalStore + API services
 │       │   ├── ui/               # PrimeNG-based components
 │       │   │   ├── strategy-form/         # Create/edit strategy form
 │       │   │   ├── strategy-list/         # List all strategies
@@ -140,5 +144,4 @@ apps/api/Invenet.Test/
 
 ---
 
-*End of Implementation Plan - Proceed to Phase 0 (research.md) for technology-specific implementation details.*
-
+_End of Implementation Plan - Proceed to Phase 0 (research.md) for technology-specific implementation details._
