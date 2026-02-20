@@ -38,6 +38,25 @@ npx nx lint invenet
 - Follow `docs/AGENT_PLAYBOOK.md` for patterns.
 - See `docs/ANGULAR_BEST_PRACTICES.md` for comprehensive Angular guidelines.
 
+## Feature Libraries
+
+### Accounts (`libs/accounts`)
+
+Brokerage account management with CRUD operations:
+- **Route**: `/accounts` (protected by authGuard)
+- **Shell**: `AccountsShellComponent` exported as `Accounts`
+- **Store**: `AccountsStore` with SignalStore pattern
+- **API**: REST endpoints at `/api/accounts`
+- **Features**: Create, list, view, edit accounts with risk settings
+- **Docs**: See `libs/accounts/README.md` for detailed API
+
+**Usage in routes**:
+```typescript
+import { Accounts } from '@invenet/accounts';
+
+{ path: 'accounts', component: Accounts, canActivate: [authGuard] }
+```
+
 ## Quick Reference: NgRx SignalStore
 
 ### Creating a Store

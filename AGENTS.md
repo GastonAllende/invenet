@@ -29,8 +29,20 @@ cd apps/Invenet.Api
 - State management: NgRx SignalStore (`@ngrx/signals`)
 - Backend: ASP.NET Core (.NET 10) + Entity Framework Core
   - **Architecture**: Modular Monolith (see `apps/api/MODULAR_MONOLITH.md`)
-  - **Modules**: Auth, Trades, Health, Shared
+  - **Modules**: Auth, Trades, Health, Shared, Accounts
 - Database: PostgreSQL
+
+## Libraries
+
+### Accounts (`libs/accounts/`)
+
+Account management library for trading journal accounts:
+- **Route**: `/accounts` 
+- **Features**: Create, list, view, edit accounts with risk management settings
+- **Backend**: `apps/api/Invenet.Api/Modules/Accounts/` (Feature-based structure)
+- **State**: NgRx SignalStore with reactive signals
+- **Components**: AccountsShellComponent (smart), AccountFormComponent, AccountListComponent (presentational)
+- **README**: `libs/accounts/README.md` for detailed usage and API
 
 ## Common Tasks
 

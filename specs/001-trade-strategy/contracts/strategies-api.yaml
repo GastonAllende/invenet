@@ -54,7 +54,7 @@ paths:
                       description: Trade on strong breakouts above resistance with volume confirmation
                       isDeleted: false
                       createdAt: '2026-02-01T10:00:00Z'
-updated At: '2026-02-01T10:00:00Z'
+                      updatedAt: '2026-02-01T10:00:00Z'
                     - id: 550e8400-e29b-41d4-a716-446655440002
                       name: Mean Reversion
                       description: Buy oversold conditions using RSI
