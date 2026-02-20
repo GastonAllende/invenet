@@ -1,0 +1,43 @@
+<p-toast></p-toast>
+
+<div class="accounts-shell-container">
+  <div class="header">
+    <h1>Accounts</h1>
+    @if (!createMode() && !editMode()) {
+      <p-button
+        label="Create Account"
+        icon="pi pi-plus"
+        (onClick)="showCreateForm()"
+      ></p-button>
+    }
+  </div>
+
+  <div class="content">
+    @if (createMode() || editMode()) {
+      <lib-invenet-account-form
+        [account]="selectedAccount()"
+        [mode]="formMode()"
+        [isLoading]="accountsStore.isLoading()"
+        (formSubmit)="handleFormSubmit($event)"
+        (formCancel)="handleCancel()"
+      ></lib-invenet-account-form>
+    } @else {
+      <lib-account-list
+        [accounts]="accountsStore.entities()"
+        [includeArchived]="includeArchived()"
+        [isLoading]="accountsStore.isLoading()"
+        (includeArchivedChange)="handleIncludeArchivedChange($event)"
+        (accountSelected)="handleAccountSelected($event)"
+        (editClicked)="handleEditClicked($event)"
+        (archiveClicked)="handleArchiveClicked($event)"
+      ></lib-account-list>
+    }
+  </div>
+
+  @if (accountsStore.isLoading()) {
+    <div class="loading-overlay">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Loading...</span>
+    </div>
+  }
+</div>

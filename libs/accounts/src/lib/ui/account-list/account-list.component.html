@@ -1,0 +1,117 @@
+<div class="account-list-container">
+  <div class="list-header">
+    <h3>My Accounts</h3>
+    <div class="list-controls">
+      <p-checkbox
+        [(ngModel)]="includeArchived"
+        (onChange)="onIncludeArchivedChange($event.checked)"
+        [binary]="true"
+        inputId="includeArchived"
+        label="Show Archived"
+      ></p-checkbox>
+    </div>
+  </div>
+
+  <p-table
+    [value]="accounts()"
+    [tableStyle]="{ 'min-width': '60rem' }"
+    styleClass="p-datatable-striped"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} accounts"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="name">
+          Name <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="broker">
+          Broker <p-sortIcon field="broker"></p-sortIcon>
+        </th>
+        <th pSortableColumn="accountType">
+          Type <p-sortIcon field="accountType"></p-sortIcon>
+        </th>
+        <th pSortableColumn="baseCurrency">Currency</th>
+        <th pSortableColumn="startingBalance" style="text-align: right">
+          Starting Balance <p-sortIcon field="startingBalance"></p-sortIcon>
+        </th>
+        <th>Risk Per Trade</th>
+        <th pSortableColumn="isActive">
+          Status <p-sortIcon field="isActive"></p-sortIcon>
+        </th>
+        <th style="width: 12rem">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-account>
+      <tr (click)="onRowSelect(account)" style="cursor: pointer">
+        <td>
+          <strong>{{ account.name }}</strong>
+        </td>
+        <td>{{ account.broker }}</td>
+        <td>
+          <span class="account-type-badge">{{ account.accountType }}</span>
+        </td>
+        <td>{{ account.baseCurrency }}</td>
+        <td style="text-align: right">
+          {{ account.startingBalance | currency: account.baseCurrency }}
+        </td>
+        <td>
+          @if (account.riskSettings) {
+            <span>{{ account.riskSettings.riskPerTradePct }}%</span>
+          } @else {
+            <span class="no-risk">—</span>
+          }
+        </td>
+        <td>
+          <p-tag
+            [value]="getStatusLabel(account.isActive)"
+            [severity]="getSeverity(account.isActive)"
+          ></p-tag>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              severity="info"
+              [disabled]="isLoading()"
+              (onClick)="onEdit(account.id); $event.stopPropagation()"
+              pTooltip="Edit"
+              tooltipPosition="top"
+            ></p-button>
+            @if (account.isActive) {
+              <p-button
+                icon="pi pi-archive"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                [disabled]="isLoading()"
+                (onClick)="onArchive(account.id); $event.stopPropagation()"
+                pTooltip="Archive"
+                tooltipPosition="top"
+              ></p-button>
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="empty-message">
+          <div class="empty-state">
+            <i class="pi pi-inbox" style="font-size: 3rem"></i>
+            <p>No accounts found</p>
+            @if (!includeArchived()) {
+              <small>Try enabling "Show Archived" to see all accounts</small>
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

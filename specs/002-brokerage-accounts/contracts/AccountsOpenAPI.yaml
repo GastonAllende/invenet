@@ -1,0 +1,497 @@
+openapi: 3.0.3
+info:
+  title: Invenet Accounts API
+  description: REST API for managing brokerage accounts with risk settings
+  version: 1.0.0
+  contact:
+    name: Invenet API Support
+servers:
+  - url: http://localhost:5256/api
+    description: Local development server
+  - url: https://api.invenet.com/api
+    description: Production server
+
+tags:
+  - name: Accounts
+    description: Brokerage account management operations
+
+paths:
+  /accounts:
+    get:
+      tags:
+        - Accounts
+      summary: List all accounts for the authenticated user
+      description: Returns a list of brokerage accounts with embedded risk settings
+      operationId: listAccounts
+      parameters:
+        - name: includeArchived
+          in: query
+          description: Whether to include archived accounts
+          required: false
+          schema:
+            type: boolean
+            default: false
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAccountsResponse'
+        '401':
+          description: Unauthorized - missing or invalid JWT token
+        '500':
+          description: Internal server error
+
+    post:
+      tags:
+        - Accounts
+      summary: Create a new brokerage account
+      description: Creates a new account with optional risk settings
+      operationId: createAccount
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAccountResponse'
+        '400':
+          description: Bad request - validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /accounts/{id}:
+    get:
+      tags:
+        - Accounts
+      summary: Get a single account by ID
+      description: Returns account details with embedded risk settings
+      operationId: getAccount
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Account ID (GUID)
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Account not found
+        '500':
+          description: Internal server error
+
+    put:
+      tags:
+        - Accounts
+      summary: Update an existing account
+      description: Updates account details and/or risk settings
+      operationId: updateAccount
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Account ID (GUID)
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccountRequest'
+      responses:
+        '200':
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAccountResponse'
+        '400':
+          description: Bad request - validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Account not found
+        '500':
+          description: Internal server error
+
+  /accounts/{id}/archive:
+    post:
+      tags:
+        - Accounts
+      summary: Archive an account (soft delete)
+      description: Sets is_active = false without deleting data
+      operationId: archiveAccount
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Account ID (GUID)
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Account archived successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Account archived successfully'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Account not found
+        '500':
+          description: Internal server error
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token from /api/auth/login
+
+  schemas:
+    CreateAccountRequest:
+      type: object
+      required:
+        - name
+        - broker
+        - accountType
+        - baseCurrency
+        - startDate
+        - startingBalance
+      properties:
+        name:
+          type: string
+          maxLength: 200
+          description: Account display name
+          example: 'IBKR Main Account'
+        broker:
+          type: string
+          maxLength: 100
+          description: Broker or firm name
+          example: 'Interactive Brokers (IBKR)'
+        accountType:
+          type: string
+          enum: [Cash, Margin, Prop, Demo]
+          description: Type of brokerage account
+          example: 'Margin'
+        baseCurrency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: ISO 4217 currency code
+          example: 'USD'
+        startDate:
+          type: string
+          format: date-time
+          description: When tracking starts (ISO 8601)
+          example: '2026-01-01T00:00:00Z'
+        startingBalance:
+          type: number
+          format: decimal
+          minimum: 0.01
+          description: Initial account balance (must be > 0)
+          example: 10000.00
+        timezone:
+          type: string
+          maxLength: 50
+          description: IANA timezone identifier
+          default: 'Europe/Stockholm'
+          example: 'America/New_York'
+        notes:
+          type: string
+          nullable: true
+          description: Free-text notes
+          example: 'Main trading account for day trading'
+        isActive:
+          type: boolean
+          default: true
+          description: Whether account is active
+        riskSettings:
+          $ref: '#/components/schemas/RiskSettingsDto'
+
+    UpdateAccountRequest:
+      type: object
+      required:
+        - name
+        - broker
+        - accountType
+        - baseCurrency
+      properties:
+        name:
+          type: string
+          maxLength: 200
+          example: 'IBKR Main Account'
+        broker:
+          type: string
+          maxLength: 100
+          example: 'Interactive Brokers (IBKR)'
+        accountType:
+          type: string
+          enum: [Cash, Margin, Prop, Demo]
+          example: 'Margin'
+        baseCurrency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: 'USD'
+        timezone:
+          type: string
+          maxLength: 50
+          example: 'Europe/Stockholm'
+        notes:
+          type: string
+          nullable: true
+          example: 'Updated notes'
+        isActive:
+          type: boolean
+          example: true
+        riskSettings:
+          $ref: '#/components/schemas/RiskSettingsDto'
+
+    RiskSettingsDto:
+      type: object
+      required:
+        - riskPerTradePct
+        - maxDailyLossPct
+        - maxWeeklyLossPct
+        - enforceLimits
+      properties:
+        riskPerTradePct:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+          description: Risk per trade as percentage
+          example: 1.50
+        maxDailyLossPct:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+          description: Maximum daily loss as percentage
+          example: 3.00
+        maxWeeklyLossPct:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+          description: Maximum weekly loss as percentage
+          example: 6.00
+        enforceLimits:
+          type: boolean
+          description: Whether limits are enforced (true) or advisory (false)
+          example: false
+
+    GetAccountResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+        name:
+          type: string
+          example: 'IBKR Main Account'
+        broker:
+          type: string
+          example: 'Interactive Brokers (IBKR)'
+        accountType:
+          type: string
+          example: 'Margin'
+        baseCurrency:
+          type: string
+          example: 'USD'
+        startDate:
+          type: string
+          format: date-time
+          example: '2026-01-01T00:00:00Z'
+        startingBalance:
+          type: number
+          format: decimal
+          example: 10000.00
+        timezone:
+          type: string
+          example: 'Europe/Stockholm'
+        notes:
+          type: string
+          nullable: true
+          example: 'Main trading account'
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-02-19T10:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2026-02-19T10:00:00Z'
+        riskSettings:
+          $ref: '#/components/schemas/AccountRiskSettingsResponse'
+
+    CreateAccountResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        broker:
+          type: string
+        accountType:
+          type: string
+        baseCurrency:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        startingBalance:
+          type: number
+          format: decimal
+        timezone:
+          type: string
+        notes:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        riskSettings:
+          $ref: '#/components/schemas/AccountRiskSettingsResponse'
+
+    UpdateAccountResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        broker:
+          type: string
+        accountType:
+          type: string
+        baseCurrency:
+          type: string
+        timezone:
+          type: string
+        notes:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+        riskSettings:
+          $ref: '#/components/schemas/AccountRiskSettingsResponse'
+
+    AccountRiskSettingsResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        accountId:
+          type: string
+          format: uuid
+        riskPerTradePct:
+          type: number
+          format: decimal
+          example: 1.50
+        maxDailyLossPct:
+          type: number
+          format: decimal
+          example: 3.00
+        maxWeeklyLossPct:
+          type: number
+          format: decimal
+          example: 6.00
+        enforceLimits:
+          type: boolean
+          example: false
+
+    ListAccountsResponse:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetAccountResponse'
+        total:
+          type: integer
+          description: Total number of accounts returned
+          example: 5
+
+    ValidationErrors:
+      type: object
+      properties:
+        type:
+          type: string
+          example: 'https://tools.ietf.org/html/rfc7231#section-6.5.1'
+        title:
+          type: string
+          example: 'One or more validation errors occurred.'
+        status:
+          type: integer
+          example: 400
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            StartingBalance:
+              - 'The field StartingBalance must be greater than 0.'
+            Name:
+              - 'The Name field is required.'

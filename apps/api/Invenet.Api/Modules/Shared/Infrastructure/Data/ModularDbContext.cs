@@ -1,3 +1,4 @@
+using Invenet.Api.Modules.Accounts.Domain;
 using Invenet.Api.Modules.Strategies.Domain;
 using Invenet.Api.Modules.Trades.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,8 @@ public class ModularDbContext : DbContext
     }
 
     // DbSets for entities
+    public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<AccountRiskSettings> AccountRiskSettings => Set<AccountRiskSettings>();
     public DbSet<Strategy> Strategies => Set<Strategy>();
     public DbSet<Trade> Trades => Set<Trade>();
 
