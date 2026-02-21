@@ -1,7 +1,6 @@
 .accounts-shell-container {
-  padding: 2rem;
   min-height: 100vh;
-  position: relative;
+  border-radius: var(--content-border-radius);
 }
 
 .header {
