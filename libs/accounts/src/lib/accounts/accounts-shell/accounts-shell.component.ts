@@ -1,15 +1,10 @@
-import {
-  Component,
-  OnInit,
-  signal,
-  computed,
-  inject,
-  effect,
-} from '@angular/core';
+import { Component, OnInit, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { Toast } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { DialogModule } from 'primeng/dialog';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { AccountFormComponent } from '../../ui/account-form/account-form.component';
 import { AccountListComponent } from '../../ui/account-list/account-list.component';
 import { AccountsStore } from '../../../data-access/src/lib/store/accounts.store';
@@ -29,34 +24,26 @@ import {
     CommonModule,
     ButtonModule,
     Toast,
+    DialogModule,
+    ConfirmDialogModule,
     AccountFormComponent,
     AccountListComponent,
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './accounts-shell.component.html',
   styleUrl: './accounts-shell.component.css',
 })
 export class AccountsShellComponent implements OnInit {
   accountsStore = inject(AccountsStore);
   messageService = inject(MessageService);
+  confirmationService = inject(ConfirmationService);
 
-  createMode = signal(false);
-  editMode = signal(false);
-  selectedAccountId = signal<string | null>(null);
   includeArchived = signal(false);
-  lastOperationType = signal<'create' | 'update' | null>(null);
+  lastOperationType = signal<'create' | 'update' | 'delete' | null>(null);
 
-  selectedAccount = computed(() => {
-    const id = this.selectedAccountId();
-    if (!id) return null;
-    return (
-      this.accountsStore
-        .entities()
-        .find((a: GetAccountResponse) => a.id === id) || null
-    );
-  });
-
-  formMode = computed(() => (this.editMode() ? 'update' : 'create'));
+  // Modal state
+  showFormDialog = signal(false);
+  selectedAccount = signal<GetAccountResponse | null>(null);
 
   constructor() {
     // Effect to show error toasts
@@ -83,16 +70,26 @@ export class AccountsShellComponent implements OnInit {
       if (!isLoading && lastOp) {
         const error = this.accountsStore.error();
         if (!error) {
-          const message =
-            lastOp === 'create'
-              ? 'Account created successfully'
-              : 'Account updated successfully';
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: message,
-            life: 3000,
-          });
+          let message = '';
+          switch (lastOp) {
+            case 'create':
+              message = 'Account created successfully';
+              break;
+            case 'update':
+              message = 'Account updated successfully';
+              break;
+            case 'delete':
+              message = 'Account deleted successfully';
+              break;
+          }
+          if (message) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: message,
+              life: 3000,
+            });
+          }
         }
         this.lastOperationType.set(null);
       }
@@ -103,40 +100,56 @@ export class AccountsShellComponent implements OnInit {
     this.accountsStore.loadAccounts({ includeArchived: false });
   }
 
-  showCreateForm(): void {
-    this.editMode.set(false);
-    this.selectedAccountId.set(null);
-    this.createMode.set(true);
+  onCreateAccount(): void {
+    this.selectedAccount.set(null);
+    this.showFormDialog.set(true);
   }
 
-  showEditForm(id: string): void {
-    this.accountsStore.loadAccount(id);
-    this.selectedAccountId.set(id);
-    this.editMode.set(true);
-    this.createMode.set(true); // Reuse createMode for showing form
+  onEditAccount(account: GetAccountResponse): void {
+    this.selectedAccount.set(account);
+    this.showFormDialog.set(true);
   }
 
-  handleFormSubmit(request: CreateAccountRequest | UpdateAccountRequest): void {
-    if (this.editMode()) {
-      const id = this.selectedAccountId();
-      if (id) {
-        this.lastOperationType.set('update');
-        this.accountsStore.updateAccount({
-          id,
-          payload: request as UpdateAccountRequest,
-        });
-      }
+  onSaveAccount(request: CreateAccountRequest | UpdateAccountRequest): void {
+    const selected = this.selectedAccount();
+
+    if (selected) {
+      // Update existing account
+      this.lastOperationType.set('update');
+      this.accountsStore.updateAccount({
+        id: selected.id,
+        payload: request as UpdateAccountRequest,
+      });
     } else {
+      // Create new account
       this.lastOperationType.set('create');
       this.accountsStore.createAccount(request as CreateAccountRequest);
     }
-    this.handleCancel();
+    this.showFormDialog.set(false);
   }
 
-  handleCancel(): void {
-    this.createMode.set(false);
-    this.editMode.set(false);
-    this.selectedAccountId.set(null);
+  onCancelForm(): void {
+    this.showFormDialog.set(false);
+    this.selectedAccount.set(null);
+  }
+
+  onDeleteAccount(id: string): void {
+    const account = this.accountsStore
+      .entities()
+      .find((a: GetAccountResponse) => a.id === id);
+
+    if (!account) return;
+
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete the account '${account.name}'? This action cannot be undone.`,
+      header: 'Delete Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.lastOperationType.set('delete');
+        this.accountsStore.deleteAccount(id);
+      },
+    });
   }
 
   handleIncludeArchivedChange(value: boolean): void {
@@ -144,15 +157,26 @@ export class AccountsShellComponent implements OnInit {
     this.accountsStore.loadAccounts({ includeArchived: value });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleAccountSelected(_id: string): void {
     // Future enhancement: navigate to account detail view
   }
 
   handleEditClicked(id: string): void {
-    this.showEditForm(id);
+    const account =
+      this.accountsStore
+        .entities()
+        .find((a: GetAccountResponse) => a.id === id) || null;
+    if (account) {
+      this.onEditAccount(account);
+    }
   }
 
-  handleArchiveClicked(_id: string): void {
-    // Will implement in US4 (Archive Account)
+  handleDeleteClicked(id: string): void {
+    this.onDeleteAccount(id);
+  }
+
+  handleArchiveClicked(id: string): void {
+    this.accountsStore.archiveAccount(id);
   }
 }

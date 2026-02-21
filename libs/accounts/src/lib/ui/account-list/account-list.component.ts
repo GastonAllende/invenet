@@ -31,15 +31,25 @@ export class AccountListComponent {
 
   includeArchivedChange = output<boolean>();
   accountSelected = output<string>();
+  create = output<void>();
   editClicked = output<string>();
+  delete = output<string>();
   archiveClicked = output<string>();
 
   onIncludeArchivedChange(value: boolean): void {
     this.includeArchivedChange.emit(value);
   }
 
+  onCreate(): void {
+    this.create.emit();
+  }
+
   onEdit(id: string): void {
     this.editClicked.emit(id);
+  }
+
+  onDelete(id: string): void {
+    this.delete.emit(id);
   }
 
   onArchive(id: string): void {

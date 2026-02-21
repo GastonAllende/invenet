@@ -2,6 +2,12 @@
   <div class="list-header">
     <h3>My Accounts</h3>
     <div class="list-controls">
+      <p-button
+        label="New Account"
+        icon="pi pi-plus"
+        (onClick)="onCreate()"
+        [disabled]="isLoading()"
+      ></p-button>
       <p-checkbox
         [(ngModel)]="includeArchived"
         (onChange)="onIncludeArchivedChange($event.checked)"
@@ -83,12 +89,22 @@
               pTooltip="Edit"
               tooltipPosition="top"
             ></p-button>
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              [disabled]="isLoading()"
+              (onClick)="onDelete(account.id); $event.stopPropagation()"
+              pTooltip="Delete"
+              tooltipPosition="top"
+            ></p-button>
             @if (account.isActive) {
               <p-button
                 icon="pi pi-archive"
                 [rounded]="true"
                 [text]="true"
-                severity="danger"
+                severity="secondary"
                 [disabled]="isLoading()"
                 (onClick)="onArchive(account.id); $event.stopPropagation()"
                 pTooltip="Archive"

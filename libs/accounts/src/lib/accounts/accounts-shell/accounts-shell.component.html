@@ -1,38 +1,39 @@
 <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
 
 <div class="accounts-shell-container">
-  <div class="header">
-    <h1>Accounts</h1>
-    @if (!createMode() && !editMode()) {
-      <p-button
-        label="Create Account"
-        icon="pi pi-plus"
-        (onClick)="showCreateForm()"
-      ></p-button>
-    }
+  <div class="content">
+    <lib-account-list
+      [accounts]="accountsStore.entities()"
+      [includeArchived]="includeArchived()"
+      [isLoading]="accountsStore.isLoading()"
+      (includeArchivedChange)="handleIncludeArchivedChange($event)"
+      (accountSelected)="handleAccountSelected($event)"
+      (create)="onCreateAccount()"
+      (editClicked)="handleEditClicked($event)"
+      (delete)="handleDeleteClicked($event)"
+      (archiveClicked)="handleArchiveClicked($event)"
+    ></lib-account-list>
   </div>
 
-  <div class="content">
-    @if (createMode() || editMode()) {
-      <lib-invenet-account-form
-        [account]="selectedAccount()"
-        [mode]="formMode()"
-        [isLoading]="accountsStore.isLoading()"
-        (formSubmit)="handleFormSubmit($event)"
-        (formCancel)="handleCancel()"
-      ></lib-invenet-account-form>
-    } @else {
-      <lib-account-list
-        [accounts]="accountsStore.entities()"
-        [includeArchived]="includeArchived()"
-        [isLoading]="accountsStore.isLoading()"
-        (includeArchivedChange)="handleIncludeArchivedChange($event)"
-        (accountSelected)="handleAccountSelected($event)"
-        (editClicked)="handleEditClicked($event)"
-        (archiveClicked)="handleArchiveClicked($event)"
-      ></lib-account-list>
-    }
-  </div>
+  <p-dialog
+    [header]="selectedAccount() ? 'Edit Account' : 'Create Account'"
+    [(visible)]="showFormDialog"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [style]="{ width: '500px' }"
+  >
+    <lib-invenet-account-form
+      [account]="selectedAccount()"
+      [mode]="selectedAccount() ? 'update' : 'create'"
+      [isLoading]="accountsStore.isLoading()"
+      (formSubmit)="onSaveAccount($event)"
+      (formCancel)="onCancelForm()"
+    ></lib-invenet-account-form>
+  </p-dialog>
 
   @if (accountsStore.isLoading()) {
     <div class="loading-overlay">

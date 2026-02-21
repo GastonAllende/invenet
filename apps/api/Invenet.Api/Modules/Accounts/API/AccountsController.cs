@@ -496,4 +496,44 @@ public sealed class AccountsController : ControllerBase
         
         return Ok(response);
     }
+
+    /// <summary>
+    /// Delete a brokerage account (hard delete).
+    /// </summary>
+    /// <param name="id">Account ID to delete</param>
+    /// <returns>No content on success</returns>
+    /// <response code="204">Account deleted successfully</response>
+    /// <response code="404">Account not found</response>
+    /// <response code="401">User not authenticated</response>
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        var userId = GetCurrentUserId();
+
+        var account = await _context.Accounts
+            .Include(a => a.RiskSettings)
+            .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
+
+        if (account == null)
+        {
+            return NotFound(new { message = "Account not found" });
+        }
+
+        // Remove risk settings first (cascade delete)
+        if (account.RiskSettings != null)
+        {
+            _context.AccountRiskSettings.Remove(account.RiskSettings);
+        }
+
+        // Remove account
+        _context.Accounts.Remove(account);
+        
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Account deleted: {AccountId} - {AccountName} for User {UserId}",
+            account.Id, account.Name, userId);
+
+        return NoContent();
+    }
 }

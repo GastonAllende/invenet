@@ -26,7 +26,7 @@ public sealed class EmailService : IEmailService
     {
         var templatePath = Path.Combine(_environment.ContentRootPath, "EmailTemplates", "EmailConfirmation.html");
         var htmlContent = await File.ReadAllTextAsync(templatePath);
-        htmlContent = htmlContent.Replace("{{confirmationLink}}", confirmationLink);
+        htmlContent = htmlContent.Replace("{{CONFIRMATION_LINK}}", confirmationLink);
 
         await SendEmailAsync(
             toEmail,
@@ -39,7 +39,7 @@ public sealed class EmailService : IEmailService
     {
         var templatePath = Path.Combine(_environment.ContentRootPath, "EmailTemplates", "PasswordReset.html");
         var htmlContent = await File.ReadAllTextAsync(templatePath);
-        htmlContent = htmlContent.Replace("{{resetLink}}", resetLink);
+        htmlContent = htmlContent.Replace("{{RESET_LINK}}", resetLink);
 
         await SendEmailAsync(
             toEmail,

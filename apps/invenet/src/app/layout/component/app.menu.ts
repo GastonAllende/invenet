@@ -33,14 +33,14 @@ export class AppMenu {
         label: 'Invenet',
         items: [
           {
-            label: 'Trades',
-            icon: 'pi pi-fw pi-table',
-            routerLink: ['/trades'],
-          },
-          {
             label: 'Analytics',
             icon: 'pi pi-fw pi-chart-bar',
             routerLink: ['/analytics'],
+          },
+          {
+            label: 'Trades',
+            icon: 'pi pi-fw pi-table',
+            routerLink: ['/trades'],
           },
           {
             label: 'Strategy',

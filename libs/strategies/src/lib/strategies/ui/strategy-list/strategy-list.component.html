@@ -1,13 +1,14 @@
 <div class="strategy-list-container">
   <div class="list-header">
-    <h2 class="list-title">Strategies</h2>
-    <p-button
-      label="New Strategy"
-      icon="pi pi-plus"
-      severity="primary"
-      (onClick)="onCreate()"
-      [disabled]="isLoading()"
-    ></p-button>
+    <h3>My Strategies</h3>
+    <div class="list-controls">
+      <p-button
+        label="New Strategy"
+        icon="pi pi-plus"
+        (onClick)="onCreate()"
+        [disabled]="isLoading()"
+      ></p-button>
+    </div>
   </div>
 
   <p-table
@@ -15,11 +16,11 @@
     [loading]="isLoading()"
     [paginator]="true"
     [rows]="10"
-    [rowsPerPageOptions]="[5, 10, 20, 50]"
+    [rowsPerPageOptions]="[10, 25, 50]"
     [showCurrentPageReport]="true"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} strategies"
-    [tableStyle]="{ 'min-width': '50rem' }"
-    styleClass="p-datatable-sm"
+    [tableStyle]="{ 'min-width': '60rem' }"
+    styleClass="p-datatable-striped"
   >
     <ng-template pTemplate="header">
       <tr>
@@ -41,7 +42,9 @@
     </ng-template>
     <ng-template pTemplate="body" let-strategy>
       <tr>
-        <td class="strategy-name">{{ strategy.name }}</td>
+        <td>
+          <strong>{{ strategy.name }}</strong>
+        </td>
         <td class="strategy-description">
           {{ strategy.description || '—' }}
         </td>
@@ -84,11 +87,11 @@
     <ng-template pTemplate="emptymessage">
       <tr>
         <td [attr.colspan]="showDeleted() ? 6 : 5" class="empty-message">
-          @if (isLoading()) {
-            Loading strategies...
-          } @else {
-            No strategies found. Create your first strategy to get started.
-          }
+          <div class="empty-state">
+            <i class="pi pi-inbox" style="font-size: 3rem"></i>
+            <p>No strategies found</p>
+            <small>Create your first strategy to get started</small>
+          </div>
         </td>
       </tr>
     </ng-template>

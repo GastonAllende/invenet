@@ -118,20 +118,20 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("confirm-email")]
     [AllowAnonymous]
-    public async Task<ActionResult<MessageResponse>> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
+    public async Task<ActionResult<MessageResponse>> ConfirmEmail([FromBody] ConfirmEmailRequest request)
     {
-        if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Token))
         {
             return BadRequest(new MessageResponse("Invalid confirmation link."));
         }
 
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is null)
         {
             return BadRequest(new MessageResponse("Invalid confirmation link."));
         }
 
-        var result = await _userManager.ConfirmEmailAsync(user, token);
+        var result = await _userManager.ConfirmEmailAsync(user, request.Token);
         if (!result.Succeeded)
         {
             return BadRequest(new MessageResponse("Email confirmation failed."));
@@ -273,7 +273,7 @@ public sealed class AuthController : ControllerBase
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
             claims: claims,
-            expires: expiresAt.DateTime,
+            expires: expiresAt.UtcDateTime,
             signingCredentials: credentials
         );
 
@@ -321,19 +321,20 @@ public sealed class AuthController : ControllerBase
     private async Task SendConfirmationEmailAsync(ApplicationUser user, string token)
     {
         var encodedToken = HttpUtility.UrlEncode(token);
-        var confirmationLink = $"{_configuration["App:FrontendUrl"]}/confirm-email?userId={user.Id}&token={encodedToken}";
+        var confirmationLink = $"{_configuration["Frontend:Url"]}/verify-email?email={user.Email}&token={encodedToken}";
         await _emailService.SendEmailConfirmationAsync(user.Email!, confirmationLink);
     }
 
     private async Task SendPasswordResetEmailAsync(ApplicationUser user, string token)
     {
         var encodedToken = HttpUtility.UrlEncode(token);
-        var resetLink = $"{_configuration["App:FrontendUrl"]}/reset-password?email={user.Email}&token={encodedToken}";
+        var resetLink = $"{_configuration["Frontend:Url"]}/reset-password?email={user.Email}&token={encodedToken}";
         await _emailService.SendPasswordResetEmailAsync(user.Email!, resetLink);
     }
 }
 
 public sealed record ResendConfirmationRequest([Required, EmailAddress] string Email);
+public sealed record ConfirmEmailRequest([Required, EmailAddress] string Email, [Required] string Token);
 public sealed record ForgotPasswordRequest([Required, EmailAddress] string Email);
 public sealed record ResetPasswordRequest(
     [Required, EmailAddress] string Email,

@@ -142,4 +142,26 @@ export class AccountsApiService {
       }),
     );
   }
+
+  /**
+   * Delete an account (hard delete - permanent removal)
+   * @param id - Account ID
+   */
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Failed to delete account';
+        if (error.status === 401) {
+          errorMessage = 'Authentication required';
+        } else if (error.status === 403) {
+          errorMessage = 'You do not have permission to delete this account';
+        } else if (error.status === 404) {
+          errorMessage = 'Account not found';
+        } else if (error.error?.message) {
+          errorMessage = error.error.message;
+        }
+        return throwError(() => new Error(errorMessage));
+      }),
+    );
+  }
 }

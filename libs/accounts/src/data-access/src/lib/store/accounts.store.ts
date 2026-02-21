@@ -11,6 +11,7 @@ import {
   addEntities,
   setAllEntities,
   updateEntity,
+  removeEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
@@ -213,6 +214,33 @@ export const AccountsStore = signalStore(
               patchState(store, {
                 isLoading: false,
                 error: error.message || 'Failed to archive account',
+              });
+              return of(null);
+            }),
+          ),
+        ),
+      ),
+    ),
+
+    /**
+     * Delete an account (hard delete - permanent removal)
+     * @param id Account ID to delete
+     */
+    deleteAccount: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, { isLoading: true, error: null })),
+        switchMap((id) =>
+          apiService.delete(id).pipe(
+            tap(() => {
+              patchState(store, removeEntity(id), {
+                isLoading: false,
+                error: null,
+              });
+            }),
+            catchError((error: Error) => {
+              patchState(store, {
+                isLoading: false,
+                error: error.message || 'Failed to delete account',
               });
               return of(null);
             }),
