@@ -3,7 +3,7 @@
  */
 export interface Strategy {
   id: string;
-  accountId: string;
+  userId: string;
   name: string;
   description: string | null;
   isDeleted: boolean;

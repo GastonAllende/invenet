@@ -1,3 +1,4 @@
+using Invenet.Api.Modules.Auth.Domain;
 using Invenet.Api.Modules.Strategies.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -36,33 +37,33 @@ public class StrategyConfiguration : IEntityTypeConfiguration<Strategy>
         builder.Property(s => s.UpdatedAt)
             .IsRequired();
 
-        builder.Property(s => s.AccountId)
+        builder.Property(s => s.UserId)
             .IsRequired();
 
         // Indexes
         
-        // Index on AccountId for efficient lookups
-        builder.HasIndex(s => s.AccountId)
-            .HasDatabaseName("ix_strategies_account_id");
+        // Index on UserId for efficient lookups
+        builder.HasIndex(s => s.UserId)
+            .HasDatabaseName("ix_strategies_user_id");
 
-        // Composite index for active strategies by account
-        builder.HasIndex(s => new { s.AccountId, s.IsDeleted })
-            .HasDatabaseName("ix_strategies_account_active");
+        // Composite index for active strategies by user
+        builder.HasIndex(s => new { s.UserId, s.IsDeleted })
+            .HasDatabaseName("ix_strategies_user_active");
 
-        // Unique constraint for active strategy names per account
+        // Unique constraint for active strategy names per user
         // Only enforced when IsDeleted = FALSE
-        builder.HasIndex(s => new { s.AccountId, s.Name })
+        builder.HasIndex(s => new { s.UserId, s.Name })
             .IsUnique()
-            .HasDatabaseName("ix_strategies_account_name_unique")
+            .HasDatabaseName("ix_strategies_user_name_unique")
             .HasFilter("\"IsDeleted\" = FALSE");
 
         // Relationships
         
-        // Foreign key to Account (commented out until Account entity is available)
-        // builder.HasOne(s => s.Account)
-        //     .WithMany()
-        //     .HasForeignKey(s => s.AccountId)
-        //     .OnDelete(DeleteBehavior.Cascade);
+        // Foreign key to ApplicationUser (AspNetUsers)
+        builder.HasOne<ApplicationUser>(s => s.User)
+            .WithMany()
+            .HasForeignKey(s => s.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // One-to-many relationship with Trades
         builder.HasMany(s => s.Trades)

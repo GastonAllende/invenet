@@ -1,3 +1,4 @@
+using Invenet.Api.Modules.Auth.Domain;
 using Invenet.Api.Modules.Trades.Domain;
 
 namespace Invenet.Api.Modules.Strategies.Domain;
@@ -13,9 +14,9 @@ public class Strategy
     public Guid Id { get; set; }
 
     /// <summary>
-    /// The account that owns this strategy (account-scoped).
+    /// The user that owns this strategy.
     /// </summary>
-    public Guid AccountId { get; set; }
+    public Guid UserId { get; set; }
 
     /// <summary>
     /// Human-readable strategy name (required, max 200 characters).
@@ -46,9 +47,9 @@ public class Strategy
     // Navigation properties
     
     /// <summary>
-    /// The account that owns this strategy.
+    /// The user that owns this strategy.
     /// </summary>
-    // public Account Account { get; set; } = null!;
+    public ApplicationUser User { get; set; } = null!;
 
     /// <summary>
     /// Collection of trades that use this strategy.

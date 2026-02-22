@@ -3,6 +3,7 @@ using System;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Invenet.Api.Migrations
 {
     [DbContext(typeof(ModularDbContext))]
-    partial class ModularDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260222150152_AddStrategyUserForeignKey")]
+    partial class AddStrategyUserForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

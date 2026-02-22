@@ -31,9 +31,9 @@ public sealed class StrategiesController : ControllerBase
     }
 
     /// <summary>
-    /// Get the current authenticated user's ID (used as AccountId).
+    /// Get the current authenticated user's ID.
     /// </summary>
-    private Guid GetCurrentAccountId()
+    private Guid GetCurrentUserId()
     {
         var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
@@ -44,15 +44,15 @@ public sealed class StrategiesController : ControllerBase
     }
 
     /// <summary>
-    /// List all strategies for the authenticated user's account.
+    /// List all strategies for the authenticated user.
     /// </summary>
     [HttpGet]
     public async Task<ActionResult<ListStrategiesResponse>> List(
         [FromQuery] bool includeDeleted = false)
     {
-        var accountId = GetCurrentAccountId();
+        var userId = GetCurrentUserId();
 
-        var query = _context.Strategies.Where(s => s.AccountId == accountId);
+        var query = _context.Strategies.Where(s => s.UserId == userId);
 
         if (!includeDeleted)
         {
@@ -80,10 +80,10 @@ public sealed class StrategiesController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<GetStrategyResponse>> Get(Guid id)
     {
-        var accountId = GetCurrentAccountId();
+        var userId = GetCurrentUserId();
 
         var strategy = await _context.Strategies
-            .Where(s => s.Id == id && s.AccountId == accountId)
+            .Where(s => s.Id == id && s.UserId == userId)
             .Select(s => new GetStrategyResponse(
                 s.Id,
                 s.Name,
@@ -109,7 +109,7 @@ public sealed class StrategiesController : ControllerBase
     public async Task<ActionResult<CreateStrategyResponse>> Create(
         [FromBody] CreateStrategyRequest request)
     {
-        var accountId = GetCurrentAccountId();
+        var userId = GetCurrentUserId();
 
         // Validate name
         var trimmedName = request.Name?.Trim() ?? string.Empty;
@@ -132,7 +132,7 @@ public sealed class StrategiesController : ControllerBase
 
         // Check for duplicate name
         var exists = await _context.Strategies
-            .AnyAsync(s => s.AccountId == accountId
+            .AnyAsync(s => s.UserId == userId
                         && s.Name == trimmedName
                         && !s.IsDeleted);
 
@@ -151,7 +151,7 @@ public sealed class StrategiesController : ControllerBase
         var strategy = new Strategy
         {
             Id = Guid.NewGuid(),
-            AccountId = accountId,
+            UserId = userId,
             Name = trimmedName,
             Description = trimmedDescription,
             IsDeleted = false,
@@ -163,8 +163,8 @@ public sealed class StrategiesController : ControllerBase
         await _context.SaveChangesAsync();
 
         _logger.LogInformation(
-            "Strategy created: {StrategyId} - {StrategyName} for Account {AccountId}",
-            strategy.Id, strategy.Name, accountId);
+            "Strategy created: {StrategyId} - {StrategyName} for User {UserId}",
+            strategy.Id, strategy.Name, userId);
 
         var response = new CreateStrategyResponse(
             strategy.Id,
@@ -186,10 +186,10 @@ public sealed class StrategiesController : ControllerBase
         Guid id,
         [FromBody] UpdateStrategyRequest request)
     {
-        var accountId = GetCurrentAccountId();
+        var userId = GetCurrentUserId();
 
         var strategy = await _context.Strategies
-            .FirstOrDefaultAsync(s => s.Id == id && s.AccountId == accountId);
+            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
 
         if (strategy == null)
         {
@@ -208,7 +208,7 @@ public sealed class StrategiesController : ControllerBase
 
             // Check for duplicate (excluding current strategy)
             var exists = await _context.Strategies
-                .AnyAsync(s => s.AccountId == accountId
+                .AnyAsync(s => s.UserId == userId
                             && s.Name == trimmedName
                             && s.Id != id
                             && !s.IsDeleted);
@@ -245,8 +245,8 @@ public sealed class StrategiesController : ControllerBase
         await _context.SaveChangesAsync();
 
         _logger.LogInformation(
-            "Strategy updated: {StrategyId} - {StrategyName} for Account {AccountId}",
-            strategy.Id, strategy.Name, accountId);
+            "Strategy updated: {StrategyId} - {StrategyName} for User {UserId}",
+            strategy.Id, strategy.Name, userId);
 
         var response = new UpdateStrategyResponse(
             strategy.Id,
@@ -266,10 +266,10 @@ public sealed class StrategiesController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete(Guid id)
     {
-        var accountId = GetCurrentAccountId();
+        var userId = GetCurrentUserId();
 
         var strategy = await _context.Strategies
-            .FirstOrDefaultAsync(s => s.Id == id && s.AccountId == accountId);
+            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
 
         if (strategy == null)
         {
@@ -283,8 +283,8 @@ public sealed class StrategiesController : ControllerBase
         await _context.SaveChangesAsync();
 
         _logger.LogInformation(
-            "Strategy soft-deleted: {StrategyId} - {StrategyName} for Account {AccountId}",
-            strategy.Id, strategy.Name, accountId);
+            "Strategy soft-deleted: {StrategyId} - {StrategyName} for User {UserId}",
+            strategy.Id, strategy.Name, userId);
 
         return NoContent();
     }

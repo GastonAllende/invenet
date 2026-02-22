@@ -3,6 +3,7 @@ using System;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Invenet.Api.Migrations
 {
     [DbContext(typeof(ModularDbContext))]
-    partial class ModularDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260222091628_RenameStrategyAccountIdToUserId")]
+    partial class RenameStrategyAccountIdToUserId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -467,17 +470,6 @@ namespace Invenet.Api.Migrations
                 {
                     b.HasOne("Invenet.Api.Modules.Auth.Domain.ApplicationUser", "User")
                         .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Invenet.Api.Modules.Strategies.Domain.Strategy", b =>
-                {
-                    b.HasOne("Invenet.Api.Modules.Auth.Domain.ApplicationUser", "User")
-                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
