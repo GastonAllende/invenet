@@ -7,12 +7,12 @@ namespace Invenet.Api.Modules.Accounts.Domain;
 /// </summary>
 public sealed class AccountRiskSettings : BaseEntity
 {
-    public required Guid AccountId { get; set; }
-    public decimal RiskPerTradePct { get; set; } = 0.00m;
-    public decimal MaxDailyLossPct { get; set; } = 0.00m;
-    public decimal MaxWeeklyLossPct { get; set; } = 0.00m;
-    public bool EnforceLimits { get; set; } = false;
+  public required Guid AccountId { get; set; }
+  public decimal RiskPerTradePct { get; set; } = 0.00m;
+  public decimal MaxDailyLossPct { get; set; } = 0.00m;
+  public decimal MaxWeeklyLossPct { get; set; } = 0.00m;
+  public bool EnforceLimits { get; set; } = false;
 
-    // Navigation properties
-    public Account Account { get; set; } = null!;
+  // Navigation properties
+  public Account Account { get; set; } = null!;
 }

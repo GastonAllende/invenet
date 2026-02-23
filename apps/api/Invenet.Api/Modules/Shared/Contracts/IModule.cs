@@ -6,13 +6,13 @@ namespace Invenet.Api.Modules.Shared.Contracts;
 /// </summary>
 public interface IModule
 {
-    /// <summary>
-    /// Registers module-specific services to the dependency injection container.
-    /// </summary>
-    IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration);
-    
-    /// <summary>
-    /// Maps module-specific endpoints.
-    /// </summary>
-    IEndpointRouteBuilder MapEndpoints(IEndpointRouteBuilder endpoints);
+  /// <summary>
+  /// Registers module-specific services to the dependency injection container.
+  /// </summary>
+  IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration);
+
+  /// <summary>
+  /// Maps module-specific endpoints.
+  /// </summary>
+  IEndpointRouteBuilder MapEndpoints(IEndpointRouteBuilder endpoints);
 }

@@ -10,23 +10,23 @@ builder.Services.AddDbContext<ModularDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         npgsqlOptions =>
         {
-            npgsqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 5,
-                maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorCodesToAdd: null);
-            npgsqlOptions.CommandTimeout(60);
+          npgsqlOptions.EnableRetryOnFailure(
+              maxRetryCount: 5,
+              maxRetryDelay: TimeSpan.FromSeconds(30),
+              errorCodesToAdd: null);
+          npgsqlOptions.CommandTimeout(60);
         }));
 
 // Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DevCors", policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
+  options.AddPolicy("DevCors", policy =>
+  {
+    policy
+          .WithOrigins("http://localhost:4200")
+          .AllowAnyHeader()
+          .AllowAnyMethod();
+  });
 });
 
 // Add controllers
@@ -34,9 +34,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument(config =>
 {
-    config.Title = "Invenet API - Modular Monolith";
-    config.Version = "v1";
-    config.Description = "API organized using modular monolith architecture";
+  config.Title = "Invenet API - Modular Monolith";
+  config.Version = "v1";
+  config.Description = "API organized using modular monolith architecture";
 });
 
 // Register all modules (discovers and registers automatically)
@@ -47,15 +47,15 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseOpenApi();
-    app.UseSwaggerUi(config =>
-    {
-        config.DocumentTitle = "Invenet API";
-    });
+  app.UseOpenApi();
+  app.UseSwaggerUi(config =>
+  {
+    config.DocumentTitle = "Invenet API";
+  });
 }
 else
 {
-    app.UseHttpsRedirection();
+  app.UseHttpsRedirection();
 }
 
 app.UseCors("DevCors");

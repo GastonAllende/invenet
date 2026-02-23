@@ -11,21 +11,21 @@ namespace Invenet.Api.Modules.Shared.Infrastructure.Data;
 /// </summary>
 public class ModularDbContext : DbContext
 {
-    public ModularDbContext(DbContextOptions<ModularDbContext> options) : base(options)
-    {
-    }
+  public ModularDbContext(DbContextOptions<ModularDbContext> options) : base(options)
+  {
+  }
 
-    // DbSets for entities
-    public DbSet<Account> Accounts => Set<Account>();
-    public DbSet<AccountRiskSettings> AccountRiskSettings => Set<AccountRiskSettings>();
-    public DbSet<Strategy> Strategies => Set<Strategy>();
-    public DbSet<Trade> Trades => Set<Trade>();
+  // DbSets for entities
+  public DbSet<Account> Accounts => Set<Account>();
+  public DbSet<AccountRiskSettings> AccountRiskSettings => Set<AccountRiskSettings>();
+  public DbSet<Strategy> Strategies => Set<Strategy>();
+  public DbSet<Trade> Trades => Set<Trade>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-        
-        // Apply all configurations from the assembly
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ModularDbContext).Assembly);
-    }
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    base.OnModelCreating(modelBuilder);
+
+    // Apply all configurations from the assembly
+    modelBuilder.ApplyConfigurationsFromAssembly(typeof(ModularDbContext).Assembly);
+  }
 }

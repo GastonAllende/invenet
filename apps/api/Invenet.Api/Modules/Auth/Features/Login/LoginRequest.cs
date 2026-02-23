@@ -7,10 +7,10 @@ namespace Invenet.Api.Modules.Auth.Features.Login;
 /// </summary>
 public sealed record LoginRequest
 {
-    [Required]
-    [EmailAddress]
-    public required string Email { get; init; }
+  [Required]
+  [EmailAddress]
+  public required string Email { get; init; }
 
-    [Required]
-    public required string Password { get; init; }
+  [Required]
+  public required string Password { get; init; }
 }

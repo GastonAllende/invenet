@@ -1,4 +1,8 @@
 <div class="trades-container">
+  @if (error()) {
+  <p-message severity="error" [text]="error()!" styleClass="mb-4 w-full" />
+  }
+
   <p-card>
     <ng-template pTemplate="header">
       <div class="flex justify-between items-center p-4">
@@ -15,26 +19,38 @@
       [rowsPerPageOptions]="[5, 10, 20, 50]"
       [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} trades"
-      [tableStyle]="{ 'min-width': '60rem' }"
+      [tableStyle]="{ 'min-width': '80rem' }"
       styleClass="p-datatable-sm"
     >
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="id">ID <p-sortIcon field="id" /></th>
+          <th pSortableColumn="date">Date <p-sortIcon field="date" /></th>
           <th pSortableColumn="symbol">Symbol <p-sortIcon field="symbol" /></th>
           <th pSortableColumn="type">Type <p-sortIcon field="type" /></th>
-          <th pSortableColumn="quantity">
-            Quantity <p-sortIcon field="quantity" />
+          <th pSortableColumn="entryPrice">
+            Entry Price <p-sortIcon field="entryPrice" />
           </th>
-          <th pSortableColumn="price">Price <p-sortIcon field="price" /></th>
-          <th pSortableColumn="total">Total <p-sortIcon field="total" /></th>
-          <th pSortableColumn="date">Date <p-sortIcon field="date" /></th>
+          <th pSortableColumn="exitPrice">
+            Exit Price <p-sortIcon field="exitPrice" />
+          </th>
+          <th pSortableColumn="positionSize">
+            Position Size <p-sortIcon field="positionSize" />
+          </th>
+          <th pSortableColumn="investedAmount">
+            Invested <p-sortIcon field="investedAmount" />
+          </th>
+          <th pSortableColumn="commission">
+            Commission <p-sortIcon field="commission" />
+          </th>
+          <th pSortableColumn="profitLoss">
+            P&amp;L <p-sortIcon field="profitLoss" />
+          </th>
           <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-trade>
         <tr>
-          <td>{{ trade.id }}</td>
+          <td>{{ trade.date | date: 'short' }}</td>
           <td class="font-semibold">{{ trade.symbol }}</td>
           <td>
             <p-tag
@@ -42,10 +58,20 @@
               [severity]="getTypeSeverity(trade.type)"
             />
           </td>
-          <td>{{ trade.quantity }}</td>
-          <td>{{ trade.price | currency }}</td>
-          <td class="font-semibold">{{ trade.total | currency }}</td>
-          <td>{{ trade.date | date: 'short' }}</td>
+          <td>{{ trade.entryPrice | currency }}</td>
+          <td>
+            @if (trade.exitPrice) { {{ trade.exitPrice | currency }} } @else {
+            &mdash; }
+          </td>
+          <td>{{ trade.positionSize }}</td>
+          <td>{{ trade.investedAmount | currency }}</td>
+          <td>{{ trade.commission | currency }}</td>
+          <td
+            [class.text-green-600]="trade.profitLoss > 0"
+            [class.text-red-600]="trade.profitLoss < 0"
+          >
+            {{ trade.profitLoss | currency }}
+          </td>
           <td>
             <p-tag
               [value]="trade.status"
@@ -56,7 +82,7 @@
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="8" class="text-center py-4">No trades found.</td>
+          <td colspan="10" class="text-center py-4">No trades found.</td>
         </tr>
       </ng-template>
     </p-table>
