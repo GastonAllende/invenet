@@ -7,17 +7,17 @@ namespace Invenet.Api.Modules.Trades;
 /// </summary>
 public class TradesModule : IModule
 {
-    public IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration)
-    {
-        // Register trades-specific services here
-        // Example: services.AddScoped<ITradesService, TradesService>();
-        
-        return services;
-    }
+  public IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration)
+  {
+    // Register trades-specific services here
+    // Example: services.AddScoped<ITradesService, TradesService>();
 
-    public IEndpointRouteBuilder MapEndpoints(IEndpointRouteBuilder endpoints)
-    {
-        // Endpoints are mapped via the TradesController
-        return endpoints;
-    }
+    return services;
+  }
+
+  public IEndpointRouteBuilder MapEndpoints(IEndpointRouteBuilder endpoints)
+  {
+    // Endpoints are mapped via the TradesController
+    return endpoints;
+  }
 }

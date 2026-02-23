@@ -7,17 +7,17 @@ namespace Invenet.Api.Modules.Strategies;
 /// </summary>
 public class StrategiesModule : IModule
 {
-    public IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration)
-    {
-        // Register strategies-specific services here when needed
-        // Example: services.AddScoped<IStrategyService, StrategyService>();
-        
-        return services;
-    }
+  public IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration)
+  {
+    // Register strategies-specific services here when needed
+    // Example: services.AddScoped<IStrategyService, StrategyService>();
 
-    public IEndpointRouteBuilder MapEndpoints(IEndpointRouteBuilder endpoints)
-    {
-        // Endpoints are mapped via the StrategiesController
-        return endpoints;
-    }
+    return services;
+  }
+
+  public IEndpointRouteBuilder MapEndpoints(IEndpointRouteBuilder endpoints)
+  {
+    // Endpoints are mapped via the StrategiesController
+    return endpoints;
+  }
 }

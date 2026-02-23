@@ -5,13 +5,13 @@ namespace Invenet.Api.Modules.Auth.Infrastructure.Email;
 /// </summary>
 public interface IEmailService
 {
-    /// <summary>
-    /// Sends an email confirmation email.
-    /// </summary>
-    Task SendEmailConfirmationAsync(string toEmail, string confirmationLink);
-    
-    /// <summary>
-    /// Sends a password reset email.
-    /// </summary>
-    Task SendPasswordResetEmailAsync(string toEmail, string resetLink);
+  /// <summary>
+  /// Sends an email confirmation email.
+  /// </summary>
+  Task SendEmailConfirmationAsync(string toEmail, string confirmationLink);
+
+  /// <summary>
+  /// Sends a password reset email.
+  /// </summary>
+  Task SendPasswordResetEmailAsync(string toEmail, string resetLink);
 }

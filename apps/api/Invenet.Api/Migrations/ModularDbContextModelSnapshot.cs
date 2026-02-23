@@ -292,7 +292,15 @@ namespace Invenet.Api.Migrations
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("Commission")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("EntryPrice")
@@ -300,6 +308,22 @@ namespace Invenet.Api.Migrations
 
                     b.Property<decimal?>("ExitPrice")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("InvestedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PositionSize")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("ProfitLoss")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<Guid?>("StrategyId")
                         .HasColumnType("uuid");
@@ -309,6 +333,11 @@ namespace Invenet.Api.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -317,8 +346,14 @@ namespace Invenet.Api.Migrations
                     b.HasIndex("AccountId")
                         .HasDatabaseName("ix_trades_account_id");
 
+                    b.HasIndex("Date")
+                        .HasDatabaseName("ix_trades_date");
+
                     b.HasIndex("StrategyId")
                         .HasDatabaseName("ix_trades_strategy_id");
+
+                    b.HasIndex("AccountId", "Date")
+                        .HasDatabaseName("ix_trades_account_date");
 
                     b.HasIndex("AccountId", "StrategyId")
                         .HasDatabaseName("ix_trades_account_strategy");

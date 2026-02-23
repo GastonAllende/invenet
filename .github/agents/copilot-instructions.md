@@ -156,11 +156,13 @@ npx nx affected --target=test     # run tests only on affected projects
 | 004 | `004-fix-strategy-account-id` | Implemented | Renamed `accountId` → `userId` on `strategies.strategies` table (data model correction) |
 
 ## Recent Changes
+- 005-trades-data-refactor: Added PostgreSQL — `trades` schema, `trades` table. EF Core migrations via `dotnet ef migrations add`
 
 - **004-fix-strategy-account-id**: Renamed `account_id` column → `user_id` on `strategies.strategies` table; updated `Strategy` EF entity, TypeScript model, and all repository queries. No API response shape changes.
 - **003-align-accounts-design**: Refactored accounts page to use PrimeNG modal for create/edit (matching strategies pattern); added delete account functionality.
-- **002-brokerage-accounts**: Full brokerage account CRUD with risk settings (risk-per-trade %, max-drawdown %), NgRx SignalStore, PrimeNG Table + reactive form, accounts REST API.
-- **001-trade-strategy**: Strategy CRUD (name, description, soft-delete) + optional strategy field on trade creation/editing; strategies Nx lib + Strategies backend module.
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
+
+## Active Technologies
+- PostgreSQL — `trades` schema, `trades` table. EF Core migrations via `dotnet ef migrations add` (005-trades-data-refactor)

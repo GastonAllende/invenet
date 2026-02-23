@@ -8,18 +8,18 @@ namespace Invenet.Api.Modules.Accounts.Domain;
 /// </summary>
 public sealed class Account : BaseEntity
 {
-    public required Guid UserId { get; set; }
-    public required string Name { get; set; }
-    public required string Broker { get; set; }
-    public required string AccountType { get; set; }
-    public required string BaseCurrency { get; set; }
-    public required DateTimeOffset StartDate { get; set; }
-    public required decimal StartingBalance { get; set; }
-    public string Timezone { get; set; } = "Europe/Stockholm";
-    public string? Notes { get; set; }
-    public bool IsActive { get; set; } = true;
+  public required Guid UserId { get; set; }
+  public required string Name { get; set; }
+  public required string Broker { get; set; }
+  public required string AccountType { get; set; }
+  public required string BaseCurrency { get; set; }
+  public required DateTimeOffset StartDate { get; set; }
+  public required decimal StartingBalance { get; set; }
+  public string Timezone { get; set; } = "Europe/Stockholm";
+  public string? Notes { get; set; }
+  public bool IsActive { get; set; } = true;
 
-    // Navigation properties
-    public ApplicationUser User { get; set; } = null!;
-    public AccountRiskSettings RiskSettings { get; set; } = null!;
+  // Navigation properties
+  public ApplicationUser User { get; set; } = null!;
+  public AccountRiskSettings RiskSettings { get; set; } = null!;
 }
