@@ -1,0 +1,39 @@
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+.required {
+  color: var(--red-500);
+}
+
+.error-message {
+  color: var(--red-500);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.form-hint {
+  color: var(--text-color-secondary);
+  font-size: 0.75rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}

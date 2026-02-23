@@ -1,0 +1,31 @@
+<div class="trade-shell">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <lib-trade-list
+    [trades]="trades()"
+    [isLoading]="isLoading()"
+    (create)="onCreateTrade()"
+    (edit)="onEditTrade($event)"
+    (delete)="onDeleteTrade($event)"
+  ></lib-trade-list>
+
+  <p-dialog
+    [header]="selectedTrade() ? 'Edit Trade' : 'New Trade'"
+    [(visible)]="showFormDialog"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '720px' }"
+  >
+    <lib-trade-form
+      [trade]="selectedTrade()"
+      [accounts]="accounts()"
+      [strategies]="strategies()"
+      [isLoading]="isLoading()"
+      (save)="onSaveTrade($event)"
+      (formCancel)="onCancelForm()"
+    ></lib-trade-form>
+  </p-dialog>
+</div>
