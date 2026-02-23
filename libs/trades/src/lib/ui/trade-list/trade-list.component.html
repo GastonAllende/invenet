@@ -1,0 +1,135 @@
+<div class="trade-list-container">
+  <div class="list-header">
+    <h3>Trade History</h3>
+    <div class="list-controls">
+      <p-button
+        label="New Trade"
+        icon="pi pi-plus"
+        (onClick)="onCreate()"
+        [disabled]="isLoading()"
+      ></p-button>
+    </div>
+  </div>
+
+  <p-table
+    [value]="trades()"
+    [loading]="isLoading()"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} trades"
+    [tableStyle]="{ 'min-width': '90rem' }"
+    styleClass="p-datatable-striped"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="date" style="width: 10%">
+          Date <p-sortIcon field="date" />
+        </th>
+        <th pSortableColumn="symbol" style="width: 8%">
+          Symbol <p-sortIcon field="symbol" />
+        </th>
+        <th pSortableColumn="type" style="width: 7%">
+          Type <p-sortIcon field="type" />
+        </th>
+        <th pSortableColumn="entryPrice" style="width: 10%">
+          Entry Price <p-sortIcon field="entryPrice" />
+        </th>
+        <th pSortableColumn="exitPrice" style="width: 10%">
+          Exit Price <p-sortIcon field="exitPrice" />
+        </th>
+        <th pSortableColumn="positionSize" style="width: 10%">
+          Position Size <p-sortIcon field="positionSize" />
+        </th>
+        <th pSortableColumn="investedAmount" style="width: 10%">
+          Invested <p-sortIcon field="investedAmount" />
+        </th>
+        <th pSortableColumn="commission" style="width: 9%">
+          Commission <p-sortIcon field="commission" />
+        </th>
+        <th pSortableColumn="profitLoss" style="width: 9%">
+          P&amp;L <p-sortIcon field="profitLoss" />
+        </th>
+        <th pSortableColumn="status" style="width: 8%">
+          Status <p-sortIcon field="status" />
+        </th>
+        <th style="width: 9%">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-trade>
+      <tr>
+        <td>{{ trade.date | date: 'short' }}</td>
+        <td>
+          <strong>{{ trade.symbol }}</strong>
+        </td>
+        <td>
+          <p-tag
+            [value]="trade.type"
+            [severity]="getTypeSeverity(trade.type)"
+          />
+        </td>
+        <td>{{ trade.entryPrice | currency }}</td>
+        <td>
+          @if (trade.exitPrice) {
+            {{ trade.exitPrice | currency }}
+          } @else {
+            &mdash;
+          }
+        </td>
+        <td>{{ trade.positionSize }}</td>
+        <td>{{ trade.investedAmount | currency }}</td>
+        <td>{{ trade.commission | currency }}</td>
+        <td
+          [class.text-green-600]="trade.profitLoss > 0"
+          [class.text-red-600]="trade.profitLoss < 0"
+        >
+          {{ trade.profitLoss | currency }}
+        </td>
+        <td>
+          <p-tag
+            [value]="trade.status"
+            [severity]="getStatusSeverity(trade.status)"
+          />
+        </td>
+        <td>
+          <div class="action-buttons">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              severity="info"
+              [disabled]="isLoading()"
+              (onClick)="onEdit(trade)"
+              pTooltip="Edit trade"
+              tooltipPosition="top"
+            ></p-button>
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              [disabled]="isLoading()"
+              (onClick)="onDelete(trade.id)"
+              pTooltip="Delete trade"
+              tooltipPosition="top"
+            ></p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="11" class="empty-message">
+          <div class="empty-state">
+            <i class="pi pi-inbox" style="font-size: 3rem"></i>
+            <p>No trades found</p>
+            <small>Click "New Trade" to record your first trade</small>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

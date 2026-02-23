@@ -1,0 +1,227 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="form-grid">
+    <!-- Account (only for create) -->
+    @if (!isEditMode) {
+      <div class="form-field">
+        <label for="accountId" class="form-label">Account <span class="required">*</span></label>
+        <p-select
+          inputId="accountId"
+          formControlName="accountId"
+          [options]="accounts()"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Select account"
+          [style]="{ width: '100%' }"
+        ></p-select>
+        @if (form.get('accountId')?.invalid && form.get('accountId')?.touched) {
+          <small class="error-message">Account is required</small>
+        }
+      </div>
+    }
+
+    <!-- Strategy -->
+    <div class="form-field">
+      <label for="strategyId" class="form-label">Strategy</label>
+      <p-select
+        inputId="strategyId"
+        formControlName="strategyId"
+        [options]="strategies()"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Select strategy (optional)"
+        [showClear]="true"
+        [style]="{ width: '100%' }"
+      ></p-select>
+    </div>
+
+    <!-- Type -->
+    <div class="form-field">
+      <label for="type" class="form-label">Type <span class="required">*</span></label>
+      <p-select
+        inputId="type"
+        formControlName="type"
+        [options]="typeOptions"
+        optionLabel="label"
+        optionValue="value"
+        [style]="{ width: '100%' }"
+      ></p-select>
+      @if (form.get('type')?.invalid && form.get('type')?.touched) {
+        <small class="error-message">Type is required</small>
+      }
+    </div>
+
+    <!-- Date -->
+    <div class="form-field">
+      <label for="date" class="form-label">Date <span class="required">*</span></label>
+      <p-datepicker
+        inputId="date"
+        formControlName="date"
+        [showTime]="true"
+        [showIcon]="true"
+        dateFormat="mm/dd/yy"
+        [style]="{ width: '100%' }"
+      ></p-datepicker>
+      @if (form.get('date')?.invalid && form.get('date')?.touched) {
+        <small class="error-message">Date is required</small>
+      }
+    </div>
+
+    <!-- Symbol -->
+    <div class="form-field">
+      <label for="symbol" class="form-label">Symbol <span class="required">*</span></label>
+      <input
+        pInputText
+        id="symbol"
+        formControlName="symbol"
+        placeholder="e.g. AAPL"
+        style="width: 100%"
+        (input)="
+          form
+            .get('symbol')
+            ?.setValue(form.get('symbol')?.value?.toUpperCase(), {
+              emitEvent: true,
+            })
+        "
+      />
+      @if (form.get('symbol')?.invalid && form.get('symbol')?.touched) {
+        <small class="error-message">Symbol is required (max 20 chars)</small>
+      }
+    </div>
+
+    <!-- Entry Price -->
+    <div class="form-field">
+      <label for="entryPrice"
+        >Entry Price <span class="required">*</span></label
+      >
+      <p-inputnumber
+        inputId="entryPrice"
+        formControlName="entryPrice"
+        mode="currency"
+        currency="USD"
+        locale="en-US"
+        [minFractionDigits]="2"
+        [maxFractionDigits]="8"
+        [min]="0.0001"
+        [style]="{ width: '100%' }"
+      ></p-inputnumber>
+      @if (form.get('entryPrice')?.invalid && form.get('entryPrice')?.touched) {
+        <small class="error-message">Entry price must be greater than 0</small>
+      }
+    </div>
+
+    <!-- Exit Price -->
+    <div class="form-field">
+      <label for="exitPrice" class="form-label">Exit Price</label>
+      <p-inputnumber
+        inputId="exitPrice"
+        formControlName="exitPrice"
+        mode="currency"
+        currency="USD"
+        locale="en-US"
+        [minFractionDigits]="2"
+        [maxFractionDigits]="8"
+        [min]="0.0001"
+        [style]="{ width: '100%' }"
+      ></p-inputnumber>
+    </div>
+
+    <!-- Position Size -->
+    <div class="form-field">
+      <label for="positionSize"
+        >Position Size <span class="required">*</span></label
+      >
+      <p-inputnumber
+        inputId="positionSize"
+        formControlName="positionSize"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="8"
+        [min]="0.000001"
+        [style]="{ width: '100%' }"
+      ></p-inputnumber>
+      @if (
+        form.get('positionSize')?.invalid && form.get('positionSize')?.touched
+      ) {
+        <small class="error-message">Position size must be greater than 0</small>
+      }
+    </div>
+
+    <!-- Commission -->
+    <div class="form-field">
+      <label for="commission" class="form-label">Commission</label>
+      <p-inputnumber
+        inputId="commission"
+        formControlName="commission"
+        mode="currency"
+        currency="USD"
+        locale="en-US"
+        [minFractionDigits]="2"
+        [min]="0"
+        [style]="{ width: '100%' }"
+      ></p-inputnumber>
+    </div>
+
+    <!-- Status -->
+    <div class="form-field">
+      <label for="status" class="form-label">Status <span class="required">*</span></label>
+      <p-select
+        inputId="status"
+        formControlName="status"
+        [options]="statusOptions"
+        optionLabel="label"
+        optionValue="value"
+        [style]="{ width: '100%' }"
+      ></p-select>
+    </div>
+
+    <!-- Invested Amount (read-only, auto-calculated) -->
+    <div class="form-field">
+      <label for="investedAmount" class="form-label">Invested Amount</label>
+      <p-inputnumber
+        inputId="investedAmount"
+        formControlName="investedAmount"
+        mode="currency"
+        currency="USD"
+        locale="en-US"
+        [minFractionDigits]="2"
+        [style]="{ width: '100%' }"
+        [readonly]="true"
+      ></p-inputnumber>
+      <small class="form-hint"
+        >Auto-calculated: Entry Price × Position Size</small
+      >
+    </div>
+
+    <!-- Profit / Loss (read-only, auto-calculated) -->
+    <div class="form-field">
+      <label for="profitLoss" class="form-label">Profit / Loss</label>
+      <p-inputnumber
+        inputId="profitLoss"
+        formControlName="profitLoss"
+        mode="currency"
+        currency="USD"
+        locale="en-US"
+        [minFractionDigits]="2"
+        [style]="{ width: '100%' }"
+        [readonly]="true"
+      ></p-inputnumber>
+      <small class="form-hint">Auto-calculated when Exit Price is set</small>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="isLoading()"
+      (onClick)="onCancel()"
+    ></p-button>
+    <p-button
+      type="submit"
+      [label]="isEditMode ? 'Save Changes' : 'Create Trade'"
+      icon="pi pi-check"
+      [loading]="isLoading()"
+      [disabled]="isLoading()"
+    ></p-button>
+  </div>
+</form>
