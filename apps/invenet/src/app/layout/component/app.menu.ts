@@ -48,9 +48,9 @@ export class AppMenu {
             routerLink: ['/strategy'],
           },
           {
-            label: 'Account',
+            label: 'Accounts',
             icon: 'pi pi-fw pi-id-card',
-            routerLink: ['/account'],
+            routerLink: ['/accounts'],
           },
           /*         {
             label: 'Input',

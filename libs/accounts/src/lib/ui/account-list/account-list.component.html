@@ -1,16 +1,16 @@
 <div class="account-list-container">
   <div class="list-header">
-    <h3>My Accounts</h3>
+    <h3>Accounts</h3>
     <div class="list-controls">
       <p-button
-        label="New Account"
+        label="Add Account"
         icon="pi pi-plus"
         (onClick)="onCreate()"
         [disabled]="isLoading()"
       ></p-button>
       <p-checkbox
-        [(ngModel)]="includeArchived"
-        (onChange)="onIncludeArchivedChange($event.checked)"
+        [ngModel]="includeArchived()"
+        (ngModelChange)="onIncludeArchivedChange($event)"
         [binary]="true"
         inputId="includeArchived"
         label="Show Archived"
@@ -40,33 +40,42 @@
           Type <p-sortIcon field="accountType"></p-sortIcon>
         </th>
         <th pSortableColumn="baseCurrency">Currency</th>
-        <th pSortableColumn="startingBalance" style="text-align: right">
-          Starting Balance <p-sortIcon field="startingBalance"></p-sortIcon>
-        </th>
         <th>Risk Per Trade</th>
+        <th>Max Daily Loss</th>
         <th pSortableColumn="isActive">
           Status <p-sortIcon field="isActive"></p-sortIcon>
         </th>
-        <th style="width: 12rem">Actions</th>
+        <th style="width: 14rem">Actions</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-account>
-      <tr (click)="onRowSelect(account)" style="cursor: pointer">
+      <tr
+        (click)="onRowSelect(account)"
+        style="cursor: pointer"
+        [class.active-row]="isActiveAccount(account.id)"
+      >
         <td>
           <strong>{{ account.name }}</strong>
+          @if (isActiveAccount(account.id)) {
+            <p-tag value="Active Account" severity="success"></p-tag>
+          }
         </td>
         <td>{{ account.broker }}</td>
         <td>
           <span class="account-type-badge">{{ account.accountType }}</span>
         </td>
         <td>{{ account.baseCurrency }}</td>
-        <td style="text-align: right">
-          {{ account.startingBalance | currency: account.baseCurrency }}
-        </td>
         <td>
           @if (account.riskSettings) {
             <span>{{ account.riskSettings.riskPerTradePct }}%</span>
+          } @else {
+            <span class="no-risk">—</span>
+          }
+        </td>
+        <td>
+          @if (account.riskSettings) {
+            <span>{{ account.riskSettings.maxDailyLossPct }}%</span>
           } @else {
             <span class="no-risk">—</span>
           }
@@ -80,25 +89,27 @@
         <td>
           <div class="action-buttons">
             <p-button
-              icon="pi pi-pencil"
+              icon="pi pi-eye"
               [rounded]="true"
               [text]="true"
               severity="info"
               [disabled]="isLoading()"
-              (onClick)="onEdit(account.id); $event.stopPropagation()"
-              pTooltip="Edit"
+              (onClick)="onView(account.id); $event.stopPropagation()"
+              pTooltip="View"
               tooltipPosition="top"
             ></p-button>
-            <p-button
-              icon="pi pi-trash"
-              [rounded]="true"
-              [text]="true"
-              severity="danger"
-              [disabled]="isLoading()"
-              (onClick)="onDelete(account.id); $event.stopPropagation()"
-              pTooltip="Delete"
-              tooltipPosition="top"
-            ></p-button>
+            @if (!isActiveAccount(account.id)) {
+              <p-button
+                icon="pi pi-star"
+                [rounded]="true"
+                [text]="true"
+                severity="help"
+                [disabled]="isLoading()"
+                (onClick)="onSetActive(account.id); $event.stopPropagation()"
+                pTooltip="Set Active"
+                tooltipPosition="top"
+              ></p-button>
+            }
             @if (account.isActive) {
               <p-button
                 icon="pi pi-archive"
@@ -108,6 +119,17 @@
                 [disabled]="isLoading()"
                 (onClick)="onArchive(account.id); $event.stopPropagation()"
                 pTooltip="Archive"
+                tooltipPosition="top"
+              ></p-button>
+            } @else {
+              <p-button
+                icon="pi pi-replay"
+                [rounded]="true"
+                [text]="true"
+                severity="contrast"
+                [disabled]="isLoading()"
+                (onClick)="onUnarchive(account.id); $event.stopPropagation()"
+                pTooltip="Unarchive"
                 tooltipPosition="top"
               ></p-button>
             }

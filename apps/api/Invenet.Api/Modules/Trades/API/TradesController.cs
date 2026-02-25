@@ -45,21 +45,29 @@ public sealed class TradesController : ControllerBase
   /// </summary>
   /// <returns>List of trades belonging to the user's accounts</returns>
   /// <response code="200">Trades returned successfully</response>
+  /// <response code="400">Account context is missing</response>
   /// <response code="401">User not authenticated</response>
+  /// <response code="403">Account does not belong to user</response>
   [HttpGet]
-  public async Task<ActionResult<ListTradesResponse>> GetTrades()
+  public async Task<ActionResult<ListTradesResponse>> GetTrades([FromQuery] Guid? accountId)
   {
     var userId = GetCurrentUserId();
 
-    // Collect all account IDs owned by this user
-    var userAccountIds = await _context.Accounts
-        .Where(a => a.UserId == userId)
-        .Select(a => a.Id)
-        .ToListAsync();
+    if (!accountId.HasValue)
+    {
+      return BadRequest(new { message = "accountId query parameter is required" });
+    }
 
-    // Query trades filtered to user's accounts
+    var accountBelongsToUser = await _context.Accounts
+        .AnyAsync(a => a.Id == accountId.Value && a.UserId == userId);
+
+    if (!accountBelongsToUser)
+    {
+      return Forbid();
+    }
+
     var trades = await _context.Trades
-        .Where(t => userAccountIds.Contains(t.AccountId))
+        .Where(t => t.AccountId == accountId.Value)
         .OrderByDescending(t => t.Date)
         .Select(t => new TradeListItem(
             t.Id,

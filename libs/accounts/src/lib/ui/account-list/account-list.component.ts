@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FormsModule } from '@angular/forms';
+import { TooltipModule } from 'primeng/tooltip';
 import { GetAccountResponse } from '../../../data-access/src/lib/models/account.model';
 
 /**
@@ -20,21 +21,24 @@ import { GetAccountResponse } from '../../../data-access/src/lib/models/account.
     ButtonModule,
     TagModule,
     CheckboxModule,
+    TooltipModule,
   ],
   templateUrl: './account-list.component.html',
   styleUrl: './account-list.component.css',
 })
 export class AccountListComponent {
   accounts = input.required<GetAccountResponse[]>();
+  activeAccountId = input<string | null>(null);
   includeArchived = input<boolean>(false);
   isLoading = input<boolean>(false);
 
   includeArchivedChange = output<boolean>();
   accountSelected = output<string>();
   create = output<void>();
-  editClicked = output<string>();
-  delete = output<string>();
+  viewClicked = output<string>();
+  setActiveClicked = output<string>();
   archiveClicked = output<string>();
+  unarchiveClicked = output<string>();
 
   onIncludeArchivedChange(value: boolean): void {
     this.includeArchivedChange.emit(value);
@@ -44,16 +48,20 @@ export class AccountListComponent {
     this.create.emit();
   }
 
-  onEdit(id: string): void {
-    this.editClicked.emit(id);
+  onView(id: string): void {
+    this.viewClicked.emit(id);
   }
 
-  onDelete(id: string): void {
-    this.delete.emit(id);
+  onSetActive(id: string): void {
+    this.setActiveClicked.emit(id);
   }
 
   onArchive(id: string): void {
     this.archiveClicked.emit(id);
+  }
+
+  onUnarchive(id: string): void {
+    this.unarchiveClicked.emit(id);
   }
 
   onRowSelect(account: GetAccountResponse): void {
@@ -65,6 +73,10 @@ export class AccountListComponent {
   }
 
   getStatusLabel(isActive: boolean): string {
-    return isActive ? 'Active' : 'Archived';
+    return isActive ? 'ACTIVE' : 'ARCHIVED';
+  }
+
+  isActiveAccount(accountId: string): boolean {
+    return this.activeAccountId() === accountId;
   }
 }

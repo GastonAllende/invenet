@@ -38,10 +38,32 @@ export const appRoutes: Route[] = [
           import('@invenet/strategies').then((m) => m.Strategies),
       },
       {
-        path: 'account',
+        path: 'strategies/new',
+        loadComponent: () =>
+          import('@invenet/strategies').then((m) => m.Strategies),
+      },
+      {
+        path: 'accounts/new',
         loadComponent: () =>
           import('@invenet/accounts').then((m) => m.Accounts),
+        data: { accountMode: 'new' },
       },
+      {
+        path: 'accounts/:id',
+        loadComponent: () =>
+          import('@invenet/accounts').then((m) => m.Accounts),
+        data: { accountMode: 'detail' },
+      },
+      {
+        path: 'accounts',
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('@invenet/accounts').then((m) => m.Accounts),
+        data: { accountMode: 'list' },
+      },
+      { path: 'account/new', redirectTo: 'accounts/new', pathMatch: 'full' },
+      { path: 'account/:id', redirectTo: 'accounts/:id' },
+      { path: 'account', redirectTo: 'accounts', pathMatch: 'full' },
     ],
   },
   { path: '**', redirectTo: '' },

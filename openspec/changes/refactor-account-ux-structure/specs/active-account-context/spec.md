@@ -26,6 +26,21 @@ The system SHALL require account context for journal, analytics, and AI query su
 - **WHEN** an AI feature requests account-related insights or analysis inputs
 - **THEN** the request SHALL include `ActiveAccountId` and SHALL use only account-scoped source data
 
+### Requirement: Backend account-dependent endpoints SHALL enforce account context and ownership
+The backend SHALL require account context for account-dependent endpoints and SHALL validate that the referenced account belongs to the authenticated user before returning account-scoped data.
+
+#### Scenario: Missing account context on account-dependent endpoint
+- **WHEN** a request is sent to an account-dependent endpoint without required account context
+- **THEN** the backend SHALL reject the request with a validation error response
+
+#### Scenario: Account context does not belong to authenticated user
+- **WHEN** a request includes an account identifier that is not owned by the authenticated user
+- **THEN** the backend SHALL reject the request with an authorization error response and SHALL NOT return account data
+
+#### Scenario: Valid account context on account-dependent endpoint
+- **WHEN** a request includes a valid account identifier owned by the authenticated user
+- **THEN** the backend SHALL return data filtered to that account only
+
 ### Requirement: The user interface SHALL expose active-account context and add-account navigation
 The system SHALL display the current active account indicator in a global shell context and SHALL provide an Add Account action that routes to `/account/new`.
 

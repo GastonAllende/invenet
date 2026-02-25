@@ -64,6 +64,7 @@ export class TradeFormComponent {
 
   trade = input<Trade | null>(null);
   accounts = input<SelectOption[]>([]);
+  defaultAccountId = input<string | null>(null);
   strategies = input<SelectOption[]>([]);
   isLoading = input<boolean>(false);
 
@@ -108,8 +109,9 @@ export class TradeFormComponent {
           profitLoss: t.profitLoss,
         });
       } else {
+        const defaultAccountId = this.defaultAccountId();
         this.form.reset({
-          accountId: '',
+          accountId: defaultAccountId ?? '',
           strategyId: null,
           type: 'BUY',
           date: new Date(),

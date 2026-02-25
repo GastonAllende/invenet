@@ -1,30 +1,39 @@
-import { Component, OnInit, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { Toast } from 'primeng/toast';
-import { DialogModule } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { AccountFormComponent } from '../../ui/account-form/account-form.component';
-import { AccountListComponent } from '../../ui/account-list/account-list.component';
-import { AccountsStore } from '../../../data-access/src/lib/store/accounts.store';
+import { Toast } from 'primeng/toast';
 import {
   CreateAccountRequest,
-  GetAccountResponse,
   UpdateAccountRequest,
 } from '../../../data-access/src/lib/models/account.model';
+import { ActiveAccountStore } from '../../../data-access/src/lib/store/active-account.store';
+import { AccountsStore } from '../../../data-access/src/lib/store/accounts.store';
+import { AccountFormComponent } from '../../ui/account-form/account-form.component';
+import { AccountListComponent } from '../../ui/account-list/account-list.component';
 
-/**
- * Shell component for accounts management
- */
+type AccountRouteMode = 'list' | 'new' | 'detail';
+type PendingOperation = 'create' | 'update' | 'archive' | 'unarchive' | null;
+
 @Component({
   selector: 'lib-invenet-accounts-shell',
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     ButtonModule,
     Toast,
-    DialogModule,
     ConfirmDialogModule,
     AccountFormComponent,
     AccountListComponent,
@@ -34,149 +43,243 @@ import {
   styleUrl: './accounts-shell.component.css',
 })
 export class AccountsShellComponent implements OnInit {
-  accountsStore = inject(AccountsStore);
-  messageService = inject(MessageService);
-  confirmationService = inject(ConfirmationService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  readonly accountsStore = inject(AccountsStore);
+  readonly activeAccountStore = inject(ActiveAccountStore);
+  private readonly messageService = inject(MessageService);
+  private readonly confirmationService = inject(ConfirmationService);
 
-  includeArchived = signal(false);
-  lastOperationType = signal<'create' | 'update' | 'delete' | null>(null);
+  readonly routeMode = signal<AccountRouteMode>('list');
+  readonly routeAccountId = signal<string | null>(null);
+  readonly editMode = signal(false);
+  readonly includeArchived = signal(false);
+  readonly pendingOperation = signal<PendingOperation>(null);
 
-  // Modal state
-  showFormDialog = signal(false);
-  selectedAccount = signal<GetAccountResponse | null>(null);
+  readonly accounts = this.accountsStore.entities;
+  readonly activeAccounts = this.accountsStore.activeAccounts;
+  readonly selectedAccount = this.accountsStore.selectedAccount;
+  readonly isLoading = this.accountsStore.isLoading;
+  readonly error = this.accountsStore.error;
+  readonly activeAccountId = this.activeAccountStore.activeAccountId;
+  readonly activeAccount = this.activeAccountStore.activeAccount;
+
+  readonly isListMode = computed(() => this.routeMode() === 'list');
+  readonly isCreateMode = computed(() => this.routeMode() === 'new');
+  readonly isDetailMode = computed(() => this.routeMode() === 'detail');
+  readonly isOnboarding = computed(
+    () => this.isCreateMode() && this.activeAccounts().length === 0,
+  );
 
   constructor() {
-    // Effect to show error toasts
     effect(() => {
-      const error = this.accountsStore.error();
-      if (error) {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: error,
-          life: 5000,
-        });
-        // Clear error after showing
-        setTimeout(() => this.accountsStore.clearError(), 100);
+      const currentError = this.error();
+      if (!currentError) {
+        return;
       }
+
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: currentError,
+        life: 5000,
+      });
+
+      this.accountsStore.clearError();
+      this.pendingOperation.set(null);
     });
 
-    // Effect to show success toasts
     effect(() => {
-      const isLoading = this.accountsStore.isLoading();
-      const lastOp = this.lastOperationType();
+      const activeIds = this.activeAccounts().map((account) => account.id);
+      this.activeAccountStore.syncWithAccounts(activeIds);
+    });
 
-      // When loading completes and there's no error, show success
-      if (!isLoading && lastOp) {
-        const error = this.accountsStore.error();
-        if (!error) {
-          let message = '';
-          switch (lastOp) {
-            case 'create':
-              message = 'Account created successfully';
-              break;
-            case 'update':
-              message = 'Account updated successfully';
-              break;
-            case 'delete':
-              message = 'Account deleted successfully';
-              break;
-          }
-          if (message) {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: message,
-              life: 3000,
-            });
-          }
+    effect(() => {
+      const operation = this.pendingOperation();
+      if (!operation || this.isLoading() || this.error()) {
+        return;
+      }
+
+      if (operation === 'create') {
+        const newId = this.accountsStore.selectedAccountId();
+        if (!newId) {
+          this.pendingOperation.set(null);
+          return;
         }
-        this.lastOperationType.set(null);
+
+        this.activeAccountStore.setActiveAccount(newId);
+        this.accountsStore.setActiveAccountOnServer(newId);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Account created and set as active.',
+          life: 3000,
+        });
+        void this.router.navigate(['/accounts', newId]);
+      }
+
+      if (operation === 'update') {
+        this.editMode.set(false);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Account updated',
+          life: 3000,
+        });
+      }
+
+      if (operation === 'archive') {
+        this.accountsStore.loadAccounts({
+          includeArchived: this.includeArchived(),
+        });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Account archived',
+          life: 3000,
+        });
+      }
+
+      if (operation === 'unarchive') {
+        this.accountsStore.loadAccounts({
+          includeArchived: this.includeArchived(),
+        });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Account restored',
+          life: 3000,
+        });
+      }
+
+      this.pendingOperation.set(null);
+    });
+
+    effect(() => {
+      const mode = this.routeMode();
+      const accountId = this.routeAccountId();
+      const loading = this.isLoading();
+      const accounts = this.accounts();
+
+      if (loading) {
+        return;
+      }
+
+      if (mode === 'list' && accounts.length === 0) {
+        void this.router.navigateByUrl('/accounts/new');
+        return;
+      }
+
+      if (mode === 'detail') {
+        if (!accountId) {
+          void this.router.navigateByUrl('/accounts');
+          return;
+        }
+
+        this.accountsStore.selectAccount(accountId);
+        if (!accounts.some((item) => item.id === accountId)) {
+          this.accountsStore.loadAccount(accountId);
+        }
       }
     });
   }
 
   ngOnInit(): void {
-    this.accountsStore.loadAccounts({ includeArchived: false });
-  }
+    this.activeAccountStore.initializeFromStorage();
+    this.accountsStore.loadAccounts({ includeArchived: this.includeArchived() });
 
-  onCreateAccount(): void {
-    this.selectedAccount.set(null);
-    this.showFormDialog.set(true);
-  }
-
-  onEditAccount(account: GetAccountResponse): void {
-    this.selectedAccount.set(account);
-    this.showFormDialog.set(true);
-  }
-
-  onSaveAccount(request: CreateAccountRequest | UpdateAccountRequest): void {
-    const selected = this.selectedAccount();
-
-    if (selected) {
-      // Update existing account
-      this.lastOperationType.set('update');
-      this.accountsStore.updateAccount({
-        id: selected.id,
-        payload: request as UpdateAccountRequest,
-      });
-    } else {
-      // Create new account
-      this.lastOperationType.set('create');
-      this.accountsStore.createAccount(request as CreateAccountRequest);
-    }
-    this.showFormDialog.set(false);
-  }
-
-  onCancelForm(): void {
-    this.showFormDialog.set(false);
-    this.selectedAccount.set(null);
-  }
-
-  onDeleteAccount(id: string): void {
-    const account = this.accountsStore
-      .entities()
-      .find((a: GetAccountResponse) => a.id === id);
-
-    if (!account) return;
-
-    this.confirmationService.confirm({
-      message: `Are you sure you want to delete the account '${account.name}'? This action cannot be undone.`,
-      header: 'Delete Confirmation',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
-      accept: () => {
-        this.lastOperationType.set('delete');
-        this.accountsStore.deleteAccount(id);
-      },
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
+      this.routeMode.set((data['accountMode'] as AccountRouteMode) ?? 'list');
+      this.editMode.set(false);
     });
+
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.routeAccountId.set(params.get('id'));
+      });
   }
 
-  handleIncludeArchivedChange(value: boolean): void {
+  onIncludeArchivedChange(value: boolean): void {
     this.includeArchived.set(value);
     this.accountsStore.loadAccounts({ includeArchived: value });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleAccountSelected(_id: string): void {
-    // Future enhancement: navigate to account detail view
+  onCreateAccount(): void {
+    void this.router.navigateByUrl('/accounts/new');
   }
 
-  handleEditClicked(id: string): void {
-    const account =
-      this.accountsStore
-        .entities()
-        .find((a: GetAccountResponse) => a.id === id) || null;
-    if (account) {
-      this.onEditAccount(account);
+  onViewAccount(id: string): void {
+    void this.router.navigate(['/accounts', id]);
+  }
+
+  onEnterEditMode(): void {
+    this.editMode.set(true);
+  }
+
+  onSetActiveAccount(id: string): void {
+    this.activeAccountStore.setActiveAccount(id);
+    this.accountsStore.setActiveAccountOnServer(id);
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Active account updated',
+      life: 2500,
+    });
+  }
+
+  onArchiveAccount(id: string): void {
+    this.confirmationService.confirm({
+      header: 'Archive Account',
+      message: 'Archive this account? It will be hidden from default views.',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.pendingOperation.set('archive');
+        this.accountsStore.archiveAccount(id);
+      },
+    });
+  }
+
+  onUnarchiveAccount(id: string): void {
+    this.confirmationService.confirm({
+      header: 'Restore Account',
+      message: 'Restore this archived account?',
+      icon: 'pi pi-info-circle',
+      accept: () => {
+        this.pendingOperation.set('unarchive');
+        this.accountsStore.unarchiveAccount(id);
+      },
+    });
+  }
+
+  onSaveAccount(request: CreateAccountRequest | UpdateAccountRequest): void {
+    if (this.isCreateMode()) {
+      this.pendingOperation.set('create');
+      this.accountsStore.createAccount(request as CreateAccountRequest);
+      return;
     }
+
+    const selected = this.selectedAccount();
+    if (!selected) {
+      return;
+    }
+
+    this.pendingOperation.set('update');
+    this.accountsStore.updateAccount({
+      id: selected.id,
+      payload: request as UpdateAccountRequest,
+    });
   }
 
-  handleDeleteClicked(id: string): void {
-    this.onDeleteAccount(id);
-  }
+  onCancelForm(): void {
+    if (this.isDetailMode()) {
+      this.editMode.set(false);
+      return;
+    }
 
-  handleArchiveClicked(id: string): void {
-    this.accountsStore.archiveAccount(id);
+    if (this.isCreateMode()) {
+      void this.router.navigateByUrl('/accounts');
+    }
   }
 }

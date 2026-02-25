@@ -1,10 +1,13 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { MenuModule } from 'primeng/menu';
+import { SelectModule } from 'primeng/select';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '@invenet/auth';
+import { AccountsStore, ActiveAccountStore } from '@invenet/accounts';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 
@@ -16,6 +19,8 @@ import { LayoutService } from '../service/layout.service';
     CommonModule,
     StyleClassModule,
     MenuModule,
+    SelectModule,
+    FormsModule,
     AppConfigurator,
   ],
   template: ` <div class="layout-topbar">
@@ -112,6 +117,22 @@ import { LayoutService } from '../service/layout.service';
             <i class="pi pi-inbox"></i>
             <span>Messages</span>
           </button>
+          <div
+            class="active-account-switcher"
+            style="display:flex;align-items:center;gap:.5rem;padding:0 .75rem;"
+          >
+            <i class="pi pi-wallet"></i>
+            <span class="active-account-label" style="font-size:.875rem;">Active:</span>
+            <p-select
+              [options]="accountOptions()"
+              optionLabel="name"
+              optionValue="id"
+              [ngModel]="activeAccountStore.activeAccountId()"
+              (ngModelChange)="onActiveAccountChange($event)"
+              placeholder="Select account"
+              [style]="{ width: '12rem' }"
+            ></p-select>
+          </div>
           <div class="relative">
             <button
               type="button"
@@ -133,7 +154,7 @@ import { LayoutService } from '../service/layout.service';
     </div>
   </div>`,
 })
-export class AppTopbar {
+export class AppTopbar implements OnInit {
   items!: MenuItem[];
   profileMenuItems: MenuItem[] = [
     {
@@ -144,8 +165,30 @@ export class AppTopbar {
   ];
 
   layoutService = inject(LayoutService);
+  private readonly accountsStore = inject(AccountsStore);
+  readonly activeAccountStore = inject(ActiveAccountStore);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+
+  readonly accountOptions = computed(() =>
+    this.accountsStore
+      .activeAccounts()
+      .map((account) => ({ id: account.id, name: account.name })),
+  );
+
+  ngOnInit(): void {
+    this.activeAccountStore.initializeFromStorage();
+    this.accountsStore.loadAccounts({ includeArchived: false });
+  }
+
+  onActiveAccountChange(accountId: string | null): void {
+    if (!accountId) {
+      return;
+    }
+
+    this.activeAccountStore.setActiveAccount(accountId);
+    this.accountsStore.setActiveAccountOnServer(accountId);
+  }
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({

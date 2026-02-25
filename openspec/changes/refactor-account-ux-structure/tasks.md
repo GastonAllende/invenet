@@ -33,9 +33,18 @@
 - [ ] 5.3 Update AI query input/request composition to require and pass `ActiveAccountId`.
 - [ ] 5.4 Add shared guard/utilities to prevent unscoped account queries from executing.
 
-## 6. Verification
+## 6. Backend Refactor For Account Context
 
-- [ ] 6.1 Add/adjust routing tests for `/account/new`, `/account/:id`, and legacy `/account` redirect outcomes.
-- [ ] 6.2 Add/adjust component/store tests for overview default mode, edit toggle, cancel reset, and save transitions.
-- [ ] 6.3 Add/adjust state/query tests asserting `ActiveAccountId` propagation into journal, analytics, and AI requests.
-- [ ] 6.4 Run targeted Nx tests for affected account and dependent feature projects.
+- [ ] 6.1 Define/standardize backend request contracts for account-dependent endpoints to require account context where applicable.
+- [ ] 6.2 Refactor Trades module read/query endpoints to enforce account-context presence and authenticated-user ownership checks.
+- [ ] 6.3 Refactor account-dependent analytics/AI-facing backend endpoints to enforce account-context presence and ownership checks.
+- [ ] 6.4 Centralize reusable account-ownership validation to avoid duplicated authorization logic across modules.
+- [ ] 6.5 Ensure backend response payloads for account-dependent endpoints are filtered by the validated account context only.
+
+## 7. Verification
+
+- [ ] 7.1 Add/adjust routing tests for `/account/new`, `/account/:id`, and legacy `/account` redirect outcomes.
+- [ ] 7.2 Add/adjust component/store tests for overview default mode, edit toggle, cancel reset, and save transitions.
+- [ ] 7.3 Add/adjust frontend state/query tests asserting `ActiveAccountId` propagation into journal, analytics, and AI requests.
+- [ ] 7.4 Add/adjust backend tests for missing account context, wrong-owner account context, and valid account-context filtering.
+- [ ] 7.5 Run targeted Nx and .NET tests for affected account/trade/backend modules.

@@ -35,11 +35,11 @@ export const TradesStore = signalStore(
   withState(initialState),
   withEntities<Trade>(),
   withMethods((store, apiService = inject(TradesApiService)) => ({
-    loadTrades: rxMethod<void>(
+    loadTrades: rxMethod<string>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
-        switchMap(() =>
-          apiService.list().pipe(
+        switchMap((accountId) =>
+          apiService.list(accountId).pipe(
             tap((response: ListTradesResponse) => {
               patchState(store, setAllEntities(response.trades), {
                 isLoading: false,
@@ -147,6 +147,13 @@ export const TradesStore = signalStore(
 
     clearLastSaved(): void {
       patchState(store, { lastSavedId: null });
+    },
+
+    clearTrades(): void {
+      patchState(store, setAllEntities<Trade>([]), {
+        isLoading: false,
+        error: null,
+      });
     },
   })),
 );

@@ -4,7 +4,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { AccountsStore } from '@invenet/accounts';
+import { AccountsStore, ActiveAccountStore } from '@invenet/accounts';
 import { StrategiesStore } from '@invenet/strategies';
 import { TradesStore } from '../../../data-access/src/lib/store/trades.store';
 import { TradeListComponent } from '../../ui/trade-list/trade-list.component';
@@ -33,6 +33,7 @@ import type {
 export class TradeShellComponent implements OnInit {
   private readonly store = inject(TradesStore);
   private readonly accountsStore = inject(AccountsStore);
+  private readonly activeAccountStore = inject(ActiveAccountStore);
   private readonly strategiesStore = inject(StrategiesStore);
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
@@ -42,6 +43,7 @@ export class TradeShellComponent implements OnInit {
   isLoading = this.store.isLoading;
   error = this.store.error;
   accounts = this.accountsStore.activeAccounts;
+  activeAccountId = this.activeAccountStore.activeAccountId;
   strategies = this.strategiesStore.activeStrategies;
 
   // Local UI state
@@ -49,6 +51,22 @@ export class TradeShellComponent implements OnInit {
   selectedTrade = signal<Trade | null>(null);
 
   constructor() {
+    effect(() => {
+      const accounts = this.accounts();
+      const activeAccountId = this.activeAccountId();
+
+      if (!activeAccountId) {
+        if (accounts.length > 0) {
+          this.activeAccountStore.setActiveAccount(accounts[0].id);
+        } else {
+          this.store.clearTrades();
+        }
+        return;
+      }
+
+      this.store.loadTrades(activeAccountId);
+    });
+
     effect(() => {
       const error = this.error();
       if (error) {
@@ -64,7 +82,6 @@ export class TradeShellComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.store.loadTrades();
     this.accountsStore.loadAccounts({ includeArchived: false });
     this.strategiesStore.loadStrategies({ includeDeleted: false });
   }

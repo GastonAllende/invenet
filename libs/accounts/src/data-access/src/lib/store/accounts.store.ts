@@ -11,7 +11,6 @@ import {
   addEntities,
   setAllEntities,
   updateEntity,
-  removeEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
@@ -135,6 +134,7 @@ export const AccountsStore = signalStore(
               patchState(store, addEntities([newAccount]), {
                 isLoading: false,
                 error: null,
+                selectedAccountId: newAccount.id,
               });
             }),
             catchError((error: Error) => {
@@ -223,24 +223,47 @@ export const AccountsStore = signalStore(
     ),
 
     /**
-     * Delete an account (hard delete - permanent removal)
-     * @param id Account ID to delete
+     * Restore an archived account (sets IsActive=true)
+     * @param id Account ID to restore
      */
-    deleteAccount: rxMethod<string>(
+    unarchiveAccount: rxMethod<string>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((id) =>
-          apiService.delete(id).pipe(
+          apiService.unarchive(id).pipe(
             tap(() => {
-              patchState(store, removeEntity(id), {
-                isLoading: false,
-                error: null,
-              });
+              patchState(
+                store,
+                updateEntity({
+                  id,
+                  changes: { isActive: true },
+                }),
+                { isLoading: false, error: null },
+              );
             }),
             catchError((error: Error) => {
               patchState(store, {
                 isLoading: false,
-                error: error.message || 'Failed to delete account',
+                error: error.message || 'Failed to unarchive account',
+              });
+              return of(null);
+            }),
+          ),
+        ),
+      ),
+    ),
+
+    /**
+     * Persist active account selection server-side for compatibility.
+     * Active context source of truth is still the frontend ActiveAccountStore.
+     */
+    setActiveAccountOnServer: rxMethod<string>(
+      pipe(
+        switchMap((id) =>
+          apiService.setActive(id).pipe(
+            catchError((error: Error) => {
+              patchState(store, {
+                error: error.message || 'Failed to set active account',
               });
               return of(null);
             }),

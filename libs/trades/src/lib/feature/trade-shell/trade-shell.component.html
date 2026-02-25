@@ -22,6 +22,7 @@
     <lib-trade-form
       [trade]="selectedTrade()"
       [accounts]="accounts()"
+      [defaultAccountId]="activeAccountId()"
       [strategies]="strategies()"
       [isLoading]="isLoading()"
       (save)="onSaveTrade($event)"

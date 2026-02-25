@@ -71,18 +71,13 @@ public sealed class AccountsController : ControllerBase
 
     // Validate broker
     var trimmedBroker = request.Broker?.Trim() ?? string.Empty;
-    if (string.IsNullOrWhiteSpace(trimmedBroker))
-    {
-      return BadRequest(new { message = "Broker is required" });
-    }
-
     if (trimmedBroker.Length > 100)
     {
       return BadRequest(new { message = "Broker must be 100 characters or less" });
     }
 
     // Validate account type
-    var validAccountTypes = new[] { "Cash", "Margin", "Prop", "Demo" };
+    var validAccountTypes = new[] { "Personal", "Prop Firm", "Funded", "Cash", "Margin", "Prop", "Demo" };
     if (!validAccountTypes.Contains(request.AccountType))
     {
       return BadRequest(new
@@ -356,18 +351,13 @@ public sealed class AccountsController : ControllerBase
 
     // Validate broker
     var trimmedBroker = request.Broker?.Trim() ?? string.Empty;
-    if (string.IsNullOrWhiteSpace(trimmedBroker))
-    {
-      return BadRequest(new { message = "Broker is required" });
-    }
-
     if (trimmedBroker.Length > 100)
     {
       return BadRequest(new { message = "Broker must be 100 characters or less" });
     }
 
     // Validate account type
-    var validAccountTypes = new[] { "Cash", "Margin", "Prop", "Demo" };
+    var validAccountTypes = new[] { "Personal", "Prop Firm", "Funded", "Cash", "Margin", "Prop", "Demo" };
     if (!validAccountTypes.Contains(request.AccountType))
     {
       return BadRequest(new
@@ -498,20 +488,20 @@ public sealed class AccountsController : ControllerBase
   }
 
   /// <summary>
-  /// Delete a brokerage account (hard delete).
+  /// Validates account ownership and acknowledges active account selection.
+  /// Active context is persisted client-side for now.
   /// </summary>
-  /// <param name="id">Account ID to delete</param>
+  /// <param name="id">Account ID selected as active</param>
   /// <returns>No content on success</returns>
-  /// <response code="204">Account deleted successfully</response>
+  /// <response code="204">Account selection accepted</response>
   /// <response code="404">Account not found</response>
   /// <response code="401">User not authenticated</response>
-  [HttpDelete("{id:guid}")]
-  public async Task<ActionResult> Delete(Guid id)
+  [HttpPost("{id:guid}/set-active")]
+  public async Task<ActionResult> SetActive(Guid id)
   {
     var userId = GetCurrentUserId();
 
     var account = await _context.Accounts
-        .Include(a => a.RiskSettings)
         .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
 
     if (account == null)
@@ -519,20 +509,55 @@ public sealed class AccountsController : ControllerBase
       return NotFound(new { message = "Account not found" });
     }
 
-    // Remove risk settings first (cascade delete)
-    if (account.RiskSettings != null)
+    _logger.LogInformation(
+        "Account set-active acknowledged: {AccountId} - {AccountName} for User {UserId}",
+        account.Id, account.Name, userId);
+
+    return NoContent();
+  }
+
+  /// <summary>
+  /// Archive an account (soft disable).
+  /// </summary>
+  [HttpPost("{id:guid}/archive")]
+  public async Task<ActionResult> Archive(Guid id)
+  {
+    var userId = GetCurrentUserId();
+
+    var account = await _context.Accounts
+        .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
+
+    if (account == null)
     {
-      _context.AccountRiskSettings.Remove(account.RiskSettings);
+      return NotFound(new { message = "Account not found" });
     }
 
-    // Remove account
-    _context.Accounts.Remove(account);
-
+    account.IsActive = false;
+    account.UpdatedAt = DateTime.UtcNow;
     await _context.SaveChangesAsync();
 
-    _logger.LogInformation(
-        "Account deleted: {AccountId} - {AccountName} for User {UserId}",
-        account.Id, account.Name, userId);
+    return NoContent();
+  }
+
+  /// <summary>
+  /// Unarchive an account (soft enable).
+  /// </summary>
+  [HttpPost("{id:guid}/unarchive")]
+  public async Task<ActionResult> Unarchive(Guid id)
+  {
+    var userId = GetCurrentUserId();
+
+    var account = await _context.Accounts
+        .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
+
+    if (account == null)
+    {
+      return NotFound(new { message = "Account not found" });
+    }
+
+    account.IsActive = true;
+    account.UpdatedAt = DateTime.UtcNow;
+    await _context.SaveChangesAsync();
 
     return NoContent();
   }

@@ -10,9 +10,8 @@ public record CreateAccountRequest(
     [MaxLength(200)]
     string Name,
 
-    [Required]
     [MaxLength(100)]
-    string Broker,
+    string? Broker,
 
     [Required]
     string AccountType,

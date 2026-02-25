@@ -1,4 +1,11 @@
-export type AccountType = 'Cash' | 'Margin' | 'Prop' | 'Demo';
+export type AccountType =
+  | 'Personal'
+  | 'Prop Firm'
+  | 'Funded'
+  | 'Cash'
+  | 'Margin'
+  | 'Prop'
+  | 'Demo';
 
 /**
  * Brokerage account model
@@ -39,7 +46,7 @@ export interface AccountRiskSettings {
  */
 export interface CreateAccountRequest {
   name: string;
-  broker: string;
+  broker?: string;
   accountType: AccountType;
   baseCurrency: string;
   startDate: string; // ISO 8601 date
@@ -65,7 +72,7 @@ export interface CreateAccountRiskSettingsRequest {
  */
 export interface UpdateAccountRequest {
   name: string;
-  broker: string;
+  broker?: string;
   accountType: AccountType;
   baseCurrency: string;
   timezone?: string;

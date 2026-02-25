@@ -144,17 +144,39 @@ export class AccountsApiService {
   }
 
   /**
-   * Delete an account (hard delete - permanent removal)
+   * Unarchive an account (restores archived account)
    * @param id - Account ID
    */
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+  unarchive(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/unarchive`, {}).pipe(
       catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to delete account';
+        let errorMessage = 'Failed to unarchive account';
         if (error.status === 401) {
           errorMessage = 'Authentication required';
         } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to delete this account';
+          errorMessage = 'You do not have permission to unarchive this account';
+        } else if (error.status === 404) {
+          errorMessage = 'Account not found';
+        } else if (error.error?.message) {
+          errorMessage = error.error.message;
+        }
+        return throwError(() => new Error(errorMessage));
+      }),
+    );
+  }
+
+  /**
+   * Persist active account selection for the current user context
+   * @param id - Account ID
+   */
+  setActive(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/set-active`, {}).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Failed to set active account';
+        if (error.status === 401) {
+          errorMessage = 'Authentication required';
+        } else if (error.status === 403) {
+          errorMessage = 'You do not have permission to access this account';
         } else if (error.status === 404) {
           errorMessage = 'Account not found';
         } else if (error.error?.message) {

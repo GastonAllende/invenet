@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { API_BASE_URL } from '@invenet/core';
@@ -16,12 +16,17 @@ export class TradesApiService {
   private readonly apiBaseUrl = inject(API_BASE_URL);
   private readonly baseUrl = `${this.apiBaseUrl}/api/trades`;
 
-  list(): Observable<ListTradesResponse> {
-    return this.http.get<ListTradesResponse>(this.baseUrl).pipe(
+  list(accountId: string): Observable<ListTradesResponse> {
+    const params = new HttpParams().set('accountId', accountId);
+    return this.http.get<ListTradesResponse>(this.baseUrl, { params }).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorMessage = 'Failed to load trades';
         if (error.status === 401) {
           errorMessage = 'Authentication required';
+        } else if (error.status === 400) {
+          errorMessage = 'Active account is required to load trades';
+        } else if (error.status === 403) {
+          errorMessage = 'You do not have access to this account';
         } else if (error.error?.message) {
           errorMessage = error.error.message;
         }

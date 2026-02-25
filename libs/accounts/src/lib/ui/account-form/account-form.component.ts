@@ -52,6 +52,9 @@ export class AccountFormComponent implements OnInit {
   account = input<GetAccountResponse | null>(null);
   mode = input<'create' | 'update'>('create');
   isLoading = input<boolean>(false);
+  submitLabel = input<string | null>(null);
+  showCancel = input<boolean>(true);
+  showTitle = input<boolean>(true);
 
   formSubmit = output<CreateAccountRequest | UpdateAccountRequest>();
   formCancel = output<void>();
@@ -73,10 +76,9 @@ export class AccountFormComponent implements OnInit {
   ];
 
   accountTypes = [
-    { label: 'Cash', value: 'Cash' },
-    { label: 'Margin', value: 'Margin' },
-    { label: 'Prop', value: 'Prop' },
-    { label: 'Demo', value: 'Demo' },
+    { label: 'Personal', value: 'Personal' },
+    { label: 'Prop Firm', value: 'Prop Firm' },
+    { label: 'Funded', value: 'Funded' },
   ];
 
   currencies = [
@@ -130,12 +132,12 @@ export class AccountFormComponent implements OnInit {
   ngOnInit(): void {
     this.accountForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(200)]],
-      broker: ['', [Validators.required, Validators.maxLength(100)]],
+      broker: ['', [Validators.maxLength(100)]],
       accountType: ['', [Validators.required]],
       baseCurrency: ['', [Validators.required]],
       startDate: [new Date(), [Validators.required]],
       startingBalance: [1000, [Validators.required, Validators.min(0.01)]],
-      timezone: ['Europe/Stockholm', [Validators.maxLength(50)]],
+      timezone: ['America/New_York', [Validators.maxLength(50)]],
       notes: [''],
       isActive: [true],
       riskSettings: this.fb.group({
@@ -258,6 +260,14 @@ export class AccountFormComponent implements OnInit {
 
   get notes() {
     return this.accountForm.get('notes');
+  }
+
+  get resolvedSubmitLabel(): string {
+    const customLabel = this.submitLabel();
+    if (customLabel && customLabel.trim().length > 0) {
+      return customLabel;
+    }
+    return this.isEditMode ? 'Update Account' : 'Create Account';
   }
 
   get isActive() {

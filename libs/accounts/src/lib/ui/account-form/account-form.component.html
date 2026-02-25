@@ -1,8 +1,10 @@
 <div class="account-form-container">
   <form [formGroup]="accountForm" (ngSubmit)="onSubmit()" class="account-form">
-    <h2 class="form-title">
-      {{ isEditMode ? 'Edit Account' : 'Create Account' }}
-    </h2>
+    @if (showTitle()) {
+      <h2 class="form-title">
+        {{ isEditMode ? 'Edit Account' : 'Create Account' }}
+      </h2>
+    }
 
     <!-- Basic Account Information -->
     <div class="form-section">
@@ -30,20 +32,20 @@
       </div>
 
       <div class="form-field">
-        <label for="broker">Broker *</label>
+        <label for="broker">Broker</label>
         <p-select
           [options]="brokers"
           formControlName="broker"
           optionLabel="label"
           optionValue="value"
-          placeholder="Select a broker"
+          placeholder="Select broker (optional)"
           styleClass="dropdown-full-width"
           [showClear]="true"
         ></p-select>
         @if (broker?.invalid && broker?.touched) {
           <small class="error-message">
-            @if (broker?.errors?.['required']) {
-              Broker is required
+            @if (broker?.errors?.['maxlength']) {
+              Max 100 characters allowed
             }
           </small>
         }
@@ -142,31 +144,6 @@
         </div>
       </div>
 
-      <div class="form-field">
-        <label for="timezone">Timezone</label>
-        <p-select
-          [options]="timezones"
-          formControlName="timezone"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Select timezone"
-          styleClass="dropdown-full-width"
-          [showClear]="true"
-        ></p-select>
-      </div>
-
-      <div class="form-field">
-        <label for="notes">Notes</label>
-        <textarea
-          pTextarea
-          id="notes"
-          formControlName="notes"
-          placeholder="Optional notes about this account"
-          rows="3"
-          class="input-full-width"
-        ></textarea>
-      </div>
-
       <div class="form-field checkbox-field">
         <p-checkbox
           formControlName="isActive"
@@ -215,7 +192,20 @@
         </div>
       </div>
 
-      <div class="form-row">
+      <div class="form-field checkbox-field">
+        <p-checkbox
+          formControlName="enforceLimits"
+          [binary]="true"
+          inputId="enforceLimits"
+          label="Enforce Risk Limits"
+        ></p-checkbox>
+      </div>
+    </div>
+
+    <details class="form-section">
+      <summary><h3>Advanced</h3></summary>
+
+      <div class="form-row" formGroupName="riskSettings">
         <div class="form-field">
           <label for="maxWeeklyLossPct">Max Weekly Loss (%)</label>
           <p-inputNumber
@@ -231,30 +221,48 @@
             <small class="error-message">Must be between 0 and 100</small>
           }
         </div>
-
-        <div class="form-field checkbox-field">
-          <p-checkbox
-            formControlName="enforceLimits"
-            [binary]="true"
-            inputId="enforceLimits"
-            label="Enforce Risk Limits"
-          ></p-checkbox>
-        </div>
       </div>
-    </div>
+
+      <div class="form-field">
+        <label for="timezone">Timezone</label>
+        <p-select
+          [options]="timezones"
+          formControlName="timezone"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select timezone"
+          styleClass="dropdown-full-width"
+          [showClear]="true"
+        ></p-select>
+      </div>
+
+      <div class="form-field">
+        <label for="notes">Notes</label>
+        <textarea
+          pTextarea
+          id="notes"
+          formControlName="notes"
+          placeholder="Optional notes about this account"
+          rows="3"
+          class="input-full-width"
+        ></textarea>
+      </div>
+    </details>
 
     <!-- Form Actions -->
     <div class="form-actions">
+      @if (showCancel()) {
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          (onClick)="onCancel()"
+          [outlined]="true"
+          type="button"
+          [disabled]="isLoading()"
+        ></p-button>
+      }
       <p-button
-        label="Cancel"
-        severity="secondary"
-        (onClick)="onCancel()"
-        [outlined]="true"
-        type="button"
-        [disabled]="isLoading()"
-      ></p-button>
-      <p-button
-        [label]="isEditMode ? 'Update Account' : 'Create Account'"
+        [label]="resolvedSubmitLabel"
         type="submit"
         [disabled]="accountForm.invalid || isLoading()"
         [loading]="isLoading()"

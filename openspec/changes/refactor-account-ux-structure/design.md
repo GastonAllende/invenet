@@ -46,13 +46,19 @@ Constraints:
 - Alternative considered: Resolve active account ad hoc per feature.
 - Why not: Leads to inconsistent filtering and data leakage risks between accounts.
 
-4. Onboarding redirect strategy
+4. Backend account-context enforcement contract
+- Decision: Account-dependent backend read/query endpoints must require account context and validate that the provided account belongs to the authenticated user.
+- Rationale: Frontend `ActiveAccountId` is only safe if server-side authorization and filtering guarantees are consistent and mandatory.
+- Alternative considered: Keep current permissive/list-all-user-accounts query patterns and rely on frontend filtering.
+- Why not: Allows inconsistent payloads across clients and weakens domain boundaries for multi-account behavior.
+
+5. Onboarding redirect strategy
 - Decision: If user has no accounts, redirect to `/account/new` automatically and use focused onboarding copy/CTA.
 - Rationale: Enforces account setup before dependent workflows and reduces empty-state ambiguity.
 - Alternative considered: Keep user on `/account` with inline empty state panel.
 - Why not: Preserves mixed-mode page complexity and dilutes onboarding path.
 
-5. Post-create navigation and activation
+6. Post-create navigation and activation
 - Decision: On account creation, persist, set active account, and redirect:
 - Standard flow: `/account/:newId`
 - First-account onboarding completion: `/strategies/new`
@@ -64,6 +70,7 @@ Constraints:
 
 - [Risk] Route split may break existing links or assumptions to `/account` -> Mitigation: add deterministic redirect from legacy `/account` to `/account/new` or active `/account/:id` based on store/account presence.
 - [Risk] Global `ActiveAccountId` adoption may leave unscoped queries in some features -> Mitigation: add shared query contracts and targeted tests for account-id propagation.
+- [Risk] Backend endpoints may diverge in account-context enforcement across modules -> Mitigation: define a shared validation pattern and add integration tests for unauthorized or missing account context.
 - [Risk] Dual redirect behavior after create can produce inconsistent UX if onboarding detection is wrong -> Mitigation: centralize onboarding-complete predicate (has-at-least-one-account before create).
 - [Trade-off] Read-only-first adds one click before edits -> Mitigation: provide clear Edit action in header and preserve fast inline editing.
 
@@ -77,8 +84,9 @@ Constraints:
 3. Add global `ActiveAccountId` store slice and selectors/actions to set/update active account.
 4. Update account creation/update flows to set active account and trigger route transitions + toasts.
 5. Add active account indicator and Add Account navigation entry points.
-6. Enforce account-id requirement in journal/analytics/AI data queries.
-7. Validate through focused route/store/query tests; rollout behind normal deployment process.
+6. Refactor backend account-dependent endpoints to require account context and enforce account ownership checks.
+7. Enforce account-id requirement in journal/analytics/AI data queries end-to-end (frontend request + backend filtering).
+8. Validate through focused route/store/query tests, including backend authorization and scoping tests; rollout behind normal deployment process.
 
 Rollback approach:
 - Revert routing and state changes in a single release unit; fallback to previous account shell behavior while preserving persisted account data.

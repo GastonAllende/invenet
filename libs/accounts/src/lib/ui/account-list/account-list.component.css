@@ -47,6 +47,18 @@
   align-items: center;
 }
 
+.active-row {
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+}
+
+.active-row td strong {
+  color: var(--primary-color);
+}
+
+td p-tag {
+  margin-left: 0.5rem;
+}
+
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
