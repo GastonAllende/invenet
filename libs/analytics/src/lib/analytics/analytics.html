@@ -1,1 +1,78 @@
-<p>Analytics works!</p>
+<section class="analytics-page">
+  <header class="analytics-header">
+    <h1>Analytics</h1>
+    <p>Track performance while keeping market context visible.</p>
+  </header>
+
+  <section class="analytics-summary" data-testid="analytics-summary">
+    <article class="summary-card">
+      <p class="summary-label">Win Rate</p>
+      <p class="summary-value">62%</p>
+    </article>
+    <article class="summary-card">
+      <p class="summary-label">Profit Factor</p>
+      <p class="summary-value">1.84</p>
+    </article>
+    <article class="summary-card">
+      <p class="summary-label">Average R</p>
+      <p class="summary-value">+0.43R</p>
+    </article>
+  </section>
+
+  <section class="widget-panel">
+    <div class="widget-toolbar">
+      <label>
+        Symbol
+        <select
+          [value]="store.symbol()"
+          (change)="onSymbolChange($event)"
+          data-testid="symbol-select"
+        >
+          @for (symbol of symbols; track symbol.value) {
+            <option [value]="symbol.value">{{ symbol.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Timeframe
+        <select
+          [value]="store.timeframe()"
+          (change)="onTimeframeChange($event)"
+          data-testid="timeframe-select"
+        >
+          @for (timeframe of timeframes; track timeframe.value) {
+            <option [value]="timeframe.value">{{ timeframe.label }}</option>
+          }
+        </select>
+      </label>
+
+      <button
+        type="button"
+        class="retry-button"
+        (click)="store.retryWidget()"
+        [disabled]="store.isWidgetLoading()"
+      >
+        Retry
+      </button>
+    </div>
+
+    @if (store.isWidgetLoading()) {
+      <p class="widget-loading" data-testid="widget-loading">Loading TradingView chart...</p>
+    }
+
+    @if (store.widgetError()) {
+      <p class="widget-error" data-testid="widget-error">
+        {{ store.widgetError() }}
+      </p>
+    }
+
+    <lib-tradingview-widget
+      [symbol]="store.symbol()"
+      [timeframe]="store.timeframe()"
+      [refreshKey]="store.refreshKey()"
+      (loadingChange)="store.setWidgetLoading($event)"
+      (errorChange)="store.setWidgetError($event)"
+    />
+  </section>
+</section>

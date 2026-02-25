@@ -59,3 +59,7 @@ Thumbs.db
 __screenshots__/
 
 vitest.config.*.timestamp*
+
+# Local configuration files
+.codex
+.claude
