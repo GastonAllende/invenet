@@ -1,9 +1,12 @@
 namespace Invenet.Api.Modules.Strategies.Features.CreateStrategy;
 
-/// <summary>
-/// Request to create a new trading strategy.
-/// </summary>
 public record CreateStrategyRequest(
     string Name,
-    string? Description = null
+    string? Market,
+    string? DefaultTimeframe,
+    string? Timeframe,
+    string EntryRules,
+    string ExitRules,
+    string RiskRules,
+    string? Notes = null
 );

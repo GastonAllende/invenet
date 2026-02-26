@@ -1,22 +1,14 @@
-import {
-  Component,
-  input,
-  output,
-  effect,
-  inject,
-  OnInit,
-} from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { Component, OnInit, effect, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
-import type { GetStrategyResponse } from '../../data-access/models';
+import type {
+  CreateStrategyRequest,
+  CreateStrategyVersionRequest,
+  GetStrategyResponse,
+} from '../../data-access/models';
 
 @Component({
   selector: 'lib-strategy-form',
@@ -33,67 +25,84 @@ import type { GetStrategyResponse } from '../../data-access/models';
 export class StrategyFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
 
-  // Inputs
   strategy = input<GetStrategyResponse | null>(null);
+  mode = input<'create' | 'version'>('create');
   isLoading = input<boolean>(false);
 
-  // Outputs
-  save = output<{ name: string; description?: string }>();
+  save = output<CreateStrategyRequest | CreateStrategyVersionRequest>();
   formCancel = output<void>();
 
-  strategyForm!: FormGroup;
+  readonly form = this.fb.group({
+    name: ['', [Validators.required, Validators.maxLength(200)]],
+    market: ['', [Validators.maxLength(100)]],
+    defaultTimeframe: ['', [Validators.maxLength(50)]],
+    timeframe: ['', [Validators.maxLength(50)]],
+    entryRules: ['', [Validators.required]],
+    exitRules: ['', [Validators.required]],
+    riskRules: ['', [Validators.required]],
+    notes: [''],
+  });
 
   constructor() {
-    // Update form when strategy input changes
     effect(() => {
       const strategy = this.strategy();
-      if (strategy && this.strategyForm) {
-        this.strategyForm.patchValue({
-          name: strategy.name,
-          description: strategy.description || '',
-        });
+      if (!strategy) {
+        return;
       }
+
+      this.form.patchValue({
+        name: strategy.name,
+        market: strategy.market ?? '',
+        defaultTimeframe: strategy.defaultTimeframe ?? '',
+        timeframe: strategy.currentVersion?.timeframe ?? '',
+        entryRules: strategy.currentVersion?.entryRules ?? '',
+        exitRules: strategy.currentVersion?.exitRules ?? '',
+        riskRules: strategy.currentVersion?.riskRules ?? '',
+        notes: strategy.currentVersion?.notes ?? '',
+      });
     });
   }
 
   ngOnInit(): void {
-    this.strategyForm = this.fb.group({
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(200),
-          Validators.pattern(/^[a-zA-Z0-9 _-]+$/),
-        ],
-      ],
-      description: ['', [Validators.maxLength(2000)]],
-    });
+    if (this.mode() === 'version') {
+      this.form.controls.name.disable();
+      this.form.controls.market.disable();
+      this.form.controls.defaultTimeframe.disable();
+    }
   }
 
   onSubmit(): void {
-    if (this.strategyForm.valid) {
-      const value = this.strategyForm.value;
-      this.save.emit({
-        name: value.name.trim(),
-        description: value.description?.trim() || undefined,
-      });
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
     }
+
+    const value = this.form.getRawValue();
+
+    if (this.mode() === 'create') {
+      this.save.emit({
+        name: (value.name ?? '').trim(),
+        market: value.market?.trim() || undefined,
+        defaultTimeframe: value.defaultTimeframe?.trim() || undefined,
+        timeframe: value.timeframe?.trim() || undefined,
+        entryRules: (value.entryRules ?? '').trim(),
+        exitRules: (value.exitRules ?? '').trim(),
+        riskRules: (value.riskRules ?? '').trim(),
+        notes: value.notes?.trim() || undefined,
+      });
+      return;
+    }
+
+    this.save.emit({
+      timeframe: value.timeframe?.trim() || undefined,
+      entryRules: (value.entryRules ?? '').trim(),
+      exitRules: (value.exitRules ?? '').trim(),
+      riskRules: (value.riskRules ?? '').trim(),
+      notes: value.notes?.trim() || undefined,
+    });
   }
 
   onCancel(): void {
     this.formCancel.emit();
-    this.strategyForm.reset();
-  }
-
-  get nameControl() {
-    return this.strategyForm.get('name');
-  }
-
-  get descriptionControl() {
-    return this.strategyForm.get('description');
-  }
-
-  get isEditMode(): boolean {
-    return this.strategy() !== null;
   }
 }

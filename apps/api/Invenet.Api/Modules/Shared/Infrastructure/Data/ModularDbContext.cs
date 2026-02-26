@@ -19,6 +19,7 @@ public class ModularDbContext : DbContext
   public DbSet<Account> Accounts => Set<Account>();
   public DbSet<AccountRiskSettings> AccountRiskSettings => Set<AccountRiskSettings>();
   public DbSet<Strategy> Strategies => Set<Strategy>();
+  public DbSet<StrategyVersion> StrategyVersions => Set<StrategyVersion>();
   public DbSet<Trade> Trades => Set<Trade>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)

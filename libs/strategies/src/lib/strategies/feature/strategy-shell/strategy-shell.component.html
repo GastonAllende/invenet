@@ -2,28 +2,143 @@
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
-  <lib-strategy-list
-    [strategies]="strategies()"
-    [isLoading]="isLoading()"
-    (create)="onCreateStrategy()"
-    (edit)="onEditStrategy($event)"
-    (delete)="onDeleteStrategy($event)"
-  ></lib-strategy-list>
-
-  <p-dialog
-    [header]="selectedStrategy() ? 'Edit Strategy' : 'Create Strategy'"
-    [(visible)]="showFormDialog"
-    [modal]="true"
-    [closable]="true"
-    [draggable]="false"
-    [resizable]="false"
-    [style]="{ width: '500px' }"
-  >
-    <lib-strategy-form
-      [strategy]="selectedStrategy()"
+  @if (isListMode()) {
+    <lib-strategy-list
+      [strategies]="strategies()"
       [isLoading]="isLoading()"
-      (save)="onSaveStrategy($event)"
-      (formCancel)="onCancelForm()"
-    ></lib-strategy-form>
-  </p-dialog>
+      (create)="onCreateStrategy()"
+      (view)="onViewStrategy($event)"
+      (archive)="onArchiveStrategy($event)"
+      (unarchive)="onUnarchiveStrategy($event)"
+    ></lib-strategy-list>
+  }
+
+  @if (isNewMode()) {
+    <section class="panel">
+      <h1>Create Strategy</h1>
+      <lib-strategy-form
+        [mode]="'create'"
+        [isLoading]="isLoading()"
+        (save)="onSave($event)"
+        (formCancel)="onCancelForm()"
+      ></lib-strategy-form>
+    </section>
+  }
+
+  @if (isDetailMode() && selectedStrategy(); as strategy) {
+    <section class="panel header-panel">
+      <div>
+        <h1>{{ strategy.name }}</h1>
+        <p>
+          <p-tag
+            [value]="strategy.isArchived ? 'ARCHIVED' : 'ACTIVE'"
+            [severity]="strategy.isArchived ? 'contrast' : 'success'"
+          ></p-tag>
+        </p>
+      </div>
+      <div class="header-actions">
+        <p-button
+          label="Edit (new version)"
+          icon="pi pi-pencil"
+          [disabled]="strategy.isArchived"
+          (onClick)="onEditNewVersion()"
+        ></p-button>
+        @if (!strategy.isArchived) {
+          <p-button
+            label="Archive"
+            icon="pi pi-archive"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="onArchiveStrategy(strategy.id)"
+          ></p-button>
+        } @else {
+          <p-button
+            label="Unarchive"
+            icon="pi pi-replay"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="onUnarchiveStrategy(strategy.id)"
+          ></p-button>
+        }
+        <p-button
+          label="Back"
+          icon="pi pi-arrow-left"
+          severity="contrast"
+          [outlined]="true"
+          (onClick)="onBackToList()"
+        ></p-button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Current Version</h2>
+      @if (strategy.currentVersion; as currentVersion) {
+        <div class="version-meta">v{{ currentVersion.versionNumber }} • {{ currentVersion.createdAt | date: 'short' }}</div>
+        <div class="rule-block">
+          <h3>Entry Rules</h3>
+          <p>{{ currentVersion.entryRules }}</p>
+        </div>
+        <div class="rule-block">
+          <h3>Exit Rules</h3>
+          <p>{{ currentVersion.exitRules }}</p>
+        </div>
+        <div class="rule-block">
+          <h3>Risk Rules</h3>
+          <p>{{ currentVersion.riskRules }}</p>
+        </div>
+        <div class="rule-block">
+          <h3>Notes</h3>
+          <p>{{ currentVersion.notes || '—' }}</p>
+        </div>
+      } @else {
+        <p>No version available.</p>
+      }
+    </section>
+
+    <section class="panel">
+      <h2>Version History</h2>
+      <p-table [value]="strategy.versions" [tableStyle]="{ 'min-width': '36rem' }">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Version</th>
+            <th>Created At</th>
+            <th>Created By</th>
+            <th>Action</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-version>
+          <tr>
+            <td>v{{ version.versionNumber }}</td>
+            <td>{{ version.createdAt | date: 'short' }}</td>
+            <td>{{ version.createdByUserId }}</td>
+            <td>
+              <p-button
+                icon="pi pi-eye"
+                [rounded]="true"
+                [text]="true"
+                (onClick)="onSelectVersion(version)"
+              ></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+  }
+
+  @if (isEditMode() && selectedStrategy(); as strategy) {
+    <section class="panel">
+      <h1>Edit Strategy (New Version)</h1>
+      <p-message severity="warn" [closable]="false">
+        Saving will create a new version. Previous versions remain unchanged.
+      </p-message>
+
+      <lib-strategy-form
+        [strategy]="strategy"
+        [mode]="'version'"
+        [isLoading]="isLoading()"
+        (save)="onSave($event)"
+        (formCancel)="onCancelForm()"
+      ></lib-strategy-form>
+    </section>
+  }
 </div>

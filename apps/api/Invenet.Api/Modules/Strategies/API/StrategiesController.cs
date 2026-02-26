@@ -1,19 +1,17 @@
+using System.Data;
 using System.Security.Claims;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Invenet.Api.Modules.Strategies.Domain;
 using Invenet.Api.Modules.Strategies.Features.CreateStrategy;
+using Invenet.Api.Modules.Strategies.Features.CreateStrategyVersion;
 using Invenet.Api.Modules.Strategies.Features.GetStrategy;
 using Invenet.Api.Modules.Strategies.Features.ListStrategies;
-using Invenet.Api.Modules.Strategies.Features.UpdateStrategy;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Invenet.Api.Modules.Strategies.API;
 
-/// <summary>
-/// Controller for trading strategy management.
-/// </summary>
 [ApiController]
 [Route("api/strategies")]
 [Authorize]
@@ -22,41 +20,37 @@ public sealed class StrategiesController : ControllerBase
   private readonly ModularDbContext _context;
   private readonly ILogger<StrategiesController> _logger;
 
-  public StrategiesController(
-      ModularDbContext context,
-      ILogger<StrategiesController> logger)
+  public StrategiesController(ModularDbContext context, ILogger<StrategiesController> logger)
   {
     _context = context;
     _logger = logger;
   }
 
-  /// <summary>
-  /// Get the current authenticated user's ID.
-  /// </summary>
-  private Guid GetCurrentUserId()
+  private bool TryGetCurrentUserId(out Guid userId)
   {
+    userId = Guid.Empty;
     var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+    if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var parsedUserId))
     {
-      throw new UnauthorizedAccessException("User ID not found in claims");
+      return false;
     }
-    return userId;
+
+    userId = parsedUserId;
+    return true;
   }
 
-  /// <summary>
-  /// List all strategies for the authenticated user.
-  /// </summary>
   [HttpGet]
-  public async Task<ActionResult<ListStrategiesResponse>> List(
-      [FromQuery] bool includeDeleted = false)
+  public async Task<ActionResult<ListStrategiesResponse>> List([FromQuery] bool includeArchived = true)
   {
-    var userId = GetCurrentUserId();
-
-    var query = _context.Strategies.Where(s => s.UserId == userId);
-
-    if (!includeDeleted)
+    if (!TryGetCurrentUserId(out var userId))
     {
-      query = query.Where(s => !s.IsDeleted);
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
+
+    var query = _context.Strategies.AsNoTracking().Where(s => s.UserId == userId);
+    if (!includeArchived)
+    {
+      query = query.Where(s => !s.IsArchived);
     }
 
     var strategies = await query
@@ -64,34 +58,47 @@ public sealed class StrategiesController : ControllerBase
         .Select(s => new StrategyListItem(
             s.Id,
             s.Name,
-            s.Description,
-            s.IsDeleted,
+            s.Market,
+            s.DefaultTimeframe,
+            s.IsArchived,
             s.CreatedAt,
-            s.UpdatedAt
+            s.UpdatedAt,
+            _context.StrategyVersions
+                .Where(v => v.StrategyId == s.Id)
+                .OrderByDescending(v => v.VersionNumber)
+                .Select(v => new CurrentVersionSummary(v.Id, v.VersionNumber, v.CreatedAt, v.Timeframe))
+                .FirstOrDefault()
         ))
         .ToListAsync();
 
     return Ok(new ListStrategiesResponse(strategies, strategies.Count));
   }
 
-  /// <summary>
-  /// Get a single strategy by ID.
-  /// </summary>
   [HttpGet("{id:guid}")]
-  public async Task<ActionResult<GetStrategyResponse>> Get(Guid id)
+  public async Task<ActionResult<GetStrategyResponse>> Get(Guid id, [FromQuery] int? version = null)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
     var strategy = await _context.Strategies
+        .AsNoTracking()
         .Where(s => s.Id == id && s.UserId == userId)
-        .Select(s => new GetStrategyResponse(
-            s.Id,
-            s.Name,
-            s.Description,
-            s.IsDeleted,
-            s.CreatedAt,
-            s.UpdatedAt
-        ))
+        .Select(s => new
+        {
+          s.Id,
+          s.Name,
+          s.Market,
+          s.DefaultTimeframe,
+          s.IsArchived,
+          s.CreatedAt,
+          s.UpdatedAt,
+          Versions = s.Versions
+              .OrderByDescending(v => v.VersionNumber)
+              .Select(v => new StrategyVersionHistoryItem(v.Id, v.VersionNumber, v.CreatedAt, v.CreatedByUserId))
+              .ToList(),
+        })
         .FirstOrDefaultAsync();
 
     if (strategy == null)
@@ -99,19 +106,68 @@ public sealed class StrategiesController : ControllerBase
       return NotFound(new { message = "Strategy not found" });
     }
 
-    return Ok(strategy);
+    StrategyVersionDetail? currentVersion;
+    if (version.HasValue)
+    {
+      currentVersion = await _context.StrategyVersions
+          .AsNoTracking()
+          .Where(v => v.StrategyId == id && v.VersionNumber == version.Value)
+          .Select(v => new StrategyVersionDetail(
+              v.Id,
+              v.VersionNumber,
+              v.Timeframe,
+              v.EntryRules,
+              v.ExitRules,
+              v.RiskRules,
+              v.Notes,
+              v.CreatedAt,
+              v.CreatedByUserId
+          ))
+          .FirstOrDefaultAsync();
+    }
+    else
+    {
+      currentVersion = await _context.StrategyVersions
+          .AsNoTracking()
+          .Where(v => v.StrategyId == id)
+          .OrderByDescending(v => v.VersionNumber)
+          .Select(v => new StrategyVersionDetail(
+              v.Id,
+              v.VersionNumber,
+              v.Timeframe,
+              v.EntryRules,
+              v.ExitRules,
+              v.RiskRules,
+              v.Notes,
+              v.CreatedAt,
+              v.CreatedByUserId
+          ))
+          .FirstOrDefaultAsync();
+    }
+
+    var response = new GetStrategyResponse(
+        strategy.Id,
+        strategy.Name,
+        strategy.Market,
+        strategy.DefaultTimeframe,
+        strategy.IsArchived,
+        strategy.CreatedAt,
+        strategy.UpdatedAt,
+        currentVersion,
+        strategy.Versions
+    );
+
+    return Ok(response);
   }
 
-  /// <summary>
-  /// Create a new strategy.
-  /// </summary>
   [HttpPost]
-  public async Task<ActionResult<CreateStrategyResponse>> Create(
-      [FromBody] CreateStrategyRequest request)
+  public async Task<ActionResult<CreateStrategyResponse>> Create([FromBody] CreateStrategyRequest request)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    // Validate name
     var trimmedName = request.Name?.Trim() ?? string.Empty;
     if (string.IsNullOrWhiteSpace(trimmedName))
     {
@@ -123,18 +179,13 @@ public sealed class StrategiesController : ControllerBase
       return BadRequest(new { message = "Name must be 200 characters or less" });
     }
 
-    // Validate description length
-    var trimmedDescription = request.Description?.Trim();
-    if (trimmedDescription != null && trimmedDescription.Length > 2000)
+    if (string.IsNullOrWhiteSpace(request.EntryRules) || string.IsNullOrWhiteSpace(request.ExitRules) || string.IsNullOrWhiteSpace(request.RiskRules))
     {
-      return BadRequest(new { message = "Description must be 2000 characters or less" });
+      return BadRequest(new { message = "EntryRules, ExitRules and RiskRules are required" });
     }
 
-    // Check for duplicate name
     var exists = await _context.Strategies
-        .AnyAsync(s => s.UserId == userId
-                    && s.Name == trimmedName
-                    && !s.IsDeleted);
+        .AnyAsync(s => s.UserId == userId && s.Name == trimmedName);
 
     if (exists)
     {
@@ -143,148 +194,195 @@ public sealed class StrategiesController : ControllerBase
         type = "https://api.invenet.com/errors/duplicate-strategy",
         title = "Duplicate Strategy",
         status = 409,
-        detail = $"A strategy with the name '{trimmedName}' already exists for your account"
+        detail = $"A strategy with the name '{trimmedName}' already exists"
       });
     }
 
-    var now = DateTime.UtcNow;
-    var strategy = new Strategy
+    var executionStrategy = _context.Database.CreateExecutionStrategy();
+    Strategy? strategy = null;
+    StrategyVersion? version = null;
+
+    await executionStrategy.ExecuteAsync(async () =>
     {
-      Id = Guid.NewGuid(),
-      UserId = userId,
-      Name = trimmedName,
-      Description = trimmedDescription,
-      IsDeleted = false,
-      CreatedAt = now,
-      UpdatedAt = now
-    };
+      await using var tx = await _context.Database.BeginTransactionAsync();
 
-    _context.Strategies.Add(strategy);
-    await _context.SaveChangesAsync();
+      var now = DateTime.UtcNow;
+      strategy = new Strategy
+      {
+        Id = Guid.NewGuid(),
+        UserId = userId,
+        Name = trimmedName,
+        Market = request.Market?.Trim(),
+        DefaultTimeframe = request.DefaultTimeframe?.Trim(),
+        IsArchived = false,
+        CreatedAt = now,
+        UpdatedAt = now,
+      };
 
-    _logger.LogInformation(
-        "Strategy created: {StrategyId} - {StrategyName} for User {UserId}",
-        strategy.Id, strategy.Name, userId);
+      version = new StrategyVersion
+      {
+        Id = Guid.NewGuid(),
+        StrategyId = strategy.Id,
+        VersionNumber = 1,
+        Timeframe = request.Timeframe?.Trim(),
+        EntryRules = request.EntryRules.Trim(),
+        ExitRules = request.ExitRules.Trim(),
+        RiskRules = request.RiskRules.Trim(),
+        Notes = request.Notes?.Trim(),
+        CreatedAt = now,
+        CreatedByUserId = userId,
+      };
 
-    var response = new CreateStrategyResponse(
-        strategy.Id,
-        strategy.Name,
-        strategy.Description,
-        strategy.IsDeleted,
-        strategy.CreatedAt,
-        strategy.UpdatedAt
+      _context.Strategies.Add(strategy);
+      _context.StrategyVersions.Add(version);
+      await _context.SaveChangesAsync();
+      await tx.CommitAsync();
+    });
+
+    if (strategy == null || version == null)
+    {
+      return StatusCode(500, new { message = "Failed to create strategy" });
+    }
+
+    return CreatedAtAction(
+        nameof(Get),
+        new { id = strategy.Id },
+        new CreateStrategyResponse(
+            strategy.Id,
+            strategy.Name,
+            strategy.Market,
+            strategy.DefaultTimeframe,
+            strategy.IsArchived,
+            strategy.CreatedAt,
+            strategy.UpdatedAt,
+            version.Id,
+            version.VersionNumber
+        )
     );
-
-    return CreatedAtAction(nameof(Get), new { id = strategy.Id }, response);
   }
 
-  /// <summary>
-  /// Update an existing strategy.
-  /// </summary>
-  [HttpPut("{id:guid}")]
-  public async Task<ActionResult<UpdateStrategyResponse>> Update(
-      Guid id,
-      [FromBody] UpdateStrategyRequest request)
+  [HttpPost("{id:guid}/versions")]
+  public async Task<ActionResult<CreateStrategyVersionResponse>> CreateVersion(Guid id, [FromBody] CreateStrategyVersionRequest request)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    var strategy = await _context.Strategies
-        .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+    if (string.IsNullOrWhiteSpace(request.EntryRules) || string.IsNullOrWhiteSpace(request.ExitRules) || string.IsNullOrWhiteSpace(request.RiskRules))
+    {
+      return BadRequest(new { message = "EntryRules, ExitRules and RiskRules are required" });
+    }
+
+    var executionStrategy = _context.Database.CreateExecutionStrategy();
+    StrategyVersion? newVersion = null;
+    ActionResult? failureResult = null;
+
+    await executionStrategy.ExecuteAsync(async () =>
+    {
+      await using var tx = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+
+      var strategy = await _context.Strategies.FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+      if (strategy == null)
+      {
+        failureResult = NotFound(new { message = "Strategy not found" });
+        return;
+      }
+
+      if (strategy.IsArchived)
+      {
+        failureResult = BadRequest(new { message = "Archived strategies cannot receive new versions" });
+        return;
+      }
+
+      var latestVersionNumber = await _context.StrategyVersions
+          .Where(v => v.StrategyId == id)
+          .Select(v => (int?)v.VersionNumber)
+          .MaxAsync() ?? 0;
+
+      var now = DateTime.UtcNow;
+      newVersion = new StrategyVersion
+      {
+        Id = Guid.NewGuid(),
+        StrategyId = id,
+        VersionNumber = latestVersionNumber + 1,
+        Timeframe = request.Timeframe?.Trim(),
+        EntryRules = request.EntryRules.Trim(),
+        ExitRules = request.ExitRules.Trim(),
+        RiskRules = request.RiskRules.Trim(),
+        Notes = request.Notes?.Trim(),
+        CreatedAt = now,
+        CreatedByUserId = userId,
+      };
+
+      strategy.UpdatedAt = now;
+      _context.StrategyVersions.Add(newVersion);
+
+      await _context.SaveChangesAsync();
+      await tx.CommitAsync();
+    });
+
+    if (failureResult != null)
+    {
+      return failureResult;
+    }
+
+    if (newVersion == null)
+    {
+      return StatusCode(500, new { message = "Failed to create strategy version" });
+    }
+
+    return Ok(new CreateStrategyVersionResponse(
+        newVersion.Id,
+        newVersion.VersionNumber,
+        newVersion.CreatedAt,
+        newVersion.CreatedByUserId,
+        newVersion.Timeframe,
+        newVersion.EntryRules,
+        newVersion.ExitRules,
+        newVersion.RiskRules,
+        newVersion.Notes
+    ));
+  }
+
+  [HttpPost("{id:guid}/archive")]
+  public async Task<ActionResult> Archive(Guid id)
+  {
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
+    var strategy = await _context.Strategies.FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
 
     if (strategy == null)
     {
       return NotFound(new { message = "Strategy not found" });
     }
 
-    // Update name if provided
-    if (!string.IsNullOrWhiteSpace(request.Name))
-    {
-      var trimmedName = request.Name.Trim();
-
-      if (trimmedName.Length > 200)
-      {
-        return BadRequest(new { message = "Name must be 200 characters or less" });
-      }
-
-      // Check for duplicate (excluding current strategy)
-      var exists = await _context.Strategies
-          .AnyAsync(s => s.UserId == userId
-                      && s.Name == trimmedName
-                      && s.Id != id
-                      && !s.IsDeleted);
-
-      if (exists)
-      {
-        return Conflict(new
-        {
-          type = "https://api.invenet.com/errors/duplicate-strategy",
-          title = "Duplicate Strategy",
-          status = 409,
-          detail = $"A strategy with the name '{trimmedName}' already exists for your account"
-        });
-      }
-
-      strategy.Name = trimmedName;
-    }
-
-    // Update description (allow clearing by passing empty string)
-    if (request.Description != null)
-    {
-      var trimmedDescription = request.Description.Trim();
-
-      if (trimmedDescription.Length > 2000)
-      {
-        return BadRequest(new { message = "Description must be 2000 characters or less" });
-      }
-
-      strategy.Description = string.IsNullOrWhiteSpace(trimmedDescription) ? null : trimmedDescription;
-    }
-
+    strategy.IsArchived = true;
     strategy.UpdatedAt = DateTime.UtcNow;
-
     await _context.SaveChangesAsync();
 
-    _logger.LogInformation(
-        "Strategy updated: {StrategyId} - {StrategyName} for User {UserId}",
-        strategy.Id, strategy.Name, userId);
-
-    var response = new UpdateStrategyResponse(
-        strategy.Id,
-        strategy.Name,
-        strategy.Description,
-        strategy.IsDeleted,
-        strategy.CreatedAt,
-        strategy.UpdatedAt
-    );
-
-    return Ok(response);
+    return NoContent();
   }
 
-  /// <summary>
-  /// Delete a strategy (soft delete).
-  /// </summary>
-  [HttpDelete("{id:guid}")]
-  public async Task<ActionResult> Delete(Guid id)
+  [HttpPost("{id:guid}/unarchive")]
+  public async Task<ActionResult> Unarchive(Guid id)
   {
-    var userId = GetCurrentUserId();
-
-    var strategy = await _context.Strategies
-        .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
+    var strategy = await _context.Strategies.FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
 
     if (strategy == null)
     {
       return NotFound(new { message = "Strategy not found" });
     }
 
-    // Soft delete
-    strategy.IsDeleted = true;
+    strategy.IsArchived = false;
     strategy.UpdatedAt = DateTime.UtcNow;
-
     await _context.SaveChangesAsync();
-
-    _logger.LogInformation(
-        "Strategy soft-deleted: {StrategyId} - {StrategyName} for User {UserId}",
-        strategy.Id, strategy.Name, userId);
 
     return NoContent();
   }

@@ -1,14 +1,12 @@
 <div class="strategy-list-container">
   <div class="list-header">
-    <h3>My Strategies</h3>
-    <div class="list-controls">
-      <p-button
-        label="New Strategy"
-        icon="pi pi-plus"
-        (onClick)="onCreate()"
-        [disabled]="isLoading()"
-      ></p-button>
-    </div>
+    <h3>Strategies</h3>
+    <p-button
+      label="Create strategy"
+      icon="pi pi-plus"
+      (onClick)="onCreate()"
+      [disabled]="isLoading()"
+    ></p-button>
   </div>
 
   <p-table
@@ -19,64 +17,68 @@
     [rowsPerPageOptions]="[10, 25, 50]"
     [showCurrentPageReport]="true"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} strategies"
-    [tableStyle]="{ 'min-width': '60rem' }"
-    styleClass="p-datatable-striped"
+    [tableStyle]="{ 'min-width': '70rem' }"
   >
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="name" style="width: 25%">
-          Name <p-sortIcon field="name" />
-        </th>
-        <th style="width: 40%">Description</th>
-        <th pSortableColumn="createdAt" style="width: 15%">
-          Created <p-sortIcon field="createdAt" />
-        </th>
-        <th pSortableColumn="updatedAt" style="width: 15%">
-          Updated <p-sortIcon field="updatedAt" />
-        </th>
-        @if (showDeleted()) {
-          <th style="width: 10%">Status</th>
-        }
-        <th style="width: 10%">Actions</th>
+        <th>Name</th>
+        <th>Market</th>
+        <th>Default timeframe</th>
+        <th>Current version</th>
+        <th>Updated</th>
+        <th>Status</th>
+        <th>Actions</th>
       </tr>
     </ng-template>
+
     <ng-template pTemplate="body" let-strategy>
       <tr>
+        <td><strong>{{ strategy.name }}</strong></td>
+        <td>{{ strategy.market || '—' }}</td>
+        <td>{{ strategy.defaultTimeframe || '—' }}</td>
         <td>
-          <strong>{{ strategy.name }}</strong>
+          @if (strategy.currentVersion) {
+            v{{ strategy.currentVersion.versionNumber }}
+          } @else {
+            —
+          }
         </td>
-        <td class="strategy-description">
-          {{ strategy.description || '—' }}
-        </td>
-        <td>{{ strategy.createdAt | date: 'short' }}</td>
         <td>{{ strategy.updatedAt | date: 'short' }}</td>
-        @if (showDeleted()) {
-          <td>
-            <p-tag
-              [value]="getStatusLabel(strategy.isDeleted)"
-              [severity]="getStatusSeverity(strategy.isDeleted)"
-            />
-          </td>
-        }
+        <td>
+          <p-tag
+            [value]="getStatusLabel(strategy.isArchived)"
+            [severity]="getStatusSeverity(strategy.isArchived)"
+          ></p-tag>
+        </td>
         <td>
           <div class="action-buttons">
-            @if (!strategy.isDeleted) {
+            <p-button
+              icon="pi pi-eye"
+              [rounded]="true"
+              [text]="true"
+              severity="info"
+              (onClick)="onView(strategy.id)"
+              pTooltip="View"
+              tooltipPosition="top"
+            ></p-button>
+            @if (!strategy.isArchived) {
               <p-button
-                icon="pi pi-pencil"
+                icon="pi pi-archive"
                 [rounded]="true"
                 [text]="true"
-                severity="info"
-                (onClick)="onEdit(strategy)"
-                pTooltip="Edit strategy"
+                severity="secondary"
+                (onClick)="onArchive(strategy.id)"
+                pTooltip="Archive"
                 tooltipPosition="top"
               ></p-button>
+            } @else {
               <p-button
-                icon="pi pi-trash"
+                icon="pi pi-replay"
                 [rounded]="true"
                 [text]="true"
-                severity="danger"
-                (onClick)="onDelete(strategy.id)"
-                pTooltip="Delete strategy"
+                severity="contrast"
+                (onClick)="onUnarchive(strategy.id)"
+                pTooltip="Unarchive"
                 tooltipPosition="top"
               ></p-button>
             }
@@ -84,15 +86,10 @@
         </td>
       </tr>
     </ng-template>
+
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td [attr.colspan]="showDeleted() ? 6 : 5" class="empty-message">
-          <div class="empty-state">
-            <i class="pi pi-inbox" style="font-size: 3rem"></i>
-            <p>No strategies found</p>
-            <small>Create your first strategy to get started</small>
-          </div>
-        </td>
+        <td colspan="7" class="empty-message">No strategies found</td>
       </tr>
     </ng-template>
   </p-table>

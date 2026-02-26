@@ -1,20 +1,23 @@
 namespace Invenet.Api.Modules.Strategies.Features.ListStrategies;
 
-/// <summary>
-/// Response for a single strategy in the list.
-/// </summary>
+public record CurrentVersionSummary(
+    Guid Id,
+    int VersionNumber,
+    DateTime CreatedAt,
+    string? Timeframe
+);
+
 public record StrategyListItem(
     Guid Id,
     string Name,
-    string? Description,
-    bool IsDeleted,
+    string? Market,
+    string? DefaultTimeframe,
+    bool IsArchived,
     DateTime CreatedAt,
-    DateTime UpdatedAt
+    DateTime UpdatedAt,
+    CurrentVersionSummary? CurrentVersion
 );
 
-/// <summary>
-/// Response for listing strategies with pagination info.
-/// </summary>
 public record ListStrategiesResponse(
     IEnumerable<StrategyListItem> Strategies,
     int Total

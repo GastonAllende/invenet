@@ -3,49 +3,45 @@ import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import type { GetStrategyResponse } from '../../data-access/models';
+import { TooltipModule } from 'primeng/tooltip';
+import type { StrategyListItem } from '../../data-access/models';
 
 @Component({
   selector: 'lib-strategy-list',
-  imports: [
-    CommonModule,
-    TableModule,
-    ButtonModule,
-    TagModule,
-    ConfirmDialogModule,
-  ],
+  imports: [CommonModule, TableModule, ButtonModule, TagModule, TooltipModule],
   templateUrl: './strategy-list.component.html',
   styleUrls: ['./strategy-list.component.css'],
 })
 export class StrategyListComponent {
-  // Inputs
-  strategies = input<GetStrategyResponse[]>([]);
+  strategies = input<StrategyListItem[]>([]);
   isLoading = input<boolean>(false);
-  showDeleted = input<boolean>(false);
 
-  // Outputs
-  edit = output<GetStrategyResponse>();
-  delete = output<string>();
   create = output<void>();
-
-  onEdit(strategy: GetStrategyResponse): void {
-    this.edit.emit(strategy);
-  }
-
-  onDelete(strategyId: string): void {
-    this.delete.emit(strategyId);
-  }
+  view = output<string>();
+  archive = output<string>();
+  unarchive = output<string>();
 
   onCreate(): void {
     this.create.emit();
   }
 
-  getStatusSeverity(isDeleted: boolean): 'success' | 'danger' {
-    return isDeleted ? 'danger' : 'success';
+  onView(id: string): void {
+    this.view.emit(id);
   }
 
-  getStatusLabel(isDeleted: boolean): string {
-    return isDeleted ? 'Deleted' : 'Active';
+  onArchive(id: string): void {
+    this.archive.emit(id);
+  }
+
+  onUnarchive(id: string): void {
+    this.unarchive.emit(id);
+  }
+
+  getStatusSeverity(isArchived: boolean): 'contrast' | 'success' {
+    return isArchived ? 'contrast' : 'success';
+  }
+
+  getStatusLabel(isArchived: boolean): string {
+    return isArchived ? 'ARCHIVED' : 'ACTIVE';
   }
 }

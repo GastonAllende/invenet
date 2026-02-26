@@ -33,15 +33,34 @@ export const appRoutes: Route[] = [
           import('@invenet/analytics').then((m) => m.Analytics),
       },
       {
-        path: 'strategy',
-        loadComponent: () =>
-          import('@invenet/strategies').then((m) => m.Strategies),
-      },
-      {
         path: 'strategies/new',
         loadComponent: () =>
           import('@invenet/strategies').then((m) => m.Strategies),
+        data: { strategyMode: 'new' },
       },
+      {
+        path: 'strategies/:id/edit',
+        loadComponent: () =>
+          import('@invenet/strategies').then((m) => m.Strategies),
+        data: { strategyMode: 'edit' },
+      },
+      {
+        path: 'strategies/:id',
+        loadComponent: () =>
+          import('@invenet/strategies').then((m) => m.Strategies),
+        data: { strategyMode: 'detail' },
+      },
+      {
+        path: 'strategies',
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('@invenet/strategies').then((m) => m.Strategies),
+        data: { strategyMode: 'list' },
+      },
+      { path: 'strategy', redirectTo: 'strategies', pathMatch: 'full' },
+      { path: 'strategy/new', redirectTo: 'strategies/new', pathMatch: 'full' },
+      { path: 'strategy/:id', redirectTo: 'strategies/:id' },
+      { path: 'strategy/:id/edit', redirectTo: 'strategies/:id/edit' },
       {
         path: 'accounts/new',
         loadComponent: () =>

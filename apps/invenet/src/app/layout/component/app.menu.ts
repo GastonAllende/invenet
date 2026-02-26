@@ -43,9 +43,9 @@ export class AppMenu {
             routerLink: ['/trades'],
           },
           {
-            label: 'Strategy',
+            label: 'Strategies',
             icon: 'pi pi-fw pi-list',
-            routerLink: ['/strategy'],
+            routerLink: ['/strategies'],
           },
           {
             label: 'Accounts',

@@ -1,13 +1,13 @@
 namespace Invenet.Api.Modules.Strategies.Features.CreateStrategy;
 
-/// <summary>
-/// Response after creating a strategy.
-/// </summary>
 public record CreateStrategyResponse(
     Guid Id,
     string Name,
-    string? Description,
-    bool IsDeleted,
+    string? Market,
+    string? DefaultTimeframe,
+    bool IsArchived,
     DateTime CreatedAt,
-    DateTime UpdatedAt
+    DateTime UpdatedAt,
+    Guid VersionId,
+    int VersionNumber
 );

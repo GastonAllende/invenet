@@ -83,7 +83,7 @@ export class TradeShellComponent implements OnInit {
 
   ngOnInit(): void {
     this.accountsStore.loadAccounts({ includeArchived: false });
-    this.strategiesStore.loadStrategies({ includeDeleted: false });
+    this.strategiesStore.loadStrategies({ includeArchived: false });
   }
 
   onCreateTrade(): void {

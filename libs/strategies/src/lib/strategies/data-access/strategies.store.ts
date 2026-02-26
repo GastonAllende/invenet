@@ -7,19 +7,16 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
-import {
-  addEntities,
-  setAllEntities,
-  updateEntity,
-  withEntities,
-} from '@ngrx/signals/entities';
+import { addEntities, setAllEntities, updateEntity, withEntities } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, of, pipe, switchMap, tap } from 'rxjs';
 import type {
+  CreateStrategyRequest,
+  CreateStrategyResponse,
+  CreateStrategyVersionRequest,
   GetStrategyResponse,
   ListStrategiesResponse,
-  CreateStrategyResponse,
-  UpdateStrategyResponse,
+  StrategyListItem,
 } from './models';
 import { StrategiesApiService } from './strategies-api.service';
 
@@ -27,36 +24,45 @@ type StrategiesState = {
   isLoading: boolean;
   error: string | null;
   selectedStrategyId: string | null;
+  selectedStrategyDetail: GetStrategyResponse | null;
+  lastCreatedStrategyId: string | null;
 };
 
 const initialState: StrategiesState = {
   isLoading: false,
   error: null,
   selectedStrategyId: null,
+  selectedStrategyDetail: null,
+  lastCreatedStrategyId: null,
 };
 
 export const StrategiesStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withEntities<GetStrategyResponse>(),
-  withComputed(({ entities, selectedStrategyId }) => ({
+  withEntities<StrategyListItem>(),
+  withComputed(({ entities, selectedStrategyId, selectedStrategyDetail }) => ({
     selectedStrategy: computed(() => {
       const id = selectedStrategyId();
-      return id ? entities().find((s) => s.id === id) : null;
+      return id ? entities().find((s) => s.id === id) ?? null : null;
     }),
-    activeStrategies: computed(() => entities().filter((s) => !s.isDeleted)),
-    deletedStrategies: computed(() => entities().filter((s) => s.isDeleted)),
+    selectedDetail: computed(() => selectedStrategyDetail()),
+    activeStrategies: computed(() => entities().filter((s) => !s.isArchived)),
+    archivedStrategies: computed(() => entities().filter((s) => s.isArchived)),
   })),
   withMethods((store, apiService = inject(StrategiesApiService)) => ({
     selectStrategy(id: string | null): void {
       patchState(store, { selectedStrategyId: id });
     },
 
-    loadStrategies: rxMethod<{ includeDeleted?: boolean }>(
+    clearLastCreatedStrategyId(): void {
+      patchState(store, { lastCreatedStrategyId: null });
+    },
+
+    loadStrategies: rxMethod<{ includeArchived?: boolean }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
-        switchMap(({ includeDeleted = false }) =>
-          apiService.list(includeDeleted).pipe(
+        switchMap(({ includeArchived = true }) =>
+          apiService.list(includeArchived).pipe(
             tap((response: ListStrategiesResponse) => {
               patchState(store, setAllEntities(response.strategies), {
                 isLoading: false,
@@ -64,7 +70,6 @@ export const StrategiesStore = signalStore(
               });
             }),
             catchError((error: Error) => {
-              console.error('Error loading strategies:', error);
               patchState(store, {
                 isLoading: false,
                 error: error.message || 'Failed to load strategies',
@@ -76,22 +81,52 @@ export const StrategiesStore = signalStore(
       ),
     ),
 
-    loadStrategy: rxMethod<string>(
+    loadStrategyDetail: rxMethod<{ id: string; version?: number }>(
       pipe(
-        tap(() => patchState(store, { isLoading: true, error: null })),
-        switchMap((id) =>
-          apiService.get(id).pipe(
+        tap(({ id }) =>
+          patchState(store, {
+            isLoading: true,
+            error: null,
+            selectedStrategyId: id,
+          }),
+        ),
+        switchMap(({ id, version }) =>
+          apiService.get(id, version).pipe(
             tap((strategy: GetStrategyResponse) => {
-              patchState(store, addEntities([strategy]), {
+              patchState(store, {
                 isLoading: false,
                 error: null,
-                selectedStrategyId: strategy.id,
+                selectedStrategyDetail: strategy,
               });
+
+              patchState(
+                store,
+                updateEntity({
+                  id: strategy.id,
+                  changes: {
+                    id: strategy.id,
+                    name: strategy.name,
+                    market: strategy.market,
+                    defaultTimeframe: strategy.defaultTimeframe,
+                    isArchived: strategy.isArchived,
+                    createdAt: strategy.createdAt,
+                    updatedAt: strategy.updatedAt,
+                    currentVersion: strategy.currentVersion
+                      ? {
+                          id: strategy.currentVersion.id,
+                          versionNumber: strategy.currentVersion.versionNumber,
+                          createdAt: strategy.currentVersion.createdAt,
+                          timeframe: strategy.currentVersion.timeframe,
+                        }
+                      : null,
+                  },
+                }),
+              );
             }),
             catchError((error: Error) => {
               patchState(store, {
                 isLoading: false,
-                error: error.message || 'Failed to load strategy',
+                error: error.message || 'Failed to load strategy detail',
               });
               return of(null);
             }),
@@ -100,24 +135,38 @@ export const StrategiesStore = signalStore(
       ),
     ),
 
-    createStrategy: rxMethod<{ name: string; description?: string }>(
+    createStrategy: rxMethod<CreateStrategyRequest>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((payload) =>
           apiService.create(payload).pipe(
             tap((response: CreateStrategyResponse) => {
-              const newStrategy: GetStrategyResponse = {
+              const createdStrategy: StrategyListItem = {
                 id: response.id,
                 name: response.name,
-                description: response.description,
-                isDeleted: false,
+                market: response.market,
+                defaultTimeframe: response.defaultTimeframe,
+                isArchived: response.isArchived,
                 createdAt: response.createdAt,
-                updatedAt: response.createdAt,
+                updatedAt: response.updatedAt,
+                currentVersion: {
+                  id: response.versionId,
+                  versionNumber: response.versionNumber,
+                  createdAt: response.createdAt,
+                  timeframe: payload.timeframe ?? null,
+                },
               };
-              patchState(store, addEntities([newStrategy]), {
-                isLoading: false,
-                error: null,
-              });
+
+              patchState(
+                store,
+                addEntities<StrategyListItem>([createdStrategy]),
+                {
+                  isLoading: false,
+                  error: null,
+                  selectedStrategyId: response.id,
+                  lastCreatedStrategyId: response.id,
+                },
+              );
             }),
             catchError((error: Error) => {
               patchState(store, {
@@ -131,24 +180,24 @@ export const StrategiesStore = signalStore(
       ),
     ),
 
-    updateStrategy: rxMethod<{
-      id: string;
-      name: string;
-      description?: string;
-    }>(
+    createStrategyVersion: rxMethod<{ id: string; payload: CreateStrategyVersionRequest }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
-        switchMap(({ id, ...payload }) =>
-          apiService.update(id, payload).pipe(
-            tap((response: UpdateStrategyResponse) => {
+        switchMap(({ id, payload }) =>
+          apiService.createVersion(id, payload).pipe(
+            tap((response) => {
               patchState(
                 store,
                 updateEntity({
                   id,
                   changes: {
-                    name: response.name,
-                    description: response.description,
-                    updatedAt: response.updatedAt,
+                    updatedAt: response.createdAt,
+                    currentVersion: {
+                      id: response.id,
+                      versionNumber: response.versionNumber,
+                      createdAt: response.createdAt,
+                      timeframe: response.timeframe,
+                    },
                   },
                 }),
                 { isLoading: false, error: null },
@@ -157,7 +206,7 @@ export const StrategiesStore = signalStore(
             catchError((error: Error) => {
               patchState(store, {
                 isLoading: false,
-                error: error.message || 'Failed to update strategy',
+                error: error.message || 'Failed to create strategy version',
               });
               return of(null);
             }),
@@ -166,25 +215,68 @@ export const StrategiesStore = signalStore(
       ),
     ),
 
-    deleteStrategy: rxMethod<string>(
+    archiveStrategy: rxMethod<string>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((id) =>
-          apiService.delete(id).pipe(
+          apiService.archive(id).pipe(
             tap(() => {
+              const detail = store.selectedStrategyDetail();
               patchState(
                 store,
                 updateEntity({
                   id,
-                  changes: { isDeleted: true },
+                  changes: { isArchived: true },
                 }),
-                { isLoading: false, error: null },
+                {
+                  isLoading: false,
+                  error: null,
+                  selectedStrategyDetail:
+                    detail && detail.id === id
+                      ? { ...detail, isArchived: true }
+                      : detail,
+                },
               );
             }),
             catchError((error: Error) => {
               patchState(store, {
                 isLoading: false,
-                error: error.message || 'Failed to delete strategy',
+                error: error.message || 'Failed to archive strategy',
+              });
+              return of(null);
+            }),
+          ),
+        ),
+      ),
+    ),
+
+    unarchiveStrategy: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, { isLoading: true, error: null })),
+        switchMap((id) =>
+          apiService.unarchive(id).pipe(
+            tap(() => {
+              const detail = store.selectedStrategyDetail();
+              patchState(
+                store,
+                updateEntity({
+                  id,
+                  changes: { isArchived: false },
+                }),
+                {
+                  isLoading: false,
+                  error: null,
+                  selectedStrategyDetail:
+                    detail && detail.id === id
+                      ? { ...detail, isArchived: false }
+                      : detail,
+                },
+              );
+            }),
+            catchError((error: Error) => {
+              patchState(store, {
+                isLoading: false,
+                error: error.message || 'Failed to unarchive strategy',
               });
               return of(null);
             }),
@@ -199,8 +291,7 @@ export const StrategiesStore = signalStore(
   })),
   withHooks({
     onInit(store) {
-      // Load strategies on store initialization
-      store.loadStrategies({ includeDeleted: false });
+      store.loadStrategies({ includeArchived: true });
     },
   }),
 );

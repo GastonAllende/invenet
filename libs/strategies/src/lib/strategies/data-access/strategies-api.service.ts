@@ -5,8 +5,8 @@ import { API_BASE_URL } from '@invenet/core';
 import type {
   CreateStrategyRequest,
   CreateStrategyResponse,
-  UpdateStrategyRequest,
-  UpdateStrategyResponse,
+  CreateStrategyVersionRequest,
+  CreateStrategyVersionResponse,
   GetStrategyResponse,
   ListStrategiesResponse,
 } from './models';
@@ -17,51 +17,41 @@ export class StrategiesApiService {
   private readonly apiBaseUrl = inject(API_BASE_URL);
   private readonly baseUrl = `${this.apiBaseUrl}/api/strategies`;
 
-  /**
-   * List all strategies for the current user
-   * @param includeDeleted - Whether to include soft-deleted strategies
-   */
-  list(includeDeleted = false): Observable<ListStrategiesResponse> {
-    const params = new HttpParams().set('includeDeleted', includeDeleted);
+  list(includeArchived = true): Observable<ListStrategiesResponse> {
+    const params = new HttpParams().set('includeArchived', includeArchived);
     return this.http.get<ListStrategiesResponse>(this.baseUrl, { params });
   }
 
-  /**
-   * Get a single strategy by ID
-   * @param id - Strategy ID
-   */
-  get(id: string): Observable<GetStrategyResponse> {
-    return this.http.get<GetStrategyResponse>(`${this.baseUrl}/${id}`);
+  get(id: string, version?: number): Observable<GetStrategyResponse> {
+    let params = new HttpParams();
+    if (version !== undefined) {
+      params = params.set('version', version);
+    }
+
+    return this.http.get<GetStrategyResponse>(`${this.baseUrl}/${id}`, {
+      params,
+    });
   }
 
-  /**
-   * Create a new strategy
-   * @param payload - Strategy data
-   */
   create(payload: CreateStrategyRequest): Observable<CreateStrategyResponse> {
     return this.http.post<CreateStrategyResponse>(this.baseUrl, payload);
   }
 
-  /**
-   * Update an existing strategy
-   * @param id - Strategy ID
-   * @param payload - Updated strategy data
-   */
-  update(
+  createVersion(
     id: string,
-    payload: UpdateStrategyRequest,
-  ): Observable<UpdateStrategyResponse> {
-    return this.http.put<UpdateStrategyResponse>(
-      `${this.baseUrl}/${id}`,
+    payload: CreateStrategyVersionRequest,
+  ): Observable<CreateStrategyVersionResponse> {
+    return this.http.post<CreateStrategyVersionResponse>(
+      `${this.baseUrl}/${id}/versions`,
       payload,
     );
   }
 
-  /**
-   * Soft delete a strategy
-   * @param id - Strategy ID
-   */
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  archive(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/archive`, {});
+  }
+
+  unarchive(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/unarchive`, {});
   }
 }
