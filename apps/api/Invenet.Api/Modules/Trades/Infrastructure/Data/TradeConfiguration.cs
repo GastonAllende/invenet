@@ -21,15 +21,17 @@ public class TradeConfiguration : IEntityTypeConfiguration<Trade>
     builder.Property(t => t.AccountId)
         .IsRequired();
 
-    builder.Property(t => t.StrategyId);  // Nullable
+    builder.Property(t => t.StrategyVersionId);  // Nullable for legacy rows
 
-    builder.Property(t => t.Type)
+    builder.Property(t => t.Direction)
         .IsRequired()
-        .HasMaxLength(4)
-        .HasConversion<string>();   // stored as "BUY" / "SELL"
+        .HasMaxLength(10)
+        .HasConversion<string>();
 
-    builder.Property(t => t.Date)
+    builder.Property(t => t.OpenedAt)
         .IsRequired();
+
+    builder.Property(t => t.ClosedAt);
 
     builder.Property(t => t.Symbol)
         .IsRequired()
@@ -42,28 +44,30 @@ public class TradeConfiguration : IEntityTypeConfiguration<Trade>
     builder.Property(t => t.ExitPrice)
         .HasColumnType("decimal(18,2)");  // Nullable
 
-    builder.Property(t => t.PositionSize)
+    builder.Property(t => t.Quantity)
         .IsRequired()
         .HasColumnType("decimal(18,4)");
 
-    builder.Property(t => t.InvestedAmount)
-        .IsRequired()
+    builder.Property(t => t.Pnl)
         .HasColumnType("decimal(18,2)");
 
-    builder.Property(t => t.Commission)
-        .IsRequired()
-        .HasColumnType("decimal(18,2)")
-        .HasDefaultValue(0m);
+    builder.Property(t => t.RMultiple)
+        .HasColumnType("decimal(18,2)");
 
-    builder.Property(t => t.ProfitLoss)
+    builder.Property(t => t.Tags)
+        .HasColumnType("text[]");
+
+    builder.Property(t => t.Notes)
+        .HasColumnType("text");
+
+    builder.Property(t => t.IsArchived)
         .IsRequired()
-        .HasColumnType("decimal(18,2)")
-        .HasDefaultValue(0m);
+        .HasDefaultValue(false);
 
     builder.Property(t => t.Status)
         .IsRequired()
         .HasMaxLength(10)
-        .HasConversion<string>();   // stored as "Open" / "Win" / "Loss"
+        .HasConversion<string>();
 
     builder.Property(t => t.CreatedAt)
         .IsRequired();
@@ -75,24 +79,24 @@ public class TradeConfiguration : IEntityTypeConfiguration<Trade>
     builder.HasIndex(t => t.AccountId)
         .HasDatabaseName("ix_trades_account_id");
 
-    builder.HasIndex(t => t.StrategyId)
-        .HasDatabaseName("ix_trades_strategy_id");
+    builder.HasIndex(t => t.StrategyVersionId)
+        .HasDatabaseName("ix_trades_strategy_version_id");
 
-    builder.HasIndex(t => new { t.AccountId, t.StrategyId })
-        .HasDatabaseName("ix_trades_account_strategy");
+    builder.HasIndex(t => new { t.AccountId, t.StrategyVersionId })
+        .HasDatabaseName("ix_trades_account_strategy_version");
 
-    builder.HasIndex(t => t.Date)
-        .HasDatabaseName("ix_trades_date");
+    builder.HasIndex(t => t.OpenedAt)
+        .HasDatabaseName("ix_trades_opened_at");
 
-    builder.HasIndex(t => new { t.AccountId, t.Date })
-        .HasDatabaseName("ix_trades_account_date");
+    builder.HasIndex(t => new { t.AccountId, t.OpenedAt })
+        .HasDatabaseName("ix_trades_account_opened_at");
 
     // Relationships
 
-    // Many-to-one relationship with Strategy (nullable)
-    builder.HasOne(t => t.Strategy)
-        .WithMany(s => s.Trades)
-        .HasForeignKey(t => t.StrategyId)
+    // Many-to-one relationship with strategy versions (nullable for legacy rows)
+    builder.HasOne(t => t.StrategyVersion)
+        .WithMany(sv => sv.Trades)
+        .HasForeignKey(t => t.StrategyVersionId)
         .OnDelete(DeleteBehavior.SetNull)
         .IsRequired(false);
   }

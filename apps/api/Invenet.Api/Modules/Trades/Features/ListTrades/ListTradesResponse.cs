@@ -6,18 +6,23 @@ namespace Invenet.Api.Modules.Trades.Features.ListTrades;
 public record TradeListItem(
     Guid Id,
     Guid AccountId,
+    Guid? StrategyVersionId,
     Guid? StrategyId,
-    string Type,
-    DateTime Date,
+    string? StrategyName,
+    int? StrategyVersionNumber,
+    string Direction,
+    DateTime OpenedAt,
+    DateTime? ClosedAt,
     string Symbol,
     decimal EntryPrice,
     decimal? ExitPrice,
-    decimal PositionSize,
-    decimal InvestedAmount,
-    decimal Commission,
-    decimal ProfitLoss,
+    decimal Quantity,
+    decimal? RMultiple,
+    decimal? Pnl,
+    bool IsArchived,
     string Status,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    DateTime UpdatedAt
 );
 
 /// <summary>

@@ -1,0 +1,108 @@
+<p-toast></p-toast>
+
+<p-dialog
+  header="Quick Log Trade"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [visible]="isOpen()"
+  [style]="{ width: '36rem' }"
+  (onHide)="close()"
+>
+  <form [formGroup]="form" class="quick-form">
+    <div class="field">
+      <label for="quickAccountId">Account *</label>
+      <p-select
+        inputId="quickAccountId"
+        formControlName="accountId"
+        [options]="accounts()"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Select account"
+      ></p-select>
+      @if (form.get('accountId')?.invalid && form.get('accountId')?.touched) {
+        <small class="error">Account is required</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="quickSymbol">Symbol *</label>
+      <input pInputText id="quickSymbol" formControlName="symbol" placeholder="e.g. AAPL" />
+      @if (form.get('symbol')?.invalid && form.get('symbol')?.touched) {
+        <small class="error">Symbol is required</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="quickDirection">Direction *</label>
+      <p-select
+        inputId="quickDirection"
+        formControlName="direction"
+        [options]="[
+          { label: 'Long', value: 'Long' },
+          { label: 'Short', value: 'Short' },
+        ]"
+        optionLabel="label"
+        optionValue="value"
+      ></p-select>
+      @if (form.get('direction')?.invalid && form.get('direction')?.touched) {
+        <small class="error">Direction is required</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="quickStrategy">Strategy *</label>
+      <p-select
+        inputId="quickStrategy"
+        formControlName="strategyId"
+        [options]="strategies()"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Select strategy"
+        (onChange)="onStrategyChange($event.value)"
+      ></p-select>
+      @if (form.get('strategyId')?.invalid && form.get('strategyId')?.touched) {
+        <small class="error">Strategy is required</small>
+      }
+      @if (currentVersionNumber()) {
+        <small class="version-label">Version: v{{ currentVersionNumber() }}</small>
+      }
+      @if (strategyVersionError()) {
+        <small class="error">{{ strategyVersionError() }}</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="quickEntryPrice">Entry Price *</label>
+      <p-inputnumber
+        inputId="quickEntryPrice"
+        formControlName="entryPrice"
+        mode="currency"
+        currency="USD"
+        locale="en-US"
+      ></p-inputnumber>
+      @if (form.get('entryPrice')?.invalid && form.get('entryPrice')?.touched) {
+        <small class="error">Entry price is required</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="quickQuantity">Quantity</label>
+      <p-inputnumber inputId="quickQuantity" formControlName="quantity"></p-inputnumber>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="actions">
+      <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="close()"></p-button>
+      <p-button
+        label="Save"
+        icon="pi pi-check"
+        [disabled]="form.invalid || !currentVersionId() || !!strategyVersionError() || isLoading()"
+        [loading]="isLoading()"
+        (onClick)="submitQuickTrade()"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>

@@ -5,12 +5,12 @@ namespace Invenet.Api.Modules.Trades.Domain;
 /// <summary>
 /// Direction of a trade.
 /// </summary>
-public enum TradeType { BUY, SELL }
+public enum TradeDirection { Long, Short }
 
 /// <summary>
 /// Outcome status of a trade.
 /// </summary>
-public enum TradeStatus { Win, Loss, Open }
+public enum TradeStatus { Open, Closed }
 
 /// <summary>
 /// Represents a trading transaction record.
@@ -28,19 +28,24 @@ public class Trade
   public Guid AccountId { get; set; }
 
   /// <summary>
-  /// Optional strategy associated with this trade.
+  /// Strategy version associated with this trade.
   /// </summary>
-  public Guid? StrategyId { get; set; }
+  public Guid? StrategyVersionId { get; set; }
 
   /// <summary>
-  /// Direction of the trade: BUY or SELL.
+  /// Direction of the trade.
   /// </summary>
-  public TradeType Type { get; set; }
+  public TradeDirection Direction { get; set; }
 
   /// <summary>
-  /// Trade execution date.
+  /// Timestamp when the trade was opened.
   /// </summary>
-  public DateTime Date { get; set; }
+  public DateTime OpenedAt { get; set; }
+
+  /// <summary>
+  /// Timestamp when the trade was closed.
+  /// </summary>
+  public DateTime? ClosedAt { get; set; }
 
   /// <summary>
   /// Trading symbol/ticker (e.g., AAPL, MSFT).
@@ -60,25 +65,35 @@ public class Trade
   /// <summary>
   /// Number of units / shares traded.
   /// </summary>
-  public decimal PositionSize { get; set; }
+  public decimal Quantity { get; set; }
 
   /// <summary>
-  /// Total capital deployed (entryPrice × positionSize).
+  /// Realised profit and loss.
   /// </summary>
-  public decimal InvestedAmount { get; set; }
+  public decimal? Pnl { get; set; }
 
   /// <summary>
-  /// Broker commission; defaults to 0.
+  /// Realised R-multiple for the trade.
   /// </summary>
-  public decimal Commission { get; set; }
+  public decimal? RMultiple { get; set; }
 
   /// <summary>
-  /// Realised profit or loss; defaults to 0 while open.
+  /// Optional tag labels.
   /// </summary>
-  public decimal ProfitLoss { get; set; }
+  public string[]? Tags { get; set; }
 
   /// <summary>
-  /// Outcome of the trade: Win, Loss, or Open.
+  /// Optional free-form notes.
+  /// </summary>
+  public string? Notes { get; set; }
+
+  /// <summary>
+  /// Soft delete state.
+  /// </summary>
+  public bool IsArchived { get; set; }
+
+  /// <summary>
+  /// Trade lifecycle status.
   /// </summary>
   public TradeStatus Status { get; set; }
 
@@ -95,7 +110,7 @@ public class Trade
   // Navigation properties
 
   /// <summary>
-  /// The strategy used for this trade (if any).
+  /// The strategy version used for this trade.
   /// </summary>
-  public Strategy? Strategy { get; set; }
+  public StrategyVersion? StrategyVersion { get; set; }
 }

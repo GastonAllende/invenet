@@ -7,6 +7,7 @@ import type {
   ListTradesResponse,
   CreateTradeRequest,
   UpdateTradeRequest,
+  TradeFilters,
   TradeResponse,
 } from '../models/trade.model';
 
@@ -16,8 +17,24 @@ export class TradesApiService {
   private readonly apiBaseUrl = inject(API_BASE_URL);
   private readonly baseUrl = `${this.apiBaseUrl}/api/trades`;
 
-  list(accountId: string): Observable<ListTradesResponse> {
-    const params = new HttpParams().set('accountId', accountId);
+  list(filters: TradeFilters): Observable<ListTradesResponse> {
+    let params = new HttpParams().set('accountId', filters.accountId);
+    if (filters.strategyId) {
+      params = params.set('strategyId', filters.strategyId);
+    }
+    if (filters.status) {
+      params = params.set('status', filters.status);
+    }
+    if (filters.dateFrom) {
+      params = params.set('dateFrom', filters.dateFrom);
+    }
+    if (filters.dateTo) {
+      params = params.set('dateTo', filters.dateTo);
+    }
+    if (filters.includeArchived !== undefined) {
+      params = params.set('includeArchived', filters.includeArchived);
+    }
+
     return this.http.get<ListTradesResponse>(this.baseUrl, { params }).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorMessage = 'Failed to load trades';
@@ -69,14 +86,50 @@ export class TradesApiService {
     );
   }
 
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+  get(id: string): Observable<TradeResponse> {
+    return this.http.get<TradeResponse>(`${this.baseUrl}/${id}`).pipe(
       catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to delete trade';
+        let errorMessage = 'Failed to load trade';
         if (error.status === 401) {
           errorMessage = 'Authentication required';
         } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to delete this trade';
+          errorMessage = 'You do not have permission to access this trade';
+        } else if (error.status === 404) {
+          errorMessage = 'Trade not found';
+        } else if (error.error?.message) {
+          errorMessage = error.error.message;
+        }
+        return throwError(() => new Error(errorMessage));
+      }),
+    );
+  }
+
+  archive(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/archive`, {}).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Failed to archive trade';
+        if (error.status === 401) {
+          errorMessage = 'Authentication required';
+        } else if (error.status === 403) {
+          errorMessage = 'You do not have permission to archive this trade';
+        } else if (error.status === 404) {
+          errorMessage = 'Trade not found';
+        } else if (error.error?.message) {
+          errorMessage = error.error.message;
+        }
+        return throwError(() => new Error(errorMessage));
+      }),
+    );
+  }
+
+  unarchive(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/unarchive`, {}).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Failed to unarchive trade';
+        if (error.status === 401) {
+          errorMessage = 'Authentication required';
+        } else if (error.status === 403) {
+          errorMessage = 'You do not have permission to unarchive this trade';
         } else if (error.status === 404) {
           errorMessage = 'Trade not found';
         } else if (error.error?.message) {

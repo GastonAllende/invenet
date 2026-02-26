@@ -1,5 +1,4 @@
 using Invenet.Api.Modules.Auth.Domain;
-using Invenet.Api.Modules.Trades.Domain;
 
 namespace Invenet.Api.Modules.Strategies.Domain;
 
@@ -19,6 +18,5 @@ public class Strategy
   public DateTime UpdatedAt { get; set; }
 
   public ApplicationUser User { get; set; } = null!;
-  public ICollection<Trade> Trades { get; set; } = new List<Trade>();
   public ICollection<StrategyVersion> Versions { get; set; } = new List<StrategyVersion>();
 }

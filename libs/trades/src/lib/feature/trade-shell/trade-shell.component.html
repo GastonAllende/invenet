@@ -2,25 +2,28 @@
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
-  <lib-trade-list
-    [trades]="trades()"
-    [isLoading]="isLoading()"
-    (create)="onCreateTrade()"
-    (edit)="onEditTrade($event)"
-    (delete)="onDeleteTrade($event)"
-  ></lib-trade-list>
+  @if (journalMode() === 'list') {
+    <lib-trade-list
+      [trades]="trades()"
+      [isLoading]="isLoading()"
+      [accounts]="accounts()"
+      [strategies]="strategies()"
+      [selectedAccountId]="activeAccountId()"
+      [includeArchived]="includeArchived()"
+      (filtersChange)="onFiltersChange($event)"
+      (includeArchivedChange)="onIncludeArchivedChange($event)"
+      (logFull)="onLogFull()"
+      (quickLog)="onQuickLog()"
+      (view)="onView($event)"
+      (archive)="onArchive($event)"
+      (unarchive)="onUnarchive($event)"
+    ></lib-trade-list>
+  }
 
-  <p-dialog
-    [header]="selectedTrade() ? 'Edit Trade' : 'New Trade'"
-    [(visible)]="showFormDialog"
-    [modal]="true"
-    [closable]="true"
-    [draggable]="false"
-    [resizable]="false"
-    [style]="{ width: '720px' }"
-  >
+  @if (journalMode() === 'new' || journalMode() === 'edit') {
     <lib-trade-form
-      [trade]="selectedTrade()"
+      [mode]="journalMode() === 'edit' ? 'edit' : 'create'"
+      [trade]="selectedTradeDetail()"
       [accounts]="accounts()"
       [defaultAccountId]="activeAccountId()"
       [strategies]="strategies()"
@@ -28,5 +31,15 @@
       (save)="onSaveTrade($event)"
       (formCancel)="onCancelForm()"
     ></lib-trade-form>
-  </p-dialog>
+  }
+
+  @if (journalMode() === 'detail') {
+    <lib-trade-detail
+      [trade]="selectedTradeDetail()"
+      (edit)="onEditFromDetail()"
+      (archive)="onArchiveFromDetail()"
+      (unarchive)="onUnarchiveFromDetail()"
+      (back)="onBackToJournal()"
+    ></lib-trade-detail>
+  }
 </div>

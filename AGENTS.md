@@ -44,6 +44,15 @@ Account management library for trading journal accounts:
 - **Components**: AccountsShellComponent (smart), AccountFormComponent, AccountListComponent (presentational)
 - **README**: `libs/accounts/README.md` for detailed usage and API
 
+### Trades (`libs/trades/`)
+
+Trade journaling library:
+- **Route**: `/journal` (legacy `/trades` redirects to `/journal`)
+- **Modes**: list (`/journal`), create (`/journal/new`), detail (`/journal/:id`), edit (`/journal/:id/edit`)
+- **Features**: quick log modal, full trade form, trade detail view, journal list filters, archive/unarchive flows
+- **Backend**: `apps/api/Invenet.Api/Modules/Trades/`
+- **State**: NgRx SignalStore (`TradesStore`) with list/detail + quick-modal state
+
 ## Common Tasks
 
 ```bash

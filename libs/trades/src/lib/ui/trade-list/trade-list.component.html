@@ -1,13 +1,59 @@
 <div class="trade-list-container">
   <div class="list-header">
-    <h3>Trade History</h3>
+    <h3>Journal</h3>
     <div class="list-controls">
+      <p-button label="Log Trade (full)" icon="pi pi-plus" (onClick)="onLogFull()"></p-button>
       <p-button
-        label="Create Trade"
-        icon="pi pi-plus"
-        (onClick)="onCreate()"
-        [disabled]="isLoading()"
+        label="Quick Log Trade"
+        icon="pi pi-bolt"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="onQuickLog()"
       ></p-button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <p-select
+      [options]="accounts()"
+      [ngModel]="selectedAccountId()"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Account"
+      disabled
+    ></p-select>
+    <p-select
+      [options]="strategies()"
+      [(ngModel)]="selectedStrategyId"
+      optionLabel="name"
+      optionValue="id"
+      [showClear]="true"
+      placeholder="Strategy"
+      (ngModelChange)="onFilterChange()"
+    ></p-select>
+    <p-datepicker
+      [(ngModel)]="selectedRange"
+      selectionMode="range"
+      [showIcon]="true"
+      placeholder="Date range"
+      (onSelect)="onFilterChange()"
+    ></p-datepicker>
+    <p-select
+      [options]="statusOptions"
+      [(ngModel)]="selectedStatus"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Status"
+      (ngModelChange)="onFilterChange()"
+    ></p-select>
+    <div class="archived-toggle">
+      <p-checkbox
+        [binary]="true"
+        [ngModel]="includeArchived()"
+        (ngModelChange)="onToggleArchived($event)"
+        inputId="showArchived"
+      ></p-checkbox>
+      <label for="showArchived">Show archived</label>
     </div>
   </div>
 
@@ -24,109 +70,77 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="date" style="width: 10%">
-          Date <p-sortIcon field="date" />
-        </th>
-        <th pSortableColumn="symbol" style="width: 8%">
-          Symbol <p-sortIcon field="symbol" />
-        </th>
-        <th pSortableColumn="type" style="width: 7%">
-          Type <p-sortIcon field="type" />
-        </th>
-        <th pSortableColumn="entryPrice" style="width: 10%">
-          Entry Price <p-sortIcon field="entryPrice" />
-        </th>
-        <th pSortableColumn="exitPrice" style="width: 10%">
-          Exit Price <p-sortIcon field="exitPrice" />
-        </th>
-        <th pSortableColumn="positionSize" style="width: 10%">
-          Position Size <p-sortIcon field="positionSize" />
-        </th>
-        <th pSortableColumn="investedAmount" style="width: 10%">
-          Invested <p-sortIcon field="investedAmount" />
-        </th>
-        <th pSortableColumn="commission" style="width: 9%">
-          Commission <p-sortIcon field="commission" />
-        </th>
-        <th pSortableColumn="profitLoss" style="width: 9%">
-          P&amp;L <p-sortIcon field="profitLoss" />
-        </th>
-        <th pSortableColumn="status" style="width: 8%">
-          Status <p-sortIcon field="status" />
-        </th>
-        <th style="width: 9%">Actions</th>
+        <th>Date</th>
+        <th>Symbol</th>
+        <th>Direction</th>
+        <th>Account</th>
+        <th>Strategy</th>
+        <th>R-Multiple</th>
+        <th>P&amp;L</th>
+        <th>Status</th>
+        <th>Actions</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-trade>
       <tr>
-        <td>{{ trade.date | date: 'short' }}</td>
+        <td>{{ trade.openedAt | date: 'short' }}</td>
+        <td><strong>{{ trade.symbol }}</strong></td>
         <td>
-          <strong>{{ trade.symbol }}</strong>
+          <p-tag [value]="trade.direction" [severity]="getDirectionSeverity(trade.direction)"></p-tag>
         </td>
+        <td>{{ getAccountName(trade.accountId) }}</td>
         <td>
-          <p-tag
-            [value]="trade.type"
-            [severity]="getTypeSeverity(trade.type)"
-          />
-        </td>
-        <td>{{ trade.entryPrice | currency }}</td>
-        <td>
-          @if (trade.exitPrice) {
-            {{ trade.exitPrice | currency }}
-          } @else {
-            &mdash;
+          {{ trade.strategyName ?? '—' }}
+          @if (trade.strategyVersionNumber) {
+            <span class="strategy-version">v{{ trade.strategyVersionNumber }}</span>
           }
         </td>
-        <td>{{ trade.positionSize }}</td>
-        <td>{{ trade.investedAmount | currency }}</td>
-        <td>{{ trade.commission | currency }}</td>
-        <td
-          [class.text-green-600]="trade.profitLoss > 0"
-          [class.text-red-600]="trade.profitLoss < 0"
-        >
-          {{ trade.profitLoss | currency }}
+        <td>{{ trade.rMultiple ?? '—' }}</td>
+        <td [class.text-green-600]="(trade.pnl ?? 0) > 0" [class.text-red-600]="(trade.pnl ?? 0) < 0">
+          {{ trade.pnl ?? '—' }}
         </td>
         <td>
-          <p-tag
-            [value]="trade.status"
-            [severity]="getStatusSeverity(trade.status)"
-          />
+          <p-tag [value]="trade.status" [severity]="getStatusSeverity(trade.status)"></p-tag>
+          @if (trade.isArchived) {
+            <p-tag value="ARCHIVED" severity="warn"></p-tag>
+          }
         </td>
         <td>
           <div class="action-buttons">
             <p-button
-              icon="pi pi-pencil"
+              icon="pi pi-eye"
               [rounded]="true"
               [text]="true"
               severity="info"
               [disabled]="isLoading()"
-              (onClick)="onEdit(trade)"
-              pTooltip="Edit trade"
+              (onClick)="onView(trade.id)"
+              pTooltip="View trade"
               tooltipPosition="top"
             ></p-button>
-            <p-button
-              icon="pi pi-trash"
-              [rounded]="true"
-              [text]="true"
-              severity="danger"
-              [disabled]="isLoading()"
-              (onClick)="onDelete(trade.id)"
-              pTooltip="Delete trade"
-              tooltipPosition="top"
-            ></p-button>
-          </div>
-        </td>
-      </tr>
-    </ng-template>
-
-    <ng-template pTemplate="emptymessage">
-      <tr>
-        <td colspan="11" class="empty-message">
-          <div class="empty-state">
-            <i class="pi pi-inbox" style="font-size: 3rem"></i>
-            <p>No trades found</p>
-            <small>Click "Create Trade" to record your first trade</small>
+            @if (!trade.isArchived) {
+              <p-button
+                icon="pi pi-folder"
+                [rounded]="true"
+                [text]="true"
+                severity="warn"
+                [disabled]="isLoading()"
+                (onClick)="onArchive(trade.id)"
+                pTooltip="Archive trade"
+                tooltipPosition="top"
+              ></p-button>
+            } @else {
+              <p-button
+                icon="pi pi-refresh"
+                [rounded]="true"
+                [text]="true"
+                severity="success"
+                [disabled]="isLoading()"
+                (onClick)="onUnarchive(trade.id)"
+                pTooltip="Unarchive trade"
+                tooltipPosition="top"
+              ></p-button>
+            }
           </div>
         </td>
       </tr>

@@ -38,9 +38,9 @@ export class AppMenu {
             routerLink: ['/analytics'],
           },
           {
-            label: 'Trades',
+            label: 'Journal',
             icon: 'pi pi-fw pi-table',
-            routerLink: ['/trades'],
+            routerLink: ['/journal'],
           },
           {
             label: 'Strategies',

@@ -47,11 +47,6 @@ public class StrategyConfiguration : IEntityTypeConfiguration<Strategy>
         .HasForeignKey(s => s.UserId)
         .OnDelete(DeleteBehavior.Cascade);
 
-    builder.HasMany(s => s.Trades)
-        .WithOne(t => t.Strategy)
-        .HasForeignKey(t => t.StrategyId)
-        .OnDelete(DeleteBehavior.SetNull);
-
     builder.HasMany(s => s.Versions)
         .WithOne(v => v.Strategy)
         .HasForeignKey(v => v.StrategyId)

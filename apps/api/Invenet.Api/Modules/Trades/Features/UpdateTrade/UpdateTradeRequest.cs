@@ -8,14 +8,17 @@ namespace Invenet.Api.Modules.Trades.Features.UpdateTrade;
 /// </summary>
 public record UpdateTradeRequest(
     Guid? StrategyId,
-    [Required][RegularExpression("^(BUY|SELL)$", ErrorMessage = "Type must be 'BUY' or 'SELL'")] string Type,
-    [Required] DateTime Date,
+    Guid? StrategyVersionId,
+    [Required][RegularExpression("^(Long|Short)$", ErrorMessage = "Direction must be 'Long' or 'Short'")] string Direction,
+    [Required] DateTime OpenedAt,
     [Required][StringLength(20, MinimumLength = 1, ErrorMessage = "Symbol must be 1–20 characters")] string Symbol,
     [Required][Range(0.00001, double.MaxValue, ErrorMessage = "EntryPrice must be greater than 0")] decimal EntryPrice,
     [Range(0.00001, double.MaxValue, ErrorMessage = "ExitPrice must be greater than 0 when provided")] decimal? ExitPrice,
-    [Required][Range(0.00001, double.MaxValue, ErrorMessage = "PositionSize must be greater than 0")] decimal PositionSize,
-    [Range(0, double.MaxValue, ErrorMessage = "InvestedAmount must be 0 or more")] decimal InvestedAmount,
-    [Range(0, double.MaxValue, ErrorMessage = "Commission must be 0 or more")] decimal Commission,
-    decimal ProfitLoss,
-    [Required][RegularExpression("^(Win|Loss|Open)$", ErrorMessage = "Status must be 'Win', 'Loss', or 'Open'")] string Status
+    DateTime? ClosedAt,
+    [Range(0.00001, double.MaxValue, ErrorMessage = "Quantity must be greater than 0")] decimal? Quantity,
+    decimal? RMultiple,
+    decimal? Pnl,
+    string[]? Tags,
+    string? Notes,
+    [Required][RegularExpression("^(Open|Closed)$", ErrorMessage = "Status must be 'Open' or 'Closed'")] string Status
 );

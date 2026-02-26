@@ -24,9 +24,30 @@ export const appRoutes: Route[] = [
           import('@invenet/dashboard').then((m) => m.Dashboard),
       },
       {
-        path: 'trades',
+        path: 'journal/new',
         loadComponent: () => import('@invenet/trades').then((m) => m.Trades),
+        data: { journalMode: 'new' },
       },
+      {
+        path: 'journal/:id/edit',
+        loadComponent: () => import('@invenet/trades').then((m) => m.Trades),
+        data: { journalMode: 'edit' },
+      },
+      {
+        path: 'journal/:id',
+        loadComponent: () => import('@invenet/trades').then((m) => m.Trades),
+        data: { journalMode: 'detail' },
+      },
+      {
+        path: 'journal',
+        pathMatch: 'full',
+        loadComponent: () => import('@invenet/trades').then((m) => m.Trades),
+        data: { journalMode: 'list' },
+      },
+      { path: 'trades', redirectTo: 'journal', pathMatch: 'full' },
+      { path: 'trades/new', redirectTo: 'journal/new', pathMatch: 'full' },
+      { path: 'trades/:id', redirectTo: 'journal/:id' },
+      { path: 'trades/:id/edit', redirectTo: 'journal/:id/edit' },
       {
         path: 'analytics',
         loadComponent: () =>

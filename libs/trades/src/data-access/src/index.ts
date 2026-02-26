@@ -1,5 +1,7 @@
 export type {
   Trade,
+  TradeDetail,
+  TradeFilters,
   ListTradesResponse,
   CreateTradeRequest,
   UpdateTradeRequest,

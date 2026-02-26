@@ -1,46 +1,20 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  effect,
-  inject,
-  input,
-  output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
-import {
-  CreateTradeRequest,
-  UpdateTradeRequest,
-  Trade,
-} from '../../../data-access/src';
+import { TextareaModule } from 'primeng/textarea';
+import { StrategiesApiService } from '@invenet/strategies';
+import { CreateTradeRequest, Trade, UpdateTradeRequest } from '../../../data-access/src';
 
 interface SelectOption {
   id: string;
   name: string;
 }
-
-const TRADE_TYPE_OPTIONS = [
-  { label: 'BUY', value: 'BUY' },
-  { label: 'SELL', value: 'SELL' },
-];
-
-const TRADE_STATUS_OPTIONS = [
-  { label: 'Open', value: 'Open' },
-  { label: 'Win', value: 'Win' },
-  { label: 'Loss', value: 'Loss' },
-];
 
 @Component({
   selector: 'lib-trade-form',
@@ -54,14 +28,18 @@ const TRADE_STATUS_OPTIONS = [
     InputNumberModule,
     SelectModule,
     DatePickerModule,
+    TextareaModule,
   ],
   templateUrl: './trade-form.component.html',
   styleUrl: './trade-form.component.css',
 })
 export class TradeFormComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly destroyRef = inject(DestroyRef);
+  private readonly strategiesApiService = inject(StrategiesApiService);
+  private isPatchingStrategy = false;
+  private initialStrategyId: string | null = null;
 
+  mode = input<'create' | 'edit'>('create');
   trade = input<Trade | null>(null);
   accounts = input<SelectOption[]>([]);
   defaultAccountId = input<string | null>(null);
@@ -71,90 +49,141 @@ export class TradeFormComponent {
   save = output<CreateTradeRequest | UpdateTradeRequest>();
   formCancel = output<void>();
 
-  readonly typeOptions = TRADE_TYPE_OPTIONS;
-  readonly statusOptions = TRADE_STATUS_OPTIONS;
+  readonly directionOptions = [
+    { label: 'Long', value: 'Long' },
+    { label: 'Short', value: 'Short' },
+  ];
 
-  form: FormGroup = this.fb.group({
+  readonly statusOptions = [
+    { label: 'Open', value: 'Open' },
+    { label: 'Closed', value: 'Closed' },
+  ];
+
+  readonly form = this.fb.group({
     accountId: ['', Validators.required],
-    strategyId: [null],
-    type: ['BUY', Validators.required],
-    date: [new Date(), Validators.required],
+    strategyId: [null as string | null],
+    strategyVersionId: [null as string | null],
+    direction: this.fb.control<'Long' | 'Short'>('Long', Validators.required),
+    openedAt: [new Date(), Validators.required],
+    closedAt: [null as Date | null],
     symbol: ['', [Validators.required, Validators.maxLength(20)]],
-    entryPrice: [null, [Validators.required, Validators.min(0.0001)]],
-    exitPrice: [null, Validators.min(0.0001)],
-    positionSize: [null, [Validators.required, Validators.min(0.000001)]],
-    commission: [0, [Validators.required, Validators.min(0)]],
-    status: ['Open', Validators.required],
-    investedAmount: [{ value: null, disabled: true }],
-    profitLoss: [{ value: null, disabled: true }],
+    entryPrice: [null as number | null, [Validators.required, Validators.min(0.0001)]],
+    exitPrice: [null as number | null],
+    quantity: [null as number | null],
+    rMultiple: [null as number | null],
+    pnl: [null as number | null],
+    tags: [''],
+    notes: [''],
+    status: this.fb.control<'Open' | 'Closed'>('Open', Validators.required),
   });
 
   constructor() {
-    // Sync form with incoming trade signal
     effect(() => {
       const t = this.trade();
-      if (t) {
+      if (t && this.mode() === 'edit') {
+        this.initialStrategyId = t.strategyId;
         this.form.patchValue({
           accountId: t.accountId,
-          strategyId: t.strategyId ?? null,
-          type: t.type,
-          date: new Date(t.date),
+          strategyId: t.strategyId,
+          strategyVersionId: t.strategyVersionId,
+          direction: t.direction,
+          openedAt: new Date(t.openedAt),
+          closedAt: t.closedAt ? new Date(t.closedAt) : null,
           symbol: t.symbol,
           entryPrice: t.entryPrice,
-          exitPrice: t.exitPrice ?? null,
-          positionSize: t.positionSize,
-          commission: t.commission,
+          exitPrice: t.exitPrice,
+          quantity: t.quantity,
+          rMultiple: t.rMultiple,
+          pnl: t.pnl,
+          tags: (t.tags ?? []).join(', '),
+          notes: t.notes ?? '',
           status: t.status,
-          investedAmount: t.investedAmount,
-          profitLoss: t.profitLoss,
         });
       } else {
-        const defaultAccountId = this.defaultAccountId();
+        this.initialStrategyId = null;
         this.form.reset({
-          accountId: defaultAccountId ?? '',
+          accountId: this.defaultAccountId() ?? '',
           strategyId: null,
-          type: 'BUY',
-          date: new Date(),
+          strategyVersionId: null,
+          direction: 'Long',
+          openedAt: new Date(),
+          closedAt: null,
           symbol: '',
           entryPrice: null,
           exitPrice: null,
-          positionSize: null,
-          commission: 0,
+          quantity: null,
+          rMultiple: null,
+          pnl: null,
+          tags: '',
+          notes: '',
           status: 'Open',
-          investedAmount: null,
-          profitLoss: null,
         });
       }
     });
 
-    // Auto-calculate investedAmount and profitLoss on relevant field changes
-    this.form.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        const { entryPrice, exitPrice, positionSize, commission } =
-          this.form.value;
+    effect(() => {
+      const status = this.form.controls.status.value;
+      const exitPrice = this.form.controls.exitPrice;
+      const closedAt = this.form.controls.closedAt;
 
-        const entry = entryPrice ?? 0;
-        const size = positionSize ?? 0;
-        const comm = commission ?? 0;
-        const invested = entry * size;
+      if (status === 'Closed') {
+        exitPrice.setValidators([Validators.required, Validators.min(0.0001)]);
+        closedAt.setValidators([Validators.required]);
+      } else {
+        exitPrice.clearValidators();
+        closedAt.clearValidators();
+      }
 
-        const updates: Record<string, number | null> = {
-          investedAmount: invested,
-          profitLoss: null,
-        };
+      exitPrice.updateValueAndValidity({ emitEvent: false });
+      closedAt.updateValueAndValidity({ emitEvent: false });
+    });
 
-        if (exitPrice != null) {
-          const gross = (exitPrice - entry) * size;
-          updates['profitLoss'] = gross - comm;
+    this.form.controls.strategyId.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((strategyId) => {
+        if (this.mode() !== 'edit' || this.isPatchingStrategy) {
+          return;
         }
 
-        this.form.patchValue(updates, { emitEvent: false });
+        if ((strategyId ?? null) === this.initialStrategyId) {
+          return;
+        }
+
+        const confirmed = window.confirm(
+          'Changing the strategy will update the strategy version to the current version. Continue?',
+        );
+
+        if (!confirmed) {
+          this.isPatchingStrategy = true;
+          this.form.controls.strategyId.setValue(this.initialStrategyId);
+          this.isPatchingStrategy = false;
+          return;
+        }
+
+        if (!strategyId) {
+          this.form.controls.strategyVersionId.setValue(null);
+          this.initialStrategyId = null;
+          return;
+        }
+
+        this.strategiesApiService.get(strategyId).subscribe({
+          next: (strategy) => {
+            this.form.controls.strategyVersionId.setValue(
+              strategy.currentVersion?.id ?? null,
+            );
+            this.initialStrategyId = strategyId;
+          },
+          error: () => {
+            this.isPatchingStrategy = true;
+            this.form.controls.strategyId.setValue(this.initialStrategyId);
+            this.isPatchingStrategy = false;
+          },
+        });
       });
   }
 
   get isEditMode(): boolean {
-    return this.trade() !== null;
+    return this.mode() === 'edit';
   }
 
   onSubmit(): void {
@@ -164,41 +193,53 @@ export class TradeFormComponent {
     }
 
     const raw = this.form.getRawValue();
-    const dateValue =
-      raw.date instanceof Date ? raw.date.toISOString() : raw.date;
+    const openedAt = raw.openedAt instanceof Date ? raw.openedAt.toISOString() : `${raw.openedAt}`;
+    const closedAt =
+      raw.closedAt instanceof Date ? raw.closedAt.toISOString() : raw.closedAt ? `${raw.closedAt}` : undefined;
+    const tags = (raw.tags ?? '')
+      .split(',')
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0);
 
     if (this.isEditMode) {
       const request: UpdateTradeRequest = {
-        strategyId: raw.strategyId || undefined,
-        type: raw.type,
-        date: dateValue,
-        symbol: raw.symbol,
-        entryPrice: raw.entryPrice,
-        exitPrice: raw.exitPrice || undefined,
-        positionSize: raw.positionSize,
-        investedAmount: raw.investedAmount ?? 0,
-        commission: raw.commission,
-        profitLoss: raw.profitLoss ?? 0,
-        status: raw.status,
+        strategyId: raw.strategyId ?? undefined,
+        strategyVersionId: raw.strategyVersionId ?? undefined,
+        direction: raw.direction ?? 'Long',
+        openedAt,
+        closedAt,
+        symbol: (raw.symbol ?? '').toUpperCase(),
+        entryPrice: raw.entryPrice ?? 0,
+        exitPrice: raw.exitPrice ?? undefined,
+        quantity: raw.quantity ?? undefined,
+        rMultiple: raw.rMultiple ?? undefined,
+        pnl: raw.pnl ?? undefined,
+        tags,
+        notes: raw.notes ?? undefined,
+        status: raw.status ?? 'Open',
       };
       this.save.emit(request);
-    } else {
-      const request: CreateTradeRequest = {
-        accountId: raw.accountId,
-        strategyId: raw.strategyId || undefined,
-        type: raw.type,
-        date: dateValue,
-        symbol: raw.symbol,
-        entryPrice: raw.entryPrice,
-        exitPrice: raw.exitPrice || undefined,
-        positionSize: raw.positionSize,
-        investedAmount: raw.investedAmount ?? 0,
-        commission: raw.commission,
-        profitLoss: raw.profitLoss ?? 0,
-        status: raw.status,
-      };
-      this.save.emit(request);
+      return;
     }
+
+    const request: CreateTradeRequest = {
+      accountId: raw.accountId ?? '',
+      strategyId: raw.strategyId ?? undefined,
+      strategyVersionId: raw.strategyVersionId ?? undefined,
+      direction: raw.direction ?? 'Long',
+      openedAt,
+      closedAt,
+      symbol: (raw.symbol ?? '').toUpperCase(),
+      entryPrice: raw.entryPrice ?? 0,
+      exitPrice: raw.exitPrice ?? undefined,
+      quantity: raw.quantity ?? undefined,
+      rMultiple: raw.rMultiple ?? undefined,
+      pnl: raw.pnl ?? undefined,
+      tags,
+      notes: raw.notes ?? undefined,
+      status: raw.status ?? 'Open',
+    };
+    this.save.emit(request);
   }
 
   onCancel(): void {

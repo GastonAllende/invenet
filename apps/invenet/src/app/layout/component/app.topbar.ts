@@ -14,6 +14,7 @@ import { MenuModule } from 'primeng/menu';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@invenet/auth';
+import { QuickTradeService } from '@invenet/trades';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 
@@ -115,6 +116,14 @@ import { LayoutService } from '../service/layout.service';
 
       <div class="layout-topbar-menu hidden lg:block">
         <div class="layout-topbar-menu-content">
+          <button
+            type="button"
+            class="layout-topbar-action"
+            (click)="onQuickLogTrade()"
+          >
+            <i class="pi pi-bolt"></i>
+            <span>Quick Log Trade</span>
+          </button>
           <button type="button" class="layout-topbar-action">
             <i class="pi pi-calendar"></i>
             <span>Calendar</span>
@@ -175,6 +184,7 @@ export class AppTopbar implements OnInit {
 
   layoutService = inject(LayoutService);
   private readonly authService = inject(AuthService);
+  private readonly quickTradeService = inject(QuickTradeService);
   private readonly router = inject(Router);
   private accountsStore: {
     activeAccounts: () => Array<{ id: string; name: string }>;
@@ -254,5 +264,9 @@ export class AppTopbar implements OnInit {
         void this.router.navigateByUrl('/login');
       },
     });
+  }
+
+  onQuickLogTrade(): void {
+    this.quickTradeService.open(this.activeAccountId() ?? undefined);
   }
 }

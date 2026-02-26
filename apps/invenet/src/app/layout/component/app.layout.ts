@@ -5,11 +5,19 @@ import { AppTopbar } from './app.topbar';
 import { AppSidebar } from './app.sidebar';
 import { AppFooter } from './app.footer';
 import { LayoutService } from '../service/layout.service';
+import { QuickTradeModalComponent } from '@invenet/trades';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
+  imports: [
+    CommonModule,
+    AppTopbar,
+    AppSidebar,
+    RouterModule,
+    AppFooter,
+    QuickTradeModalComponent,
+  ],
   template: `<div class="layout-wrapper" [ngClass]="containerClass()">
     <app-topbar></app-topbar>
     <app-sidebar></app-sidebar>
@@ -19,6 +27,7 @@ import { LayoutService } from '../service/layout.service';
       </div>
       <app-footer></app-footer>
     </div>
+    <lib-quick-trade-modal></lib-quick-trade-modal>
     <div class="layout-mask"></div>
   </div> `,
 })

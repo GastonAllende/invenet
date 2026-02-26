@@ -1,18 +1,37 @@
+export type TradeDirection = 'Long' | 'Short';
+export type TradeStatus = 'Open' | 'Closed';
+
 export interface Trade {
   id: string;
   accountId: string;
-  strategyId?: string | null;
-  type: 'BUY' | 'SELL';
-  date: string;
+  strategyVersionId: string | null;
+  strategyId: string | null;
+  strategyName: string | null;
+  strategyVersionNumber: number | null;
+  direction: TradeDirection;
+  openedAt: string;
+  closedAt: string | null;
   symbol: string;
   entryPrice: number;
-  exitPrice?: number | null;
-  positionSize: number;
-  investedAmount: number;
-  commission: number;
-  profitLoss: number;
-  status: 'Win' | 'Loss' | 'Open';
+  exitPrice: number | null;
+  quantity: number;
+  rMultiple: number | null;
+  pnl: number | null;
+  tags?: string[] | null;
+  notes?: string | null;
+  isArchived: boolean;
+  status: TradeStatus;
   createdAt: string;
+  updatedAt: string;
+}
+
+export interface TradeFilters {
+  accountId: string;
+  strategyId?: string;
+  status?: TradeStatus;
+  dateFrom?: string;
+  dateTo?: string;
+  includeArchived?: boolean;
 }
 
 export interface ListTradesResponse {
@@ -20,39 +39,39 @@ export interface ListTradesResponse {
   total: number;
 }
 
-/** Payload for creating a new trade */
 export interface CreateTradeRequest {
   accountId: string;
-  strategyId?: string | null;
-  type: 'BUY' | 'SELL';
-  date: string; // ISO 8601
+  strategyId?: string;
+  strategyVersionId?: string;
+  direction: TradeDirection;
+  openedAt: string;
   symbol: string;
   entryPrice: number;
-  exitPrice?: number | null;
-  positionSize: number;
-  investedAmount: number;
-  commission: number;
-  profitLoss: number;
-  status: 'Win' | 'Loss' | 'Open';
+  exitPrice?: number;
+  closedAt?: string;
+  quantity?: number;
+  rMultiple?: number;
+  pnl?: number;
+  tags?: string[];
+  notes?: string;
+  status?: TradeStatus;
 }
 
-/** Response returned after create (HTTP 201) or update (HTTP 200) */
-export interface TradeResponse {
-  id: string;
-  accountId: string;
-  strategyId?: string | null;
-  type: 'BUY' | 'SELL';
-  date: string;
+export interface UpdateTradeRequest {
+  strategyId?: string;
+  strategyVersionId?: string;
+  direction: TradeDirection;
+  openedAt: string;
   symbol: string;
   entryPrice: number;
-  exitPrice?: number | null;
-  positionSize: number;
-  investedAmount: number;
-  commission: number;
-  profitLoss: number;
-  status: 'Win' | 'Loss' | 'Open';
-  createdAt: string;
+  exitPrice?: number;
+  closedAt?: string;
+  quantity?: number;
+  rMultiple?: number;
+  pnl?: number;
+  tags?: string[];
+  notes?: string;
+  status: TradeStatus;
 }
-
-/** Payload for updating an existing trade (same as CreateTradeRequest minus accountId) */
-export type UpdateTradeRequest = Omit<CreateTradeRequest, 'accountId'>;
+export type TradeDetail = Trade;
+export type TradeResponse = Trade;

@@ -1,0 +1,42 @@
+@if (trade(); as t) {
+  <p-card>
+    <ng-template pTemplate="header">
+      <div class="header-row">
+        <h2>{{ t.symbol }}</h2>
+        <div class="header-tags">
+          <p-tag [value]="t.direction" [severity]="getDirectionSeverity(t.direction)"></p-tag>
+          <p-tag [value]="t.status" [severity]="getStatusSeverity(t.status)"></p-tag>
+          @if (t.isArchived) {
+            <p-tag value="ARCHIVED" severity="warn"></p-tag>
+          }
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="detail-grid">
+      <div><strong>Account:</strong> {{ t.accountId }}</div>
+      <div>
+        <strong>Strategy:</strong> {{ t.strategyName ?? '—' }}
+        @if (t.strategyVersionNumber) { v{{ t.strategyVersionNumber }} }
+      </div>
+      <div><strong>Opened:</strong> {{ t.openedAt | date: 'short' }}</div>
+      <div><strong>Closed:</strong> {{ t.closedAt ? (t.closedAt | date: 'short') : '—' }}</div>
+      <div><strong>Entry Price:</strong> {{ t.entryPrice }}</div>
+      <div><strong>Exit Price:</strong> {{ t.exitPrice ?? '—' }}</div>
+      <div><strong>P&amp;L:</strong> {{ t.pnl ?? '—' }}</div>
+      <div><strong>R-Multiple:</strong> {{ t.rMultiple ?? '—' }}</div>
+      <div><strong>Tags:</strong> {{ t.tags?.join(', ') || '—' }}</div>
+      <div class="detail-notes"><strong>Notes:</strong> {{ t.notes || '—' }}</div>
+    </div>
+
+    <div class="actions">
+      <p-button label="Back to Journal" severity="secondary" [outlined]="true" (onClick)="onBack()"></p-button>
+      <p-button label="Edit" icon="pi pi-pencil" severity="info" (onClick)="onEdit()"></p-button>
+      @if (!t.isArchived) {
+        <p-button label="Archive" icon="pi pi-folder" severity="warn" (onClick)="onArchive()"></p-button>
+      } @else {
+        <p-button label="Unarchive" icon="pi pi-refresh" severity="success" (onClick)="onUnarchive()"></p-button>
+      }
+    </div>
+  </p-card>
+}

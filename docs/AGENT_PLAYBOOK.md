@@ -82,7 +82,7 @@ Source: https://angular.dev/ai/develop-with-ai
 - Keep theme usage consistent with existing styles.
 - Prefer PrimeIcons for iconography when needed.
 
-## State Management (NgRx SignalStore)
+  ## State Management (NgRx SignalStore)
 
 ### Core Principles
 

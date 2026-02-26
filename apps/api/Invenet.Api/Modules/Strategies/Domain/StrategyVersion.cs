@@ -1,3 +1,5 @@
+using Invenet.Api.Modules.Trades.Domain;
+
 namespace Invenet.Api.Modules.Strategies.Domain;
 
 /// <summary>
@@ -17,4 +19,5 @@ public class StrategyVersion
   public Guid CreatedByUserId { get; set; }
 
   public Strategy Strategy { get; set; } = null!;
+  public ICollection<Trade> Trades { get; set; } = new List<Trade>();
 }
