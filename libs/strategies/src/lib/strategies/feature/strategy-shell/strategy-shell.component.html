@@ -1,4 +1,4 @@
-<div class="strategy-shell">
+<div class="strategy-shell entity-shell">
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
@@ -16,99 +16,122 @@
   }
 
   @if (isNewMode()) {
-    <section class="page-header">
-      <h1 class="page-title">Create Strategy</h1>
-      <p class="page-subtitle">
+    <section class="page-header entity-header">
+      <h1 class="page-title entity-title">Create Strategy</h1>
+      <p class="page-subtitle entity-subtitle">
         Define strategy metadata and your first ruleset.
       </p>
     </section>
 
-    <section class="panel">
-      <lib-strategy-form
-        [mode]="'create'"
-        [isLoading]="isLoading()"
-        (save)="onSave($event)"
-        (formCancel)="onCancelForm()"
-      ></lib-strategy-form>
-    </section>
+    <lib-strategy-form
+      [mode]="'create'"
+      [isLoading]="isLoading()"
+      (save)="onSave($event)"
+      (formCancel)="onCancelForm()"
+    ></lib-strategy-form>
   }
 
   @if (isDetailMode() && selectedStrategy(); as strategy) {
-    <section class="page-header page-header-row">
-      <div class="header-content">
-        <h1 class="page-title">{{ strategy.name }}</h1>
-        <p>
-          <p-tag
-            [value]="strategy.isArchived ? 'ARCHIVED' : 'ACTIVE'"
-            [severity]="strategy.isArchived ? 'contrast' : 'success'"
-          ></p-tag>
-        </p>
-      </div>
-      <div class="header-actions">
-        <p-button
-          label="Edit (New Version)"
-          icon="pi pi-pencil"
-          [disabled]="strategy.isArchived"
-          (onClick)="onEditNewVersion()"
-        ></p-button>
-        @if (!strategy.isArchived) {
-          <p-button
-            label="Archive"
-            icon="pi pi-archive"
-            severity="secondary"
-            [outlined]="true"
-            (onClick)="onArchiveStrategy(strategy.id)"
-          ></p-button>
-        } @else {
-          <p-button
-            label="Unarchive"
-            icon="pi pi-replay"
-            severity="secondary"
-            [outlined]="true"
-            (onClick)="onUnarchiveStrategy(strategy.id)"
-          ></p-button>
-        }
-        <p-button
-          label="Back to List"
-          icon="pi pi-arrow-left"
-          severity="contrast"
-          [outlined]="true"
-          (onClick)="onBackToList()"
-        ></p-button>
-      </div>
-    </section>
+    <p-card styleClass="strategy-hero-card">
+      <div class="strategy-hero">
+        <div class="strategy-identity">
+          <div class="strategy-title-row">
+            <h1 class="page-title entity-title">{{ strategy.name }}</h1>
+            <p-tag
+              [value]="strategy.isArchived ? 'ARCHIVED' : 'ACTIVE'"
+              [severity]="strategy.isArchived ? 'contrast' : 'success'"
+            ></p-tag>
+          </div>
+          <div class="strategy-meta-row">
+            @if (strategy.currentVersion; as currentVersion) {
+              <span class="strategy-meta-label">Current version</span>
+              <span class="strategy-meta-value">v{{ currentVersion.versionNumber }}</span>
+              <span class="strategy-meta-separator">•</span>
+              <span class="strategy-meta-label">Updated</span>
+              <span class="strategy-meta-value">{{ currentVersion.createdAt | date: 'short' }}</span>
+            }
+          </div>
+        </div>
 
-    <section class="panel">
-      <h2 class="panel-title">Current Version</h2>
+        <div class="header-actions entity-actions">
+          <p-button
+            label="Back to Strategies"
+            icon="pi pi-arrow-left"
+            severity="secondary"
+            [text]="true"
+            (onClick)="onBackToList()"
+          ></p-button>
+          <p-button
+            label="Edit (New Version)"
+            icon="pi pi-pencil"
+            size="small"
+            [disabled]="strategy.isArchived"
+            (onClick)="onEditNewVersion()"
+          ></p-button>
+          @if (!strategy.isArchived) {
+            <p-button
+              label="Archive"
+              icon="pi pi-archive"
+              severity="danger"
+              [outlined]="true"
+              size="small"
+              (onClick)="onArchiveStrategy(strategy.id)"
+            ></p-button>
+          } @else {
+            <p-button
+              label="Unarchive"
+              icon="pi pi-replay"
+              severity="success"
+              [outlined]="true"
+              size="small"
+              (onClick)="onUnarchiveStrategy(strategy.id)"
+            ></p-button>
+          }
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="strategy-version-card">
+      <ng-template pTemplate="title">Current Version</ng-template>
+      <ng-template pTemplate="subtitle">Latest ruleset currently attached to this strategy.</ng-template>
       @if (strategy.currentVersion; as currentVersion) {
-        <div class="version-meta">
-          v{{ currentVersion.versionNumber }} •
-          {{ currentVersion.createdAt | date: 'short' }}
+        <div class="version-summary">
+          <div class="version-stat">
+            <span class="version-stat-label">Version</span>
+            <span class="version-stat-value">v{{ currentVersion.versionNumber }}</span>
+          </div>
+          <div class="version-stat">
+            <span class="version-stat-label">Created At</span>
+            <span class="version-stat-value">{{ currentVersion.createdAt | date: 'short' }}</span>
+          </div>
         </div>
-        <div class="rule-block">
-          <h3>Entry Rules</h3>
-          <p>{{ currentVersion.entryRules }}</p>
-        </div>
-        <div class="rule-block">
-          <h3>Exit Rules</h3>
-          <p>{{ currentVersion.exitRules }}</p>
-        </div>
-        <div class="rule-block">
-          <h3>Risk Rules</h3>
-          <p>{{ currentVersion.riskRules }}</p>
-        </div>
-        <div class="rule-block">
-          <h3>Notes</h3>
-          <p>{{ currentVersion.notes || '—' }}</p>
+        <div class="rules-grid">
+          <div class="rule-block">
+            <h3>Entry Rules</h3>
+            <p>{{ currentVersion.entryRules }}</p>
+          </div>
+          <div class="rule-block">
+            <h3>Exit Rules</h3>
+            <p>{{ currentVersion.exitRules }}</p>
+          </div>
+          <div class="rule-block">
+            <h3>Risk Rules</h3>
+            <p>{{ currentVersion.riskRules }}</p>
+          </div>
+          <div class="rule-block">
+            <h3>Notes</h3>
+            <p>{{ currentVersion.notes || '—' }}</p>
+          </div>
         </div>
       } @else {
         <p>No version available.</p>
       }
-    </section>
+    </p-card>
 
-    <section class="panel">
-      <h2 class="panel-title">Version History</h2>
+    <p-card styleClass="strategy-history-card">
+      <ng-template pTemplate="title">Version History</ng-template>
       <p-table
+        styleClass="strategy-history-table"
         [value]="strategy.versions"
         [tableStyle]="{ 'min-width': '36rem' }"
       >
@@ -124,41 +147,42 @@
           <tr>
             <td>v{{ version.versionNumber }}</td>
             <td>{{ version.createdAt | date: 'short' }}</td>
-            <td>{{ version.createdByUserId }}</td>
+            <td><span class="created-by">{{ formatUserId(version.createdByUserId) }}</span></td>
             <td>
               <p-button
                 icon="pi pi-eye"
                 [rounded]="true"
                 [text]="true"
+                severity="secondary"
                 (onClick)="onSelectVersion(version)"
               ></p-button>
             </td>
           </tr>
         </ng-template>
       </p-table>
-    </section>
+    </p-card>
   }
 
   @if (isEditMode() && selectedStrategy(); as strategy) {
-    <section class="page-header">
-      <h1 class="page-title">Edit Strategy (New Version)</h1>
-      <p class="page-subtitle">
+    <section class="page-header entity-header">
+      <h1 class="page-title entity-title">Edit Strategy (New Version)</h1>
+      <p class="page-subtitle entity-subtitle">
         This creates a new version and preserves previous ones.
       </p>
     </section>
 
-    <section class="panel">
+    <section class="inline-notice">
       <p-message severity="warn" [closable]="false">
         Saving will create a new version. Previous versions remain unchanged.
       </p-message>
-
-      <lib-strategy-form
-        [strategy]="strategy"
-        [mode]="'version'"
-        [isLoading]="isLoading()"
-        (save)="onSave($event)"
-        (formCancel)="onCancelForm()"
-      ></lib-strategy-form>
     </section>
+
+    <lib-strategy-form
+      [strategy]="strategy"
+      [mode]="'version'"
+      [isLoading]="isLoading()"
+      (save)="onSave($event)"
+      (formCancel)="onCancelForm()"
+    ></lib-strategy-form>
   }
 </div>

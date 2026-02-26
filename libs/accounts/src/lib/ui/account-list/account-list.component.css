@@ -26,6 +26,18 @@
   gap: 1rem;
 }
 
+.archived-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color-secondary);
+}
+
+.archived-toggle label {
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
 .account-type-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;

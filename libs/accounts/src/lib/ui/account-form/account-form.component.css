@@ -96,6 +96,19 @@
   margin-bottom: 0;
 }
 
+.checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-label {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
 .error-message {
   color: var(--red-500);
   font-size: 0.75rem;

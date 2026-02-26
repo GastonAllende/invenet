@@ -122,12 +122,14 @@
       </div>
 
       <div class="form-field checkbox-field">
-        <p-checkbox
-          formControlName="isActive"
-          [binary]="true"
-          inputId="isActive"
-          label="Account Active"
-        ></p-checkbox>
+        <div class="checkbox-row">
+          <p-checkbox
+            formControlName="isActive"
+            [binary]="true"
+            inputId="isActive"
+          ></p-checkbox>
+          <label for="isActive" class="checkbox-label">Account Active</label>
+        </div>
       </div>
     </div>
 
@@ -170,12 +172,14 @@
       </div>
 
       <div class="form-field checkbox-field">
-        <p-checkbox
-          formControlName="enforceLimits"
-          [binary]="true"
-          inputId="enforceLimits"
-          label="Enforce Risk Limits"
-        ></p-checkbox>
+        <div class="checkbox-row">
+          <p-checkbox
+            formControlName="enforceLimits"
+            [binary]="true"
+            inputId="enforceLimits"
+          ></p-checkbox>
+          <label for="enforceLimits" class="checkbox-label">Enforce Risk Limits</label>
+        </div>
       </div>
     </div>
 

@@ -1,14 +1,14 @@
 // Component-specific styling for login page
 
 a.link {
-  color: #667eea;
+  color: var(--primary-color);
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s ease;
 
   &:hover {
-    color: #5568d3;
+    color: color-mix(in srgb, var(--primary-color) 85%, black);
     text-decoration: underline;
   }
 }

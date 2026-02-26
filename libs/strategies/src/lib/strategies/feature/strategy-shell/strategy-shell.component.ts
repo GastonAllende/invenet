@@ -11,6 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageModule } from 'primeng/message';
 import { TableModule } from 'primeng/table';
@@ -33,6 +34,7 @@ type StrategyMode = 'list' | 'new' | 'detail' | 'edit';
     CommonModule,
     RouterModule,
     ButtonModule,
+    CardModule,
     ToastModule,
     ConfirmDialogModule,
     MessageModule,
@@ -245,5 +247,17 @@ export class StrategyShellComponent {
     }
 
     void this.router.navigateByUrl('/strategies');
+  }
+
+  formatUserId(userId: string | null | undefined): string {
+    if (!userId) {
+      return '—';
+    }
+
+    if (userId.length <= 14) {
+      return userId;
+    }
+
+    return `${userId.slice(0, 8)}…${userId.slice(-4)}`;
   }
 }

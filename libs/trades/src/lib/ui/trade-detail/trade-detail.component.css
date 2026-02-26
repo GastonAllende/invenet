@@ -1,28 +1,152 @@
-.header-row {
+.trade-detail-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.trade-hero {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1rem 0;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
-.header-tags {
+.trade-hero-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.trade-symbol {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-color);
+}
+
+.trade-meta {
+  margin: 0;
+  color: var(--text-color-secondary);
+}
+
+.trade-tags {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.detail-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem 1rem;
-}
-
-.detail-notes {
-  grid-column: 1 / -1;
-}
-
-.actions {
+.trade-actions {
   display: flex;
-  gap: 0.75rem;
+  align-items: center;
   justify-content: flex-end;
-  margin-top: 1rem;
+  align-self: flex-start;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0.35rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-card) 94%, var(--text-color) 6%);
+}
+
+:host ::ng-deep .trade-actions .p-button {
+  border-radius: 10px;
+}
+
+:host ::ng-deep .trade-actions .p-button.p-button-text {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.trade-content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.detail-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.detail-label {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-color-secondary);
+}
+
+.detail-value-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.detail-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  text-align: right;
+}
+
+.trade-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+  color: var(--text-color-secondary);
+  max-width: 26rem;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.trade-notes {
+  margin: 0;
+  color: var(--text-color-secondary);
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+:host ::ng-deep .trade-detail-card .p-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+:host ::ng-deep .detail-rows .p-divider {
+  margin: 0.7rem 0;
+}
+
+@media (max-width: 768px) {
+  .trade-hero {
+    flex-direction: column;
+  }
+
+  .trade-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .trade-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-row {
+    flex-direction: column;
+  }
+
+  .detail-value-wrap {
+    align-items: flex-start;
+  }
+
+  .detail-value,
+  .trade-code {
+    text-align: left;
+  }
 }

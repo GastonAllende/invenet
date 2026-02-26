@@ -1,4 +1,4 @@
-<div class="trade-shell">
+<div class="trade-shell entity-shell">
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
@@ -21,6 +21,17 @@
   }
 
   @if (journalMode() === 'new' || journalMode() === 'edit') {
+    <section class="page-header entity-header">
+      <h1 class="page-title entity-title">
+        {{ journalMode() === 'edit' ? 'Edit Trade' : 'Log Trade' }}
+      </h1>
+      <p class="page-subtitle entity-subtitle">
+        {{ journalMode() === 'edit'
+          ? 'Update execution and journal details for this trade.'
+          : 'Capture complete trade context for later review.' }}
+      </p>
+    </section>
+
     <lib-trade-form
       [mode]="journalMode() === 'edit' ? 'edit' : 'create'"
       [trade]="selectedTradeDetail()"
@@ -36,6 +47,7 @@
   @if (journalMode() === 'detail') {
     <lib-trade-detail
       [trade]="selectedTradeDetail()"
+      [accounts]="accounts()"
       (edit)="onEditFromDetail()"
       (archive)="onArchiveFromDetail()"
       (unarchive)="onUnarchiveFromDetail()"

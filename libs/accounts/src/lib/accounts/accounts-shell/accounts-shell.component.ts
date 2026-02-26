@@ -12,7 +12,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DividerModule } from 'primeng/divider';
+import { TagModule } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 import {
   CreateAccountRequest,
@@ -33,6 +36,9 @@ type PendingOperation = 'create' | 'update' | 'archive' | 'unarchive' | null;
     CommonModule,
     RouterModule,
     ButtonModule,
+    CardModule,
+    DividerModule,
+    TagModule,
     Toast,
     ConfirmDialogModule,
     AccountFormComponent,
@@ -281,5 +287,9 @@ export class AccountsShellComponent implements OnInit {
     if (this.isCreateMode()) {
       void this.router.navigateByUrl('/accounts');
     }
+  }
+
+  onBackToList(): void {
+    void this.router.navigateByUrl('/accounts');
   }
 }

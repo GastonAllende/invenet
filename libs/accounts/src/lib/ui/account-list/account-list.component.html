@@ -8,13 +8,15 @@
         (onClick)="onCreate()"
         [disabled]="isLoading()"
       ></p-button>
-      <p-checkbox
-        [ngModel]="includeArchived()"
-        (ngModelChange)="onIncludeArchivedChange($event)"
-        [binary]="true"
-        inputId="includeArchived"
-        label="Show Archived"
-      ></p-checkbox>
+      <div class="archived-toggle">
+        <p-checkbox
+          [ngModel]="includeArchived()"
+          (ngModelChange)="onIncludeArchivedChange($event)"
+          [binary]="true"
+          inputId="includeArchived"
+        ></p-checkbox>
+        <label for="includeArchived">Show archived</label>
+      </div>
     </div>
   </div>
 

@@ -26,6 +26,18 @@
   gap: 1rem;
 }
 
+.archived-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color-secondary);
+}
+
+.archived-toggle label {
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
 .action-buttons {
   display: flex;
   gap: 0.5rem;

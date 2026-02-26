@@ -1,132 +1,153 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <div class="form-grid">
-    <div class="form-field">
-      <label for="accountId">Account *</label>
-      <p-select
-        inputId="accountId"
-        formControlName="accountId"
-        [options]="accounts()"
-        optionLabel="name"
-        optionValue="id"
-        placeholder="Select account"
-        [disabled]="isEditMode"
-      ></p-select>
-    </div>
+<div class="form-page">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="entity-form">
+    <section class="form-section">
+      <h3>Trade Details</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="accountId">Account *</label>
+          <p-select
+            inputId="accountId"
+            formControlName="accountId"
+            [options]="accounts()"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Select account"
+            [disabled]="isEditMode"
+            styleClass="control-full-width"
+          ></p-select>
+        </div>
 
-    <div class="form-field">
-      <label for="strategyId">Strategy *</label>
-      <p-select
-        inputId="strategyId"
-        formControlName="strategyId"
-        [options]="strategies()"
-        optionLabel="name"
-        optionValue="id"
-        placeholder="Select strategy"
-      ></p-select>
-      @if (isEditMode && trade()?.strategyVersionNumber) {
-        <small>Version: v{{ trade()?.strategyVersionNumber }}</small>
-      }
-    </div>
+        <div class="form-field">
+          <label for="strategyId">Strategy *</label>
+          <p-select
+            inputId="strategyId"
+            formControlName="strategyId"
+            [options]="strategies()"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Select strategy"
+            styleClass="control-full-width"
+          ></p-select>
+          @if (isEditMode && trade()?.strategyVersionNumber) {
+            <small>Version: v{{ trade()?.strategyVersionNumber }}</small>
+          }
+        </div>
 
-    <div class="form-field">
-      <label for="direction">Direction *</label>
-      <p-select
-        inputId="direction"
-        formControlName="direction"
-        [options]="directionOptions"
-        optionLabel="label"
-        optionValue="value"
-      ></p-select>
-    </div>
+        <div class="form-field">
+          <label for="direction">Direction *</label>
+          <p-select
+            inputId="direction"
+            formControlName="direction"
+            [options]="directionOptions"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="control-full-width"
+          ></p-select>
+        </div>
 
-    <div class="form-field">
-      <label for="status">Status *</label>
-      <p-select
-        inputId="status"
-        formControlName="status"
-        [options]="statusOptions"
-        optionLabel="label"
-        optionValue="value"
-      ></p-select>
-    </div>
+        <div class="form-field">
+          <label for="status">Status *</label>
+          <p-select
+            inputId="status"
+            formControlName="status"
+            [options]="statusOptions"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="control-full-width"
+          ></p-select>
+        </div>
 
-    <div class="form-field">
-      <label for="symbol">Symbol *</label>
-      <input pInputText id="symbol" formControlName="symbol" placeholder="e.g. AAPL" />
-    </div>
+        <div class="form-field">
+          <label for="symbol">Symbol *</label>
+          <input pInputText id="symbol" formControlName="symbol" placeholder="e.g. AAPL" class="control-full-width" />
+        </div>
 
-    <div class="form-field">
-      <label for="openedAt">Opened At *</label>
-      <p-datepicker inputId="openedAt" formControlName="openedAt" [showIcon]="true" [showTime]="true"></p-datepicker>
-    </div>
+        <div class="form-field">
+          <label for="openedAt">Opened At *</label>
+          <p-datepicker inputId="openedAt" formControlName="openedAt" [showIcon]="true" [showTime]="true" styleClass="control-full-width"></p-datepicker>
+        </div>
+      </div>
+    </section>
 
-    <div class="form-field">
-      <label for="entryPrice">Entry Price *</label>
-      <p-inputnumber
-        inputId="entryPrice"
-        formControlName="entryPrice"
-        mode="currency"
-        currency="USD"
-        locale="en-US"
-      ></p-inputnumber>
-    </div>
+    <section class="form-section">
+      <h3>Execution Metrics</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="entryPrice">Entry Price *</label>
+          <p-inputnumber
+            inputId="entryPrice"
+            formControlName="entryPrice"
+            mode="currency"
+            currency="USD"
+            locale="en-US"
+            styleClass="control-full-width"
+          ></p-inputnumber>
+        </div>
 
-    <div class="form-field">
-      <label for="quantity">Quantity</label>
-      <p-inputnumber inputId="quantity" formControlName="quantity"></p-inputnumber>
-    </div>
+        <div class="form-field">
+          <label for="quantity">Quantity</label>
+          <p-inputnumber inputId="quantity" formControlName="quantity" styleClass="control-full-width"></p-inputnumber>
+        </div>
 
-    <div class="form-field">
-      <label for="closedAt">Closed At</label>
-      <p-datepicker inputId="closedAt" formControlName="closedAt" [showIcon]="true" [showTime]="true"></p-datepicker>
-    </div>
+        <div class="form-field">
+          <label for="closedAt">Closed At</label>
+          <p-datepicker inputId="closedAt" formControlName="closedAt" [showIcon]="true" [showTime]="true" styleClass="control-full-width"></p-datepicker>
+        </div>
 
-    <div class="form-field">
-      <label for="exitPrice">Exit Price</label>
-      <p-inputnumber
-        inputId="exitPrice"
-        formControlName="exitPrice"
-        mode="currency"
-        currency="USD"
-        locale="en-US"
-      ></p-inputnumber>
-    </div>
+        <div class="form-field">
+          <label for="exitPrice">Exit Price</label>
+          <p-inputnumber
+            inputId="exitPrice"
+            formControlName="exitPrice"
+            mode="currency"
+            currency="USD"
+            locale="en-US"
+            styleClass="control-full-width"
+          ></p-inputnumber>
+        </div>
 
-    <div class="form-field">
-      <label for="pnl">P&amp;L</label>
-      <p-inputnumber inputId="pnl" formControlName="pnl"></p-inputnumber>
-    </div>
+        <div class="form-field">
+          <label for="pnl">P&amp;L</label>
+          <p-inputnumber inputId="pnl" formControlName="pnl" styleClass="control-full-width"></p-inputnumber>
+        </div>
 
-    <div class="form-field">
-      <label for="rMultiple">R-Multiple</label>
-      <p-inputnumber inputId="rMultiple" formControlName="rMultiple"></p-inputnumber>
-    </div>
+        <div class="form-field">
+          <label for="rMultiple">R-Multiple</label>
+          <p-inputnumber inputId="rMultiple" formControlName="rMultiple" styleClass="control-full-width"></p-inputnumber>
+        </div>
+      </div>
+    </section>
 
-    <div class="form-field">
-      <label for="tags">Tags</label>
-      <input pInputText id="tags" formControlName="tags" placeholder="comma,separated,tags" />
-    </div>
+    <section class="form-section">
+      <h3>Journal Notes</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="tags">Tags</label>
+          <input pInputText id="tags" formControlName="tags" placeholder="comma,separated,tags" class="control-full-width" />
+        </div>
 
-    <div class="form-field form-field-full">
-      <label for="notes">Notes</label>
-      <textarea pTextarea id="notes" formControlName="notes" rows="4"></textarea>
-    </div>
-  </div>
+        <div class="form-field form-field-full">
+          <label for="notes">Notes</label>
+          <textarea pTextarea id="notes" formControlName="notes" rows="4" class="control-full-width"></textarea>
+        </div>
+      </div>
+    </section>
 
-  <div class="form-actions">
-    <p-button
-      label="Cancel"
-      severity="secondary"
-      [outlined]="true"
-      [disabled]="isLoading()"
-      (onClick)="onCancel()"
-    ></p-button>
-    <p-button
-      type="submit"
-      [label]="isEditMode ? 'Save Changes' : 'Create Trade'"
-      icon="pi pi-check"
-      [loading]="isLoading()"
-      [disabled]="isLoading()"
-    ></p-button>
-  </div>
-</form>
+    <div class="form-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="isLoading()"
+        (onClick)="onCancel()"
+      ></p-button>
+      <p-button
+        type="submit"
+        [label]="isEditMode ? 'Save Changes' : 'Create Trade'"
+        icon="pi pi-check"
+        [loading]="isLoading()"
+        [disabled]="isLoading()"
+      ></p-button>
+    </div>
+  </form>
+</div>
