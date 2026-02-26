@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject } from '@angular/core';
+import { Component, OnInit, effect, inject, Injector, signal } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -7,7 +7,6 @@ import { MenuModule } from 'primeng/menu';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@invenet/auth';
-import { AccountsStore, ActiveAccountStore } from '@invenet/accounts';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 
@@ -127,7 +126,7 @@ import { LayoutService } from '../service/layout.service';
               [options]="accountOptions()"
               optionLabel="name"
               optionValue="id"
-              [ngModel]="activeAccountStore.activeAccountId()"
+              [ngModel]="activeAccountId()"
               (ngModelChange)="onActiveAccountChange($event)"
               placeholder="Select account"
               [style]="{ width: '12rem' }"
@@ -155,6 +154,7 @@ import { LayoutService } from '../service/layout.service';
   </div>`,
 })
 export class AppTopbar implements OnInit {
+  private readonly injector = inject(Injector);
   items!: MenuItem[];
   profileMenuItems: MenuItem[] = [
     {
@@ -165,29 +165,73 @@ export class AppTopbar implements OnInit {
   ];
 
   layoutService = inject(LayoutService);
-  private readonly accountsStore = inject(AccountsStore);
-  readonly activeAccountStore = inject(ActiveAccountStore);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private accountsStore:
+    | {
+        activeAccounts: () => Array<{ id: string; name: string }>;
+        loadAccounts: (params: { includeArchived: boolean }) => void;
+        setActiveAccountOnServer: (id: string) => void;
+      }
+    | null = null;
+  private activeAccountStore:
+    | {
+        activeAccountId: () => string | null;
+        initializeFromStorage: () => void;
+        setActiveAccount: (id: string) => void;
+      }
+    | null = null;
 
-  readonly accountOptions = computed(() =>
-    this.accountsStore
-      .activeAccounts()
-      .map((account) => ({ id: account.id, name: account.name })),
-  );
+  readonly accountOptions = signal<Array<{ id: string; name: string }>>([]);
+  readonly activeAccountId = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.activeAccountStore.initializeFromStorage();
-    this.accountsStore.loadAccounts({ includeArchived: false });
+    void this.initializeAccountsContext();
   }
 
   onActiveAccountChange(accountId: string | null): void {
-    if (!accountId) {
+    if (!accountId || !this.activeAccountStore || !this.accountsStore) {
       return;
     }
 
     this.activeAccountStore.setActiveAccount(accountId);
     this.accountsStore.setActiveAccountOnServer(accountId);
+  }
+
+  private async initializeAccountsContext(): Promise<void> {
+    const accountsModule = await import('@invenet/accounts');
+
+    this.accountsStore = this.injector.get(accountsModule.AccountsStore) as {
+      activeAccounts: () => Array<{ id: string; name: string }>;
+      loadAccounts: (params: { includeArchived: boolean }) => void;
+      setActiveAccountOnServer: (id: string) => void;
+    };
+    this.activeAccountStore = this.injector.get(
+      accountsModule.ActiveAccountStore,
+    ) as {
+      activeAccountId: () => string | null;
+      initializeFromStorage: () => void;
+      setActiveAccount: (id: string) => void;
+    };
+
+    this.activeAccountStore.initializeFromStorage();
+    this.accountsStore.loadAccounts({ includeArchived: false });
+
+    effect(
+      () => {
+        if (!this.accountsStore || !this.activeAccountStore) {
+          return;
+        }
+
+        this.accountOptions.set(
+          this.accountsStore
+            .activeAccounts()
+            .map((account) => ({ id: account.id, name: account.name })),
+        );
+        this.activeAccountId.set(this.activeAccountStore.activeAccountId());
+      },
+      { allowSignalWrites: true },
+    );
   }
 
   toggleDarkMode() {
