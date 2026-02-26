@@ -19,7 +19,7 @@
 
   @if (isCreateMode()) {
     <section class="account-header">
-      <h1 class="account-title">Set up your trading account</h1>
+      <h1 class="account-title">Create Account</h1>
       <p class="account-subtitle">
         Define your risk rules before logging trades.
       </p>
@@ -50,7 +50,6 @@
         [isLoading]="isLoading()"
         [showTitle]="false"
         [showCancel]="!isOnboarding()"
-        [submitLabel]="'Save'"
         (formSubmit)="onSaveAccount($event)"
         (formCancel)="onCancelForm()"
       ></lib-invenet-account-form>
@@ -103,7 +102,7 @@
             ></p-button>
           }
           <p-button
-            label="Add Account"
+            label="Create Account"
             icon="pi pi-plus"
             severity="contrast"
             [outlined]="true"
@@ -163,7 +162,6 @@
           [isLoading]="isLoading()"
           [showTitle]="false"
           [showCancel]="true"
-          [submitLabel]="'Save'"
           (formSubmit)="onSaveAccount($event)"
           (formCancel)="onCancelForm()"
         ></lib-invenet-account-form>

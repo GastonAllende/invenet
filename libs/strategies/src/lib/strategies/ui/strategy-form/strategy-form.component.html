@@ -1,60 +1,169 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="strategy-form">
-  @if (mode() === 'create') {
-    <div class="form-row">
-      <div class="form-field">
-        <label for="name">Name *</label>
-        <input pInputText id="name" formControlName="name" />
+<div class="strategy-form-container">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="strategy-form">
+    <div class="form-section">
+      <h3>Strategy Details</h3>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="name" class="form-label">Name <span class="required">*</span></label>
+          <input
+            pInputText
+            id="name"
+            formControlName="name"
+            class="input-full-width"
+            [class.readonly-field]="mode() === 'version'"
+          />
+          @if (mode() === 'version') {
+            <small class="form-hint">Managed by strategy metadata</small>
+          }
+          @if (form.controls.name.invalid && form.controls.name.touched) {
+            <small class="error-message">
+              @if (form.controls.name.errors?.['required']) {
+                Name is required
+              } @else {
+                Name must be 200 characters or less
+              }
+            </small>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="market" class="form-label">Market</label>
+          <input
+            pInputText
+            id="market"
+            formControlName="market"
+            class="input-full-width"
+            [class.readonly-field]="mode() === 'version'"
+          />
+          @if (mode() === 'version') {
+            <small class="form-hint">Managed by strategy metadata</small>
+          }
+          @if (form.controls.market.invalid && form.controls.market.touched) {
+            <small class="error-message">Market must be 100 characters or less</small>
+          }
+        </div>
       </div>
-      <div class="form-field">
-        <label for="market">Market</label>
-        <input pInputText id="market" formControlName="market" />
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="defaultTimeframe" class="form-label">Default Timeframe</label>
+          <input
+            pInputText
+            id="defaultTimeframe"
+            formControlName="defaultTimeframe"
+            class="input-full-width"
+            [class.readonly-field]="mode() === 'version'"
+          />
+          @if (mode() === 'version') {
+            <small class="form-hint">Managed by strategy metadata</small>
+          }
+          @if (
+            form.controls.defaultTimeframe.invalid &&
+            form.controls.defaultTimeframe.touched
+          ) {
+            <small class="error-message"
+              >Default timeframe must be 50 characters or less</small
+            >
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="timeframe" class="form-label">Version Timeframe</label>
+          <input
+            pInputText
+            id="timeframe"
+            formControlName="timeframe"
+            class="input-full-width"
+          />
+          @if (form.controls.timeframe.invalid && form.controls.timeframe.touched) {
+            <small class="error-message">Timeframe must be 50 characters or less</small>
+          }
+        </div>
       </div>
     </div>
 
-    <div class="form-field">
-      <label for="defaultTimeframe">Default timeframe</label>
-      <input pInputText id="defaultTimeframe" formControlName="defaultTimeframe" />
+    <div class="form-section">
+      <h3>Strategy Rules</h3>
+
+      <div class="form-field">
+        <label for="entryRules" class="form-label"
+          >Entry Rules <span class="required">*</span></label
+        >
+        <textarea
+          pInputTextarea
+          id="entryRules"
+          rows="4"
+          formControlName="entryRules"
+          class="input-full-width"
+        ></textarea>
+        @if (form.controls.entryRules.invalid && form.controls.entryRules.touched) {
+          <small class="error-message">Entry rules are required</small>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="exitRules" class="form-label"
+          >Exit Rules <span class="required">*</span></label
+        >
+        <textarea
+          pInputTextarea
+          id="exitRules"
+          rows="4"
+          formControlName="exitRules"
+          class="input-full-width"
+        ></textarea>
+        @if (form.controls.exitRules.invalid && form.controls.exitRules.touched) {
+          <small class="error-message">Exit rules are required</small>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="riskRules" class="form-label"
+          >Risk Rules <span class="required">*</span></label
+        >
+        <textarea
+          pInputTextarea
+          id="riskRules"
+          rows="4"
+          formControlName="riskRules"
+          class="input-full-width"
+        ></textarea>
+        @if (form.controls.riskRules.invalid && form.controls.riskRules.touched) {
+          <small class="error-message">Risk rules are required</small>
+        }
+      </div>
     </div>
-  }
 
-  <div class="form-field">
-    <label for="timeframe">Version timeframe</label>
-    <input pInputText id="timeframe" formControlName="timeframe" />
-  </div>
+    <details class="form-section">
+      <summary><h3>Advanced</h3></summary>
+      <div class="form-field">
+        <label for="notes" class="form-label">Notes</label>
+        <textarea
+          pInputTextarea
+          id="notes"
+          rows="3"
+          formControlName="notes"
+          class="input-full-width"
+        ></textarea>
+      </div>
+    </details>
 
-  <div class="form-field">
-    <label for="entryRules">Entry rules *</label>
-    <textarea pInputTextarea id="entryRules" rows="4" formControlName="entryRules"></textarea>
-  </div>
-
-  <div class="form-field">
-    <label for="exitRules">Exit rules *</label>
-    <textarea pInputTextarea id="exitRules" rows="4" formControlName="exitRules"></textarea>
-  </div>
-
-  <div class="form-field">
-    <label for="riskRules">Risk rules *</label>
-    <textarea pInputTextarea id="riskRules" rows="4" formControlName="riskRules"></textarea>
-  </div>
-
-  <div class="form-field">
-    <label for="notes">Notes</label>
-    <textarea pInputTextarea id="notes" rows="3" formControlName="notes"></textarea>
-  </div>
-
-  <div class="form-actions">
-    <p-button
-      label="Cancel"
-      severity="secondary"
-      [outlined]="true"
-      (onClick)="onCancel()"
-      [disabled]="isLoading()"
-    ></p-button>
-    <p-button
-      [label]="mode() === 'create' ? 'Create strategy' : 'Create new version'"
-      type="submit"
-      [loading]="isLoading()"
-      [disabled]="form.invalid || isLoading()"
-    ></p-button>
-  </div>
-</form>
+    <div class="form-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="onCancel()"
+        [disabled]="isLoading()"
+      ></p-button>
+      <p-button
+        [label]="mode() === 'create' ? 'Create Strategy' : 'Create Version'"
+        icon="pi pi-check"
+        type="submit"
+        [loading]="isLoading()"
+        [disabled]="form.invalid || isLoading()"
+      ></p-button>
+    </div>
+  </form>
+</div>

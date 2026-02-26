@@ -86,22 +86,12 @@
       <div class="form-row">
         <div class="form-field">
           <label for="startDate">Start Date *</label>
-          @if (isEditMode) {
-            <p-datepicker
-              formControlName="startDate"
-              [showIcon]="false"
-              dateFormat="yy-mm-dd"
-              styleClass="calendar-full-width readonly-field"
-              [disabled]="true"
-            ></p-datepicker>
-          } @else {
-            <p-datepicker
-              formControlName="startDate"
-              [showIcon]="true"
-              dateFormat="yy-mm-dd"
-              styleClass="calendar-full-width"
-            ></p-datepicker>
-          }
+          <p-datepicker
+            formControlName="startDate"
+            [showIcon]="true"
+            dateFormat="yy-mm-dd"
+            styleClass="calendar-full-width"
+          ></p-datepicker>
           @if (startDate?.invalid && startDate?.touched) {
             <small class="error-message">Start date is required</small>
           }
@@ -109,28 +99,15 @@
 
         <div class="form-field">
           <label for="startingBalance">Starting Balance *</label>
-          @if (isEditMode) {
-            <p-inputNumber
-              formControlName="startingBalance"
-              mode="currency"
-              [currency]="baseCurrency?.value || 'USD'"
-              locale="en-US"
-              [minFractionDigits]="2"
-              [min]="0.01"
-              styleClass="input-number-full-width readonly-field"
-              [disabled]="true"
-            ></p-inputNumber>
-          } @else {
-            <p-inputNumber
-              formControlName="startingBalance"
-              mode="currency"
-              [currency]="baseCurrency?.value || 'USD'"
-              locale="en-US"
-              [minFractionDigits]="2"
-              [min]="0.01"
-              styleClass="input-number-full-width"
-            ></p-inputNumber>
-          }
+          <p-inputNumber
+            formControlName="startingBalance"
+            mode="currency"
+            [currency]="baseCurrency?.value || 'USD'"
+            locale="en-US"
+            [minFractionDigits]="2"
+            [min]="0.01"
+            styleClass="input-number-full-width"
+          ></p-inputNumber>
           @if (startingBalance?.invalid && startingBalance?.touched) {
             <small class="error-message">
               @if (startingBalance?.errors?.['required']) {
@@ -263,6 +240,7 @@
       }
       <p-button
         [label]="resolvedSubmitLabel"
+        icon="pi pi-check"
         type="submit"
         [disabled]="accountForm.invalid || isLoading()"
         [loading]="isLoading()"

@@ -6,6 +6,8 @@
     <lib-strategy-list
       [strategies]="strategies()"
       [isLoading]="isLoading()"
+      [includeArchived]="includeArchived()"
+      (includeArchivedChange)="onIncludeArchivedChange($event)"
       (create)="onCreateStrategy()"
       (view)="onViewStrategy($event)"
       (archive)="onArchiveStrategy($event)"
@@ -14,8 +16,14 @@
   }
 
   @if (isNewMode()) {
+    <section class="page-header">
+      <h1 class="page-title">Create Strategy</h1>
+      <p class="page-subtitle">
+        Define strategy metadata and your first ruleset.
+      </p>
+    </section>
+
     <section class="panel">
-      <h1>Create Strategy</h1>
       <lib-strategy-form
         [mode]="'create'"
         [isLoading]="isLoading()"
@@ -26,9 +34,9 @@
   }
 
   @if (isDetailMode() && selectedStrategy(); as strategy) {
-    <section class="panel header-panel">
-      <div>
-        <h1>{{ strategy.name }}</h1>
+    <section class="page-header page-header-row">
+      <div class="header-content">
+        <h1 class="page-title">{{ strategy.name }}</h1>
         <p>
           <p-tag
             [value]="strategy.isArchived ? 'ARCHIVED' : 'ACTIVE'"
@@ -38,7 +46,7 @@
       </div>
       <div class="header-actions">
         <p-button
-          label="Edit (new version)"
+          label="Edit (New Version)"
           icon="pi pi-pencil"
           [disabled]="strategy.isArchived"
           (onClick)="onEditNewVersion()"
@@ -61,7 +69,7 @@
           ></p-button>
         }
         <p-button
-          label="Back"
+          label="Back to List"
           icon="pi pi-arrow-left"
           severity="contrast"
           [outlined]="true"
@@ -71,9 +79,12 @@
     </section>
 
     <section class="panel">
-      <h2>Current Version</h2>
+      <h2 class="panel-title">Current Version</h2>
       @if (strategy.currentVersion; as currentVersion) {
-        <div class="version-meta">v{{ currentVersion.versionNumber }} • {{ currentVersion.createdAt | date: 'short' }}</div>
+        <div class="version-meta">
+          v{{ currentVersion.versionNumber }} •
+          {{ currentVersion.createdAt | date: 'short' }}
+        </div>
         <div class="rule-block">
           <h3>Entry Rules</h3>
           <p>{{ currentVersion.entryRules }}</p>
@@ -96,8 +107,11 @@
     </section>
 
     <section class="panel">
-      <h2>Version History</h2>
-      <p-table [value]="strategy.versions" [tableStyle]="{ 'min-width': '36rem' }">
+      <h2 class="panel-title">Version History</h2>
+      <p-table
+        [value]="strategy.versions"
+        [tableStyle]="{ 'min-width': '36rem' }"
+      >
         <ng-template pTemplate="header">
           <tr>
             <th>Version</th>
@@ -126,8 +140,14 @@
   }
 
   @if (isEditMode() && selectedStrategy(); as strategy) {
+    <section class="page-header">
+      <h1 class="page-title">Edit Strategy (New Version)</h1>
+      <p class="page-subtitle">
+        This creates a new version and preserves previous ones.
+      </p>
+    </section>
+
     <section class="panel">
-      <h1>Edit Strategy (New Version)</h1>
       <p-message severity="warn" [closable]="false">
         Saving will create a new version. Previous versions remain unchanged.
       </p-message>

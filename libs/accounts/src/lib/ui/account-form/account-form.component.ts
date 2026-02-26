@@ -118,13 +118,8 @@ export class AccountFormComponent implements OnInit {
       if (acc && currentMode === 'update') {
         this.isEditMode = true;
         this.patchFormValues(acc);
-        // Make startDate and startingBalance read-only in edit mode
-        this.accountForm?.get('startDate')?.disable();
-        this.accountForm?.get('startingBalance')?.disable();
       } else {
         this.isEditMode = false;
-        this.accountForm?.get('startDate')?.enable();
-        this.accountForm?.get('startingBalance')?.enable();
       }
     });
   }
@@ -186,44 +181,43 @@ export class AccountFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (
-      this.accountForm.valid ||
-      (this.isEditMode &&
-        this.accountForm.get('startDate')?.disabled &&
-        this.accountForm.get('startingBalance')?.disabled)
-    ) {
-      const formValue = this.accountForm.getRawValue(); // getRawValue() includes disabled fields
-
-      if (this.isEditMode) {
-        const request: UpdateAccountRequest = {
-          name: formValue.name,
-          broker: formValue.broker,
-          accountType: formValue.accountType,
-          baseCurrency: formValue.baseCurrency,
-          timezone: formValue.timezone,
-          notes: formValue.notes || undefined,
-          riskSettings: formValue.riskSettings,
-        };
-        this.formSubmit.emit(request);
-      } else {
-        const request: CreateAccountRequest = {
-          name: formValue.name,
-          broker: formValue.broker,
-          accountType: formValue.accountType,
-          baseCurrency: formValue.baseCurrency,
-          startDate: formValue.startDate,
-          startingBalance: formValue.startingBalance,
-          timezone: formValue.timezone,
-          notes: formValue.notes || undefined,
-          isActive: formValue.isActive,
-          riskSettings: formValue.riskSettings,
-        };
-        this.formSubmit.emit(request);
-      }
-    } else {
-      // Mark all fields as touched to show validation errors
+    if (this.accountForm.invalid) {
       this.accountForm.markAllAsTouched();
+      return;
     }
+
+    const formValue = this.accountForm.getRawValue();
+    const normalizedStartDate = this.toIsoDate(formValue.startDate);
+
+    if (this.isEditMode) {
+      const request: UpdateAccountRequest = {
+        name: formValue.name,
+        broker: formValue.broker,
+        accountType: formValue.accountType,
+        baseCurrency: formValue.baseCurrency,
+        startDate: normalizedStartDate,
+        startingBalance: formValue.startingBalance,
+        timezone: formValue.timezone,
+        notes: formValue.notes || undefined,
+        riskSettings: formValue.riskSettings,
+      };
+      this.formSubmit.emit(request);
+      return;
+    }
+
+    const request: CreateAccountRequest = {
+      name: formValue.name,
+      broker: formValue.broker,
+      accountType: formValue.accountType,
+      baseCurrency: formValue.baseCurrency,
+      startDate: normalizedStartDate,
+      startingBalance: formValue.startingBalance,
+      timezone: formValue.timezone,
+      notes: formValue.notes || undefined,
+      isActive: formValue.isActive,
+      riskSettings: formValue.riskSettings,
+    };
+    this.formSubmit.emit(request);
   }
 
   onCancel(): void {
@@ -292,5 +286,12 @@ export class AccountFormComponent implements OnInit {
 
   get enforceLimits() {
     return this.riskSettings?.get('enforceLimits');
+  }
+
+  private toIsoDate(value: string | Date | null): string {
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+    return value ?? new Date().toISOString();
   }
 }

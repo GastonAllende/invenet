@@ -314,7 +314,7 @@ public sealed class AccountsController : ControllerBase
   /// Update an existing account.
   /// </summary>
   /// <param name="id">Account unique identifier</param>
-  /// <param name="request">Updated account data (excludes immutable fields: UserId, StartDate, StartingBalance)</param>
+  /// <param name="request">Updated account data (excludes immutable field: UserId)</param>
   /// <returns>Updated account with risk settings</returns>
   /// <response code="200">Account updated successfully</response>
   /// <response code="400">Invalid request data or duplicate account name</response>
@@ -373,6 +373,12 @@ public sealed class AccountsController : ControllerBase
       return BadRequest(new { message = "BaseCurrency must be a 3-character currency code" });
     }
 
+    // Validate starting balance (if provided)
+    if (request.StartingBalance.HasValue && request.StartingBalance.Value < 0.01m)
+    {
+      return BadRequest(new { message = "StartingBalance must be at least 0.01" });
+    }
+
     // Validate timezone
     var timezone = request.Timezone?.Trim() ?? "Europe/Stockholm";
     if (timezone.Length > 50)
@@ -418,11 +424,19 @@ public sealed class AccountsController : ControllerBase
       });
     }
 
-    // Update allowed fields (UserId, StartDate, StartingBalance are immutable)
+    // Update allowed fields (UserId is immutable)
     account.Name = trimmedName;
     account.Broker = trimmedBroker;
     account.AccountType = request.AccountType;
     account.BaseCurrency = trimmedCurrency;
+    if (request.StartDate.HasValue)
+    {
+      account.StartDate = request.StartDate.Value;
+    }
+    if (request.StartingBalance.HasValue)
+    {
+      account.StartingBalance = request.StartingBalance.Value;
+    }
     account.Timezone = timezone;
     account.Notes = request.Notes?.Trim();
     account.UpdatedAt = DateTime.UtcNow;

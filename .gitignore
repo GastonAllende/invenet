@@ -63,3 +63,8 @@ vitest.config.*.timestamp*
 # Local configuration files
 .codex
 .claude
+.agent
+.github/agents
+.github/prompts
+
+

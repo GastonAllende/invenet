@@ -17,7 +17,7 @@ export class StrategiesApiService {
   private readonly apiBaseUrl = inject(API_BASE_URL);
   private readonly baseUrl = `${this.apiBaseUrl}/api/strategies`;
 
-  list(includeArchived = true): Observable<ListStrategiesResponse> {
+  list(includeArchived = false): Observable<ListStrategiesResponse> {
     const params = new HttpParams().set('includeArchived', includeArchived);
     return this.http.get<ListStrategiesResponse>(this.baseUrl, { params });
   }

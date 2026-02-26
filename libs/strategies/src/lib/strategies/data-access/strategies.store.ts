@@ -7,7 +7,12 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
-import { addEntities, setAllEntities, updateEntity, withEntities } from '@ngrx/signals/entities';
+import {
+  addEntities,
+  setAllEntities,
+  updateEntity,
+  withEntities,
+} from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, of, pipe, switchMap, tap } from 'rxjs';
 import type {
@@ -43,7 +48,7 @@ export const StrategiesStore = signalStore(
   withComputed(({ entities, selectedStrategyId, selectedStrategyDetail }) => ({
     selectedStrategy: computed(() => {
       const id = selectedStrategyId();
-      return id ? entities().find((s) => s.id === id) ?? null : null;
+      return id ? (entities().find((s) => s.id === id) ?? null) : null;
     }),
     selectedDetail: computed(() => selectedStrategyDetail()),
     activeStrategies: computed(() => entities().filter((s) => !s.isArchived)),
@@ -61,7 +66,7 @@ export const StrategiesStore = signalStore(
     loadStrategies: rxMethod<{ includeArchived?: boolean }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
-        switchMap(({ includeArchived = true }) =>
+        switchMap(({ includeArchived = false }) =>
           apiService.list(includeArchived).pipe(
             tap((response: ListStrategiesResponse) => {
               patchState(store, setAllEntities(response.strategies), {
@@ -180,7 +185,10 @@ export const StrategiesStore = signalStore(
       ),
     ),
 
-    createStrategyVersion: rxMethod<{ id: string; payload: CreateStrategyVersionRequest }>(
+    createStrategyVersion: rxMethod<{
+      id: string;
+      payload: CreateStrategyVersionRequest;
+    }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap(({ id, payload }) =>
@@ -291,7 +299,7 @@ export const StrategiesStore = signalStore(
   })),
   withHooks({
     onInit(store) {
-      store.loadStrategies({ includeArchived: true });
+      store.loadStrategies({ includeArchived: false });
     },
   }),
 );

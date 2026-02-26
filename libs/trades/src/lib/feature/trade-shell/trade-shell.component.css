@@ -1,4 +1,7 @@
 .trade-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
   min-height: 100vh;
-  border-radius: var(--content-border-radius);
+  padding: 1rem;
 }

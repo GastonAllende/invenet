@@ -109,16 +109,3 @@
   padding-top: 1rem;
   border-top: 1px solid var(--surface-border);
 }
-
-/* Readonly field styling */
-::ng-deep .readonly-field .p-inputtext,
-::ng-deep .readonly-field .p-inputnumber-input,
-::ng-deep .readonly-field .p-calendar-input {
-  background-color: var(--surface-100);
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-::ng-deep .readonly-field .p-inputnumber-button {
-  display: none;
-}

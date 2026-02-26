@@ -1,4 +1,4 @@
-import { Component, OnInit, effect, inject, input, output } from '@angular/core';
+import { Component, effect, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -22,7 +22,7 @@ import type {
   templateUrl: './strategy-form.component.html',
   styleUrls: ['./strategy-form.component.css'],
 })
-export class StrategyFormComponent implements OnInit {
+export class StrategyFormComponent {
   private readonly fb = inject(FormBuilder);
 
   strategy = input<GetStrategyResponse | null>(null);
@@ -61,14 +61,24 @@ export class StrategyFormComponent implements OnInit {
         notes: strategy.currentVersion?.notes ?? '',
       });
     });
-  }
 
-  ngOnInit(): void {
-    if (this.mode() === 'version') {
-      this.form.controls.name.disable();
-      this.form.controls.market.disable();
-      this.form.controls.defaultTimeframe.disable();
-    }
+    effect(() => {
+      const isVersionMode = this.mode() === 'version';
+      const metadataControls = [
+        this.form.controls.name,
+        this.form.controls.market,
+        this.form.controls.defaultTimeframe,
+      ];
+
+      if (isVersionMode) {
+        metadataControls.forEach((control) =>
+          control.disable({ emitEvent: false }),
+        );
+        return;
+      }
+
+      metadataControls.forEach((control) => control.enable({ emitEvent: false }));
+    });
   }
 
   onSubmit(): void {

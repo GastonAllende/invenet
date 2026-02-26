@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -55,6 +62,8 @@ export class StrategyShellComponent {
   readonly isLoading = this.store.isLoading;
   readonly error = this.store.error;
 
+  readonly includeArchived = signal(false);
+
   readonly isListMode = computed(() => this.mode() === 'list');
   readonly isNewMode = computed(() => this.mode() === 'new');
   readonly isDetailMode = computed(() => this.mode() === 'detail');
@@ -98,7 +107,7 @@ export class StrategyShellComponent {
       const version = this.selectedVersionNumber();
 
       if (currentMode === 'list') {
-        this.store.loadStrategies({ includeArchived: true });
+        this.store.loadStrategies({ includeArchived: this.includeArchived() });
         return;
       }
 
@@ -107,13 +116,17 @@ export class StrategyShellComponent {
       }
     });
 
-    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
-      this.mode.set((data['strategyMode'] as StrategyMode) ?? 'list');
-    });
+    this.route.data
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        this.mode.set((data['strategyMode'] as StrategyMode) ?? 'list');
+      });
 
-    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      this.strategyId.set(params.get('id'));
-    });
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.strategyId.set(params.get('id'));
+      });
 
     this.route.queryParamMap
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -130,6 +143,11 @@ export class StrategyShellComponent {
     void this.router.navigateByUrl('/strategies/new');
   }
 
+  onIncludeArchivedChange(value: boolean): void {
+    this.includeArchived.set(value);
+    this.store.loadStrategies({ includeArchived: value });
+  }
+
   onViewStrategy(id: string): void {
     void this.router.navigate(['/strategies', id]);
   }
@@ -137,7 +155,8 @@ export class StrategyShellComponent {
   onArchiveStrategy(id: string): void {
     this.confirmationService.confirm({
       header: 'Archive Strategy',
-      message: 'Archive this strategy? You will not be able to create new versions while archived.',
+      message:
+        'Archive this strategy? You will not be able to create new versions while archived.',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.store.archiveStrategy(id);

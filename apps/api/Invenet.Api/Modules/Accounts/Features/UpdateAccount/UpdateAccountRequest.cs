@@ -4,7 +4,7 @@ namespace Invenet.Api.Modules.Accounts.Features.UpdateAccount;
 
 /// <summary>
 /// Request to update an existing account.
-/// Note: UserId, StartDate, and StartingBalance cannot be modified.
+/// Note: UserId cannot be modified.
 /// </summary>
 public record UpdateAccountRequest(
     [Required]
@@ -21,6 +21,11 @@ public record UpdateAccountRequest(
     [MaxLength(3)]
     [MinLength(3)]
     string BaseCurrency,
+
+    DateTimeOffset? StartDate = null,
+
+    [Range(0.01, double.MaxValue)]
+    decimal? StartingBalance = null,
 
     [MaxLength(50)]
     string? Timezone = "Europe/Stockholm",

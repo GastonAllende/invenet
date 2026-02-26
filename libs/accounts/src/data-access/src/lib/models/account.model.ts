@@ -75,6 +75,8 @@ export interface UpdateAccountRequest {
   broker?: string;
   accountType: AccountType;
   baseCurrency: string;
+  startDate?: string;
+  startingBalance?: number;
   timezone?: string;
   notes?: string;
   isActive?: boolean;
