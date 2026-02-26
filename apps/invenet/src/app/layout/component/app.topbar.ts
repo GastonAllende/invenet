@@ -1,4 +1,11 @@
-import { Component, OnInit, effect, inject, Injector, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  effect,
+  inject,
+  Injector,
+  signal,
+} from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -121,7 +128,9 @@ import { LayoutService } from '../service/layout.service';
             style="display:flex;align-items:center;gap:.5rem;padding:0 .75rem;"
           >
             <i class="pi pi-wallet"></i>
-            <span class="active-account-label" style="font-size:.875rem;">Active:</span>
+            <span class="active-account-label" style="font-size:.875rem;"
+              >Active:</span
+            >
             <p-select
               [options]="accountOptions()"
               optionLabel="name"
@@ -167,20 +176,16 @@ export class AppTopbar implements OnInit {
   layoutService = inject(LayoutService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-  private accountsStore:
-    | {
-        activeAccounts: () => Array<{ id: string; name: string }>;
-        loadAccounts: (params: { includeArchived: boolean }) => void;
-        setActiveAccountOnServer: (id: string) => void;
-      }
-    | null = null;
-  private activeAccountStore:
-    | {
-        activeAccountId: () => string | null;
-        initializeFromStorage: () => void;
-        setActiveAccount: (id: string) => void;
-      }
-    | null = null;
+  private accountsStore: {
+    activeAccounts: () => Array<{ id: string; name: string }>;
+    loadAccounts: (params: { includeArchived: boolean }) => void;
+    setActiveAccountOnServer: (id: string) => void;
+  } | null = null;
+  private activeAccountStore: {
+    activeAccountId: () => string | null;
+    initializeFromStorage: () => void;
+    setActiveAccount: (id: string) => void;
+  } | null = null;
 
   readonly accountOptions = signal<Array<{ id: string; name: string }>>([]);
   readonly activeAccountId = signal<string | null>(null);
@@ -230,7 +235,7 @@ export class AppTopbar implements OnInit {
         );
         this.activeAccountId.set(this.activeAccountStore.activeAccountId());
       },
-      { allowSignalWrites: true },
+      { injector: this.injector, allowSignalWrites: true },
     );
   }
 
