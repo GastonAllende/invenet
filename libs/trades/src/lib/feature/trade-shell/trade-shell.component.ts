@@ -144,6 +144,10 @@ export class TradeShellComponent {
     void this.router.navigateByUrl(`/journal/${tradeId}`);
   }
 
+  onEdit(tradeId: string): void {
+    void this.router.navigateByUrl(`/journal/${tradeId}/edit`);
+  }
+
   onArchive(tradeId: string): void {
     this.confirmationService.confirm({
       message: 'Archive this trade? It will be hidden from default views.',
@@ -173,10 +177,13 @@ export class TradeShellComponent {
 
   onSaveTrade(payload: CreateTradeRequest | UpdateTradeRequest): void {
     if (this.journalMode() === 'edit' && this.tradeId()) {
-      this.store.updateTrade({
-        id: this.tradeId()!,
-        request: payload as UpdateTradeRequest,
-      });
+      const id = this.tradeId();
+      if (id) {
+        this.store.updateTrade({
+          id,
+          request: payload as UpdateTradeRequest,
+        });
+      }
       return;
     }
 
@@ -198,14 +205,16 @@ export class TradeShellComponent {
   }
 
   onArchiveFromDetail(): void {
-    if (this.tradeId()) {
-      this.onArchive(this.tradeId()!);
+    const id = this.tradeId();
+    if (id) {
+      this.onArchive(id);
     }
   }
 
   onUnarchiveFromDetail(): void {
-    if (this.tradeId()) {
-      this.onUnarchive(this.tradeId()!);
+    const id = this.tradeId();
+    if (id) {
+      this.onUnarchive(id);
     }
   }
 

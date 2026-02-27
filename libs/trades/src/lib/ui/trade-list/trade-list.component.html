@@ -2,7 +2,11 @@
   <div class="list-header">
     <h3>Journal</h3>
     <div class="list-controls">
-      <p-button label="Log Trade (full)" icon="pi pi-plus" (onClick)="onLogFull()"></p-button>
+      <p-button
+        label="Log Trade (full)"
+        icon="pi pi-plus"
+        (onClick)="onLogFull()"
+      ></p-button>
       <p-button
         label="Quick Log Trade"
         icon="pi pi-bolt"
@@ -64,59 +68,94 @@
     [rows]="10"
     [rowsPerPageOptions]="[10, 25, 50]"
     [showCurrentPageReport]="true"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} trades"
-    [tableStyle]="{ 'min-width': '90rem' }"
-    styleClass="p-datatable-striped"
+    currentPageReportTemplate="{first} to {last} of {totalRecords}"
+    [tableStyle]="{ 'min-width': '60rem' }"
+    styleClass="p-datatable-sm p-datatable-striped"
   >
     <ng-template pTemplate="header">
       <tr>
-        <th>Date</th>
-        <th>Symbol</th>
+        <th pSortableColumn="openedAt">
+          Date <p-sortIcon field="openedAt"></p-sortIcon>
+        </th>
+        <th pSortableColumn="symbol">
+          Symbol <p-sortIcon field="symbol"></p-sortIcon>
+        </th>
         <th>Direction</th>
         <th>Account</th>
         <th>Strategy</th>
-        <th>R-Multiple</th>
-        <th>P&amp;L</th>
+        <th pSortableColumn="rMultiple">
+          R-Mul <p-sortIcon field="rMultiple"></p-sortIcon>
+        </th>
+        <th pSortableColumn="pnl">P&L <p-sortIcon field="pnl"></p-sortIcon></th>
         <th>Status</th>
-        <th>Actions</th>
+        <th style="width: 8rem">Actions</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-trade>
       <tr>
         <td>{{ trade.openedAt | date: 'short' }}</td>
-        <td><strong>{{ trade.symbol }}</strong></td>
         <td>
-          <p-tag [value]="trade.direction" [severity]="getDirectionSeverity(trade.direction)"></p-tag>
+          <div class="symbol-container">
+            <strong class="symbol-text">{{ trade.symbol }}</strong>
+            <p-button
+              icon="pi pi-external-link"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              size="small"
+              (onClick)="onView(trade.id)"
+              pTooltip="View details"
+            ></p-button>
+          </div>
+        </td>
+        <td>
+          <p-tag
+            [value]="trade.direction"
+            [severity]="getDirectionSeverity(trade.direction)"
+          ></p-tag>
         </td>
         <td>{{ getAccountName(trade.accountId) }}</td>
         <td>
-          {{ trade.strategyName ?? '—' }}
+          <span class="strategy-name">{{ trade.strategyName ?? '—' }}</span>
           @if (trade.strategyVersionNumber) {
-            <span class="strategy-version">v{{ trade.strategyVersionNumber }}</span>
+            <span class="strategy-version"
+              >v{{ trade.strategyVersionNumber }}</span
+            >
           }
         </td>
-        <td>{{ trade.rMultiple ?? '—' }}</td>
-        <td [class.text-green-600]="(trade.pnl ?? 0) > 0" [class.text-red-600]="(trade.pnl ?? 0) < 0">
-          {{ trade.pnl ?? '—' }}
+        <td
+          [class.text-green-500]="(trade.rMultiple ?? 0) > 0"
+          [class.text-red-500]="(trade.rMultiple ?? 0) < 0"
+          class="font-bold"
+        >
+          {{ trade.rMultiple ?? '—' }}
+        </td>
+        <td
+          [class.text-green-600]="(trade.pnl ?? 0) > 0"
+          [class.text-red-600]="(trade.pnl ?? 0) < 0"
+        >
+          {{ trade.pnl ? (trade.pnl | currency) : '—' }}
         </td>
         <td>
-          <p-tag [value]="trade.status" [severity]="getStatusSeverity(trade.status)"></p-tag>
+          <p-tag
+            [value]="trade.status"
+            [severity]="getStatusSeverity(trade.status)"
+          ></p-tag>
           @if (trade.isArchived) {
-            <p-tag value="ARCHIVED" severity="warn"></p-tag>
+            <p-tag value="ARCHIVED" severity="warn" class="ml-1"></p-tag>
           }
         </td>
         <td>
           <div class="action-buttons">
             <p-button
-              icon="pi pi-eye"
+              icon="pi pi-pencil"
               [rounded]="true"
               [text]="true"
               severity="info"
               [disabled]="isLoading()"
-              (onClick)="onView(trade.id)"
-              pTooltip="View trade"
-              tooltipPosition="top"
+              (onClick)="onEdit(trade.id)"
+              pTooltip="Edit trade"
             ></p-button>
             @if (!trade.isArchived) {
               <p-button
@@ -126,8 +165,7 @@
                 severity="warn"
                 [disabled]="isLoading()"
                 (onClick)="onArchive(trade.id)"
-                pTooltip="Archive trade"
-                tooltipPosition="top"
+                pTooltip="Archive"
               ></p-button>
             } @else {
               <p-button
@@ -137,8 +175,7 @@
                 severity="success"
                 [disabled]="isLoading()"
                 (onClick)="onUnarchive(trade.id)"
-                pTooltip="Unarchive trade"
-                tooltipPosition="top"
+                pTooltip="Unarchive"
               ></p-button>
             }
           </div>

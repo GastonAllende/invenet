@@ -32,8 +32,37 @@
   align-items: center;
 }
 
-.symbol-cell {
+.symbol-container {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.symbol-text {
   font-weight: 600;
+  font-size: 1rem;
+}
+
+.strategy-name {
+  color: var(--text-color);
+}
+
+.strategy-version {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  background: var(--surface-100);
+  border-radius: 4px;
+  color: var(--text-color-secondary);
+  border: 1px solid var(--surface-border);
+  margin-left: 0.4rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.ml-1 {
+  margin-left: 0.25rem;
 }
 
 .empty-message {

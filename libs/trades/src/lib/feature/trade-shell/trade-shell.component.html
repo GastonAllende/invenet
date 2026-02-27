@@ -15,6 +15,7 @@
       (logFull)="onLogFull()"
       (quickLog)="onQuickLog()"
       (view)="onView($event)"
+      (edit)="onEdit($event)"
       (archive)="onArchive($event)"
       (unarchive)="onUnarchive($event)"
     ></lib-trade-list>
@@ -26,9 +27,11 @@
         {{ journalMode() === 'edit' ? 'Edit Trade' : 'Log Trade' }}
       </h1>
       <p class="page-subtitle entity-subtitle">
-        {{ journalMode() === 'edit'
-          ? 'Update execution and journal details for this trade.'
-          : 'Capture complete trade context for later review.' }}
+        {{
+          journalMode() === 'edit'
+            ? 'Update execution and journal details for this trade.'
+            : 'Capture complete trade context for later review.'
+        }}
       </p>
     </section>
 

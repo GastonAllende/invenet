@@ -48,6 +48,7 @@ export class TradeListComponent {
   logFull = output<void>();
   quickLog = output<void>();
   view = output<string>();
+  edit = output<string>();
   archive = output<string>();
   unarchive = output<string>();
 
@@ -86,6 +87,10 @@ export class TradeListComponent {
 
   onView(tradeId: string): void {
     this.view.emit(tradeId);
+  }
+
+  onEdit(tradeId: string): void {
+    this.edit.emit(tradeId);
   }
 
   onArchive(tradeId: string): void {
