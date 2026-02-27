@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "npx nx run-many -t serve -p invenet invenet-api --parallel"
+    "dev": "npx nx run-many -t serve -p invenet invenet-api --parallel",
+    "api": "npx nx serve invenet-api",
+    "web": "npx nx serve invenet"
   },
   "private": true,
   "dependencies": {
