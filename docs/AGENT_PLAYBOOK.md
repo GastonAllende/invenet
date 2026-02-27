@@ -302,10 +302,34 @@ export const BooksStore = signalStore(withEntities<Book>(), withRequestStatus())
 
 ## Backend (.NET)
 
-- Prefer async APIs and `ActionResult<T>` patterns.
-- Keep controllers thin and push logic into services.
+This API uses **Modular Monolith Architecture**. Each module is self-contained with its own domain, features, and infrastructure.
+
+### Architectural Rules
+
+- Keep controllers thin and push logic into services or feature handlers.
+- Prefer async APIs and proper `ActionResult<T>`, including status codes.
 - Use EF Core `AsNoTracking()` for read-only queries.
-- Validate inputs and return proper status codes.
+- Each module implements the `IModule` interface and is auto-discovered at startup.
+- Use schema per module in the database (e.g., "auth", "trades").
+- Organize features by vertical slice (e.g. `Register/`, `Login/`).
+- **No direct module-to-module references.**
+
+### Adding New Code
+
+1. Identify which module it belongs to (e.g., `Modules/Trades`, `Modules/Auth`).
+2. Create in appropriate folder: `Domain/`, `Features/`, `Infrastructure/`, or `API/`.
+3. For new entities, create `IEntityTypeConfiguration`.
+4. Controllers go in the `API/` folder.
+5. Run migration if adding/changing entities.
+
+### Entry Points
+
+- `apps/Invenet.Api/Program.cs` - Application bootstrap with module registration
+- `apps/api/Invenet.Api/Modules/` - All business modules
+
+### Reference
+
+- Full architecture guide: `docs/backend/MODULAR_MONOLITH.md`
 
 ## Logging and Errors
 

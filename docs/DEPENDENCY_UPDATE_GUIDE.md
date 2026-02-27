@@ -62,7 +62,6 @@ git checkout -b deps/update-<dependency-name>
 
 5. **Update AGENT.md references**
    - [AGENTS.md](../AGENTS.md) - Core Stack section
-   - [apps/invenet/AGENT.md](../apps/invenet/AGENT.md) - Stack section
    - [docs/AGENT_PLAYBOOK.md](AGENT_PLAYBOOK.md) - Angular version reference
 
 6. **Test**
@@ -183,7 +182,7 @@ git checkout -b deps/update-<dependency-name>
 
 5. **Update AGENT.md references**
    - [AGENTS.md](../AGENTS.md) - Core Stack section
-   - [apps/api/Invenet.Api/AGENT.md](../apps/api/Invenet.Api/AGENT.md) - Stack section
+   - [docs/AGENT_PLAYBOOK.md](AGENT_PLAYBOOK.md) - Stack section
 
 6. **Test**
 

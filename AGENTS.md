@@ -28,30 +28,17 @@ cd apps/Invenet.Api
 - UI library: PrimeNG
 - State management: NgRx SignalStore (`@ngrx/signals`)
 - Backend: ASP.NET Core (.NET 10) + Entity Framework Core
-  - **Architecture**: Modular Monolith (see `apps/api/MODULAR_MONOLITH.md`)
+  - **Architecture**: Modular Monolith (see `docs/backend/MODULAR_MONOLITH.md`)
   - **Modules**: Auth, Trades, Health, Shared, Accounts
 - Database: PostgreSQL
 
 ## Libraries
 
-### Accounts (`libs/accounts/`)
+The project is broken into feature libraries under `libs/`.
 
-Account management library for trading journal accounts:
-- **Route**: `/accounts` 
-- **Features**: Create, list, view, edit accounts with risk management settings
-- **Backend**: `apps/api/Invenet.Api/Modules/Accounts/` (Feature-based structure)
-- **State**: NgRx SignalStore with reactive signals
-- **Components**: AccountsShellComponent (smart), AccountFormComponent, AccountListComponent (presentational)
-- **README**: `libs/accounts/README.md` for detailed usage and API
-
-### Trades (`libs/trades/`)
-
-Trade journaling library:
-- **Route**: `/journal` (legacy `/trades` redirects to `/journal`)
-- **Modes**: list (`/journal`), create (`/journal/new`), detail (`/journal/:id`), edit (`/journal/:id/edit`)
-- **Features**: quick log modal, full trade form, trade detail view, journal list filters, archive/unarchive flows
-- **Backend**: `apps/api/Invenet.Api/Modules/Trades/`
-- **State**: NgRx SignalStore (`TradesStore`) with list/detail + quick-modal state
+- **To understand a feature**: Look at its `README.md` (e.g., `libs/trades/README.md`)
+- **Structure**: Each library generally contains its components, models, and NgRx SignalStore services
+- **Backend**: Corresponding backend features are found in `apps/api/Invenet.Api/Modules/<ModuleName>/`
 
 ## Common Tasks
 
@@ -73,15 +60,12 @@ npx playwright install
 
 ## Key Entry Points
 
-| Area            | Path                               |
-| --------------- | ---------------------------------- |
-| Frontend entry  | apps/invenet/src/main.ts           |
-| Root component  | apps/invenet/src/app/app.ts        |
-| App config      | apps/invenet/src/app/app.config.ts |
-| Routes          | apps/invenet/src/app/app.routes.ts |
-| API entry       | apps/Invenet.Api/Program.cs        |
-| API modules     | apps/Invenet.Api/Modules/\*        |
-| API controllers | apps/Invenet.Api/Modules/\*/API/\* |
+| Area           | Path                              |
+| -------------- | --------------------------------- |
+| Frontend Shell | `apps/invenet/src/app`            |
+| Features/Deps  | `libs/*`                          |
+| API Core       | `apps/api/Invenet.Api/Program.cs` |
+| API Modules    | `apps/api/Invenet.Api/Modules/*`  |
 
 ## Workflow & Constraints
 
@@ -104,17 +88,13 @@ npx playwright install
 - Nx cache issues: run `npx nx reset`.
 - Playwright browsers missing: run `npx playwright install`.
 
-## Additional Agent Files
+## Additional Documentation
 
-- Frontend-specific: `apps/invenet/AGENT.md`
-- Backend architecture: `apps/api/MODULAR_MONOLITH.md`
-- Module template: `apps/api/MODULE_TEMPLATE.md`
-- Backend-specific: `apps/api/Invenet.Api/AGENT.md`
-- Best practices: `docs/AGENT_PLAYBOOK.md`
-- Official Angular AI prompt: `docs/AGENT_PLAYBOOK.md` (Angular AI Prompt section)
+- Best practices & Playbook: `docs/AGENT_PLAYBOOK.md`
+- Backend architecture: `docs/backend/MODULAR_MONOLITH.md`
+- Module template: `docs/backend/MODULE_TEMPLATE.md`
 - Angular best practices: `docs/ANGULAR_BEST_PRACTICES.md`
 - NgRx SignalStore guide: `docs/NGRX_SIGNALSTORE_GUIDE.md`
-- Code review checklist: `docs/CODE_REVIEW_CHECKLIST.md`
 - Dependency updates: `docs/DEPENDENCY_UPDATE_GUIDE.md`
 
 ## Accessibility

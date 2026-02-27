@@ -28,20 +28,16 @@ Swagger UI: `http://localhost:5000/swagger`
 
 This project uses **Modular Monolith Architecture**. For detailed information:
 
-- **Architecture Guide**: [MODULAR_MONOLITH.md](./MODULAR_MONOLITH.md) - Complete architecture documentation
-- **Migration Guide**: [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) - Guide for migrating from old structure
-- **Agent Instructions**: [Invenet.Api/AGENT.md](./Invenet.Api/AGENT.md) - Quick reference for AI agents
+- **Architecture Guide**: [MODULAR_MONOLITH.md](../../docs/backend/MODULAR_MONOLITH.md) - Complete architecture documentation
+- **Migration Guide**: [MIGRATION_GUIDE.md](../../docs/backend/MIGRATION_GUIDE.md) - Guide for migrating from old structure
+- **Agent Instructions**: [AGENT_PLAYBOOK.md](../../docs/AGENT_PLAYBOOK.md) - Quick reference for AI agents
 
 ## Project Structure
 
 ```
 apps/api/
 ├── Invenet.Api/
-│   ├── Modules/              # Business modules
-│   │   ├── Shared/          # Cross-cutting concerns
-│   │   ├── Auth/            # Authentication & authorization
-│   │   ├── Trades/          # Trading operations
-│   │   └── Health/          # Health checks
+│   ├── Modules/              # Business modules (e.g. Auth, Trades, Health)
 │   ├── Data/                # EF Core design-time factory
 │   ├── EmailTemplates/      # Email templates
 │   ├── Migrations/          # Database migrations
@@ -121,44 +117,13 @@ dotnet test
 
 ## Available Modules
 
-### Auth Module
-
-- User registration with email confirmation
-- Login with JWT tokens
-- Refresh token rotation
-- Password reset
-- Email verification
-
-**Endpoints:**
-
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/confirm-email`
-- `POST /api/auth/resend-confirmation`
-- `POST /api/auth/forgot-password`
-- `POST /api/auth/reset-password`
-- `POST /api/auth/refresh`
-- `POST /api/auth/logout`
-
-### Health Module
-
-- Application health checks
-
-**Endpoints:**
-
-- `GET /api/health`
-
-### Trades Module
-
-- Trading operations (to be implemented)
-
-**Endpoints:**
-
-- `GET /api/trades`
+The API exposes endpoints based on its internal modular architecture (e.g., Auth, Trades, Health).
+Modules follow a Vertical Slice structure containing their own Domain, Features, Infrastructure, and API controllers.
+To view current endpoints and specific schemas for any module, start the API and navigate to the Swagger UI at `http://localhost:5000/swagger`.
 
 ## Adding a New Module
 
-See the [MODULAR_MONOLITH.md](./MODULAR_MONOLITH.md#adding-a-new-module) guide for detailed instructions.
+See the [MODULAR_MONOLITH.md](../../docs/backend/MODULAR_MONOLITH.md#adding-a-new-module) guide for detailed instructions.
 
 Quick steps:
 
