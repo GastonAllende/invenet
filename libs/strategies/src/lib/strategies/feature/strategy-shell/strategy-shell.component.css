@@ -1,7 +1,13 @@
+.strategy-detail-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
 .strategy-hero {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: end;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 1rem;
 }
 
@@ -15,7 +21,7 @@
 :host ::ng-deep .strategy-hero-card .p-card-body,
 :host ::ng-deep .strategy-version-card .p-card-body,
 :host ::ng-deep .strategy-history-card .p-card-body {
-  padding: 1.2rem 1.25rem;
+  padding: 1.25rem 1.3rem;
 }
 
 :host ::ng-deep .strategy-version-card .p-card-title,
@@ -38,6 +44,15 @@
   align-items: center;
   gap: 0.6rem;
   flex-wrap: wrap;
+}
+
+.strategy-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .strategy-meta-row {
@@ -65,9 +80,12 @@
   color: var(--text-color-secondary);
 }
 
-.header-actions {
-  align-self: end;
-  margin-left: auto;
+.strategy-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  align-self: flex-start;
+  flex-wrap: wrap;
   gap: 0.45rem;
   padding: 0.35rem;
   border: 1px solid var(--surface-border);
@@ -75,13 +93,23 @@
   background: color-mix(in srgb, var(--surface-card) 94%, var(--text-color) 6%);
 }
 
-:host ::ng-deep .header-actions .p-button {
+:host ::ng-deep .strategy-actions .p-button {
   border-radius: 10px;
 }
 
-:host ::ng-deep .header-actions .p-button.p-button-text {
+:host ::ng-deep .strategy-actions .p-button.p-button-text {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+}
+
+.strategy-icon {
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+}
+
+.heading-icon {
+  font-size: 1rem;
+  color: var(--primary-color);
 }
 
 .version-summary {
@@ -164,12 +192,12 @@
 
 @media (max-width: 768px) {
   .strategy-hero {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
-  .header-actions {
-    margin-left: 0;
-    align-self: stretch;
+  .strategy-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .strategy-meta-separator {

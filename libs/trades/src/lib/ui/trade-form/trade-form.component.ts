@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -9,7 +16,11 @@ import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
 import { StrategiesApiService } from '@invenet/strategies';
-import { CreateTradeRequest, Trade, UpdateTradeRequest } from '../../../data-access/src';
+import {
+  CreateTradeRequest,
+  Trade,
+  UpdateTradeRequest,
+} from '../../../data-access/src';
 
 interface SelectOption {
   id: string;
@@ -67,7 +78,10 @@ export class TradeFormComponent {
     openedAt: [new Date(), Validators.required],
     closedAt: [null as Date | null],
     symbol: ['', [Validators.required, Validators.maxLength(20)]],
-    entryPrice: [null as number | null, [Validators.required, Validators.min(0.0001)]],
+    entryPrice: [
+      null as number | null,
+      [Validators.required, Validators.min(0.0001)],
+    ],
     exitPrice: [null as number | null],
     quantity: [null as number | null],
     rMultiple: [null as number | null],
@@ -193,9 +207,16 @@ export class TradeFormComponent {
     }
 
     const raw = this.form.getRawValue();
-    const openedAt = raw.openedAt instanceof Date ? raw.openedAt.toISOString() : `${raw.openedAt}`;
+    const openedAt =
+      raw.openedAt instanceof Date
+        ? raw.openedAt.toISOString()
+        : `${raw.openedAt}`;
     const closedAt =
-      raw.closedAt instanceof Date ? raw.closedAt.toISOString() : raw.closedAt ? `${raw.closedAt}` : undefined;
+      raw.closedAt instanceof Date
+        ? raw.closedAt.toISOString()
+        : raw.closedAt
+          ? `${raw.closedAt}`
+          : undefined;
     const tags = (raw.tags ?? '')
       .split(',')
       .map((value) => value.trim())

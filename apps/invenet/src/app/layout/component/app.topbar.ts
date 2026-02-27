@@ -67,7 +67,7 @@ import { LayoutService } from '../service/layout.service';
             />
           </g>
         </svg>
-        <span>SAKAI</span>
+        <span>Invenets</span>
       </a>
     </div>
 

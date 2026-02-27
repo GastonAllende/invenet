@@ -3,8 +3,12 @@
     <p-card styleClass="trade-hero-card">
       <div class="trade-hero">
         <div class="trade-hero-main">
-          <h2 class="trade-symbol">{{ t.symbol }}</h2>
+          <h2 class="trade-symbol">
+            <i class="pi pi-chart-line detail-icon heading-icon"></i>
+            {{ t.symbol }}
+          </h2>
           <p class="trade-meta">
+            <i class="pi pi-clock detail-icon"></i>
             Opened {{ t.openedAt | date: 'short' }}
             @if (t.closedAt) {
               • Closed {{ t.closedAt | date: 'short' }}
@@ -35,8 +39,11 @@
       <p-card styleClass="trade-detail-card">
         <ng-template pTemplate="title">Execution Details</ng-template>
         <div class="detail-rows">
-          <div class="detail-row">
-            <span class="detail-label">Account</span>
+            <div class="detail-row">
+            <span class="detail-label">
+              <i class="pi pi-briefcase detail-icon"></i>
+              Account
+            </span>
             <div class="detail-value-wrap">
               <span class="detail-value">{{ getAccountName(t.accountId) }}</span>
               <span class="trade-code">{{ t.accountId }}</span>
@@ -44,7 +51,10 @@
           </div>
           <p-divider></p-divider>
           <div class="detail-row">
-            <span class="detail-label">Strategy</span>
+            <span class="detail-label">
+              <i class="pi pi-sitemap detail-icon"></i>
+              Strategy
+            </span>
             <span class="detail-value">
               {{ t.strategyName ?? '—' }}
               @if (t.strategyVersionNumber) {
@@ -54,39 +64,62 @@
           </div>
           <p-divider></p-divider>
           <div class="detail-row">
-            <span class="detail-label">Entry Price</span>
+            <span class="detail-label">
+              <i class="pi pi-sign-in detail-icon"></i>
+              Entry Price
+            </span>
             <span class="detail-value">{{ t.entryPrice }}</span>
           </div>
           <p-divider></p-divider>
           <div class="detail-row">
-            <span class="detail-label">Exit Price</span>
+            <span class="detail-label">
+              <i class="pi pi-sign-out detail-icon"></i>
+              Exit Price
+            </span>
             <span class="detail-value">{{ t.exitPrice ?? '—' }}</span>
           </div>
           <p-divider></p-divider>
           <div class="detail-row">
-            <span class="detail-label">Quantity</span>
+            <span class="detail-label">
+              <i class="pi pi-hashtag detail-icon"></i>
+              Quantity
+            </span>
             <span class="detail-value">{{ t.quantity }}</span>
           </div>
           <p-divider></p-divider>
           <div class="detail-row">
-            <span class="detail-label">R-Multiple</span>
+            <span class="detail-label">
+              <i class="pi pi-percentage detail-icon"></i>
+              R-Multiple
+            </span>
             <span class="detail-value">{{ t.rMultiple ?? '—' }}</span>
           </div>
           <p-divider></p-divider>
           <div class="detail-row">
-            <span class="detail-label">P&amp;L</span>
+            <span class="detail-label">
+              <i class="pi pi-dollar detail-icon"></i>
+              P&amp;L
+            </span>
             <span class="detail-value">{{ t.pnl ?? '—' }}</span>
           </div>
           <p-divider></p-divider>
           <div class="detail-row">
-            <span class="detail-label">Tags</span>
+            <span class="detail-label">
+              <i class="pi pi-tag detail-icon"></i>
+              Tags
+            </span>
             <span class="detail-value">{{ t.tags?.join(', ') || '—' }}</span>
           </div>
         </div>
       </p-card>
 
       <p-card styleClass="trade-detail-card">
-        <ng-template pTemplate="title">Notes</ng-template>
+        <ng-template pTemplate="title">
+          <span class="notes-title">
+            <i class="pi pi-file-edit detail-icon"></i>
+            Notes
+          </span>
+        </ng-template>
         <p class="trade-notes">{{ t.notes || 'No notes recorded.' }}</p>
       </p-card>
     </div>

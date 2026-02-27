@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -8,7 +13,10 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
-import type { Trade, TradeFilters } from '../../../data-access/src/lib/models/trade.model';
+import type {
+  Trade,
+  TradeFilters,
+} from '../../../data-access/src/lib/models/trade.model';
 
 @Component({
   selector: 'lib-trade-list',
@@ -89,10 +97,15 @@ export class TradeListComponent {
   }
 
   getAccountName(accountId: string): string {
-    return this.accounts().find((account) => account.id === accountId)?.name ?? accountId;
+    return (
+      this.accounts().find((account) => account.id === accountId)?.name ??
+      accountId
+    );
   }
 
-  getStatusSeverity(status: string): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' {
+  getStatusSeverity(
+    status: string,
+  ): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' {
     return status === 'Closed' ? 'success' : 'info';
   }
 

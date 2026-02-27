@@ -62,7 +62,9 @@ export class TradeShellComponent {
     this.strategiesStore.loadStrategies({ includeArchived: false });
 
     effect(() => {
-      const mode = (this.route.snapshot.data['journalMode'] as JournalMode | undefined) ?? 'list';
+      const mode =
+        (this.route.snapshot.data['journalMode'] as JournalMode | undefined) ??
+        'list';
       const tradeId = this.route.snapshot.paramMap.get('id');
       this.journalMode.set(mode);
       this.tradeId.set(tradeId);
@@ -171,7 +173,10 @@ export class TradeShellComponent {
 
   onSaveTrade(payload: CreateTradeRequest | UpdateTradeRequest): void {
     if (this.journalMode() === 'edit' && this.tradeId()) {
-      this.store.updateTrade({ id: this.tradeId()!, request: payload as UpdateTradeRequest });
+      this.store.updateTrade({
+        id: this.tradeId()!,
+        request: payload as UpdateTradeRequest,
+      });
       return;
     }
 

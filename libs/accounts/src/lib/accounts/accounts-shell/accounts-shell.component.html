@@ -36,129 +36,137 @@
   }
 
   @if (isDetailMode() && selectedAccount(); as account) {
-    <section class="account-header account-header-row entity-header entity-header-row">
-      <div class="account-identity">
-        <div class="account-title-row">
-          <h1 class="account-title entity-title">{{ account.name }}</h1>
-          @if (activeAccountId() === account.id) {
-            <p-tag value="Active Account" severity="success"></p-tag>
-          }
-          @if (!account.isActive) {
-            <p-tag value="Archived" severity="contrast"></p-tag>
+    <div class="account-detail-layout">
+      <p-card styleClass="account-hero-card">
+        <div class="account-hero">
+          <div class="account-hero-main">
+            <h1 class="account-title entity-title">
+              <i class="pi pi-wallet account-icon heading-icon"></i>
+              {{ account.name }}
+            </h1>
+            <p class="account-meta">
+              <i class="pi pi-dollar account-icon"></i>
+              Base currency {{ account.baseCurrency }}
+            </p>
+            <div class="account-tags">
+              @if (activeAccountId() === account.id) {
+                <p-tag value="Active Account" severity="success"></p-tag>
+              }
+              @if (!account.isActive) {
+                <p-tag value="Archived" severity="contrast"></p-tag>
+              }
+              <p-tag [value]="'Type: ' + account.accountType" severity="secondary"></p-tag>
+            </div>
+          </div>
+
+          @if (!editMode()) {
+            <div class="account-actions">
+              <p-button
+                label="Back to Accounts"
+                icon="pi pi-arrow-left"
+                severity="secondary"
+                [text]="true"
+                (onClick)="onBackToList()"
+              ></p-button>
+              <p-button
+                label="Edit"
+                icon="pi pi-pencil"
+                size="small"
+                (onClick)="onEnterEditMode()"
+              ></p-button>
+              @if (activeAccountId() !== account.id) {
+                <p-button
+                  label="Set Active"
+                  icon="pi pi-star"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  (onClick)="onSetActiveAccount(account.id)"
+                ></p-button>
+              }
+              @if (account.isActive) {
+                <p-button
+                  label="Archive"
+                  icon="pi pi-archive"
+                  severity="danger"
+                  [outlined]="true"
+                  size="small"
+                  (onClick)="onArchiveAccount(account.id)"
+                ></p-button>
+              } @else {
+                <p-button
+                  label="Unarchive"
+                  icon="pi pi-replay"
+                  severity="success"
+                  [outlined]="true"
+                  size="small"
+                  (onClick)="onUnarchiveAccount(account.id)"
+                ></p-button>
+              }
+            </div>
           }
         </div>
-        <div class="account-meta-row">
-          <span class="account-meta-label">Base currency</span>
-          <span class="account-meta-value">{{ account.baseCurrency }}</span>
-        </div>
-      </div>
+      </p-card>
 
       @if (!editMode()) {
-        <div class="header-actions entity-actions">
-          <p-button
-            label="Back to Accounts"
-            icon="pi pi-arrow-left"
-            severity="secondary"
-            [text]="true"
-            (onClick)="onBackToList()"
-          ></p-button>
-          <p-button
-            label="Edit"
-            icon="pi pi-pencil"
-            size="small"
-            (onClick)="onEnterEditMode()"
-          ></p-button>
-          @if (activeAccountId() !== account.id) {
-            <p-button
-              label="Set Active"
-              icon="pi pi-star"
-              severity="secondary"
-              [outlined]="true"
-              size="small"
-              (onClick)="onSetActiveAccount(account.id)"
-            ></p-button>
-          }
-          @if (account.isActive) {
-            <p-button
-              label="Archive"
-              icon="pi pi-archive"
-              severity="danger"
-              [outlined]="true"
-              size="small"
-              (onClick)="onArchiveAccount(account.id)"
-            ></p-button>
-          } @else {
-            <p-button
-              label="Unarchive"
-              icon="pi pi-replay"
-              severity="secondary"
-              [outlined]="true"
-              size="small"
-              (onClick)="onUnarchiveAccount(account.id)"
-            ></p-button>
-          }
-        </div>
+        <section class="overview-grid">
+          <p-card styleClass="detail-card">
+            <ng-template pTemplate="title">Risk Summary</ng-template>
+            <ng-template pTemplate="subtitle">Configured limits for this account.</ng-template>
+            <div class="risk-metrics">
+              <div class="metric-tile">
+                <span class="metric-value">{{ account.riskSettings.riskPerTradePct }}%</span>
+                <span class="metric-label">Risk per trade</span>
+              </div>
+              <div class="metric-tile">
+                <span class="metric-value">{{ account.riskSettings.maxDailyLossPct }}%</span>
+                <span class="metric-label">Max daily loss</span>
+              </div>
+              <div class="metric-tile">
+                <span class="metric-value">{{ account.riskSettings.maxWeeklyLossPct }}%</span>
+                <span class="metric-label">Max weekly loss</span>
+              </div>
+              <div class="metric-tile">
+                <span class="metric-value">-</span>
+                <span class="metric-label">Portfolio exposure cap</span>
+              </div>
+            </div>
+          </p-card>
+
+          <p-card styleClass="detail-card">
+            <ng-template pTemplate="title">Account Details</ng-template>
+            <ng-template pTemplate="subtitle">Profile and metadata.</ng-template>
+            <div class="detail-list">
+              <div class="detail-row">
+                <span class="detail-label">Broker</span>
+                <span class="detail-value">{{ account.broker || 'Not specified' }}</span>
+              </div>
+              <p-divider></p-divider>
+              <div class="detail-row">
+                <span class="detail-label">Account type</span>
+                <span class="detail-value">{{ account.accountType }}</span>
+              </div>
+              <p-divider></p-divider>
+              <div class="detail-row detail-row-notes">
+                <span class="detail-label">Notes</span>
+                <span class="detail-value">{{ account.notes || 'No notes provided' }}</span>
+              </div>
+            </div>
+          </p-card>
+        </section>
+      } @else {
+        <section class="entity-panel">
+          <lib-invenet-account-form
+            [account]="account"
+            [mode]="'update'"
+            [isLoading]="isLoading()"
+            [showTitle]="false"
+            [showCancel]="true"
+            (formSubmit)="onSaveAccount($event)"
+            (formCancel)="onCancelForm()"
+          ></lib-invenet-account-form>
+        </section>
       }
-    </section>
-
-    @if (!editMode()) {
-      <section class="overview-grid">
-        <p-card styleClass="detail-card">
-          <ng-template pTemplate="title">Risk Summary</ng-template>
-          <ng-template pTemplate="subtitle">Configured limits for this account.</ng-template>
-          <div class="risk-metrics">
-            <div class="metric-tile">
-              <span class="metric-value">{{ account.riskSettings.riskPerTradePct }}%</span>
-              <span class="metric-label">Risk per trade</span>
-            </div>
-            <div class="metric-tile">
-              <span class="metric-value">{{ account.riskSettings.maxDailyLossPct }}%</span>
-              <span class="metric-label">Max daily loss</span>
-            </div>
-            <div class="metric-tile">
-              <span class="metric-value">{{ account.riskSettings.maxWeeklyLossPct }}%</span>
-              <span class="metric-label">Max weekly loss</span>
-            </div>
-            <div class="metric-tile">
-              <span class="metric-value">-</span>
-              <span class="metric-label">Portfolio exposure cap</span>
-            </div>
-          </div>
-        </p-card>
-
-        <p-card styleClass="detail-card">
-          <ng-template pTemplate="title">Account Details</ng-template>
-          <ng-template pTemplate="subtitle">Profile and metadata.</ng-template>
-          <div class="detail-list">
-            <div class="detail-row">
-              <span class="detail-label">Broker</span>
-              <span class="detail-value">{{ account.broker || 'Not specified' }}</span>
-            </div>
-            <p-divider></p-divider>
-            <div class="detail-row">
-              <span class="detail-label">Account type</span>
-              <span class="detail-value">{{ account.accountType }}</span>
-            </div>
-            <p-divider></p-divider>
-            <div class="detail-row detail-row-notes">
-              <span class="detail-label">Notes</span>
-              <span class="detail-value">{{ account.notes || 'No notes provided' }}</span>
-            </div>
-          </div>
-        </p-card>
-      </section>
-    } @else {
-      <section class="entity-panel">
-        <lib-invenet-account-form
-          [account]="account"
-          [mode]="'update'"
-          [isLoading]="isLoading()"
-          [showTitle]="false"
-          [showCancel]="true"
-          (formSubmit)="onSaveAccount($event)"
-          (formCancel)="onCancelForm()"
-        ></lib-invenet-account-form>
-      </section>
-    }
+    </div>
   }
 </div>
