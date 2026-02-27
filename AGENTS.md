@@ -4,6 +4,24 @@
 
 This file is for AI coding agents. Prioritize actionable commands, repo-specific workflow, and minimal necessary context.
 
+## LLM Context (Quick Map)
+
+- Frontend app: `apps/invenet`
+- Backend API: `apps/api/Invenet.Api`
+- Features live in `libs/*` (each feature should have a `README.md`)
+- Backend modules live in `apps/api/Invenet.Api/Modules/*`
+
+### Cross-Project Mapping
+
+When working on a feature, you usually need to touch both:
+| Feature | Frontend Lib | Backend Module |
+| :--- | :--- | :--- |
+| **Auth** | `libs/auth` | `Modules/Auth` |
+| **Accounts** | `libs/accounts` | `Modules/Accounts` |
+| **Trades** | `libs/trades` | `Modules/Trades` |
+| **Strategies**| `libs/strategies` | `Modules/Strategies` |
+| **Analytics** | `libs/analytics` | `Modules/Trades` (usually) |
+
 ## Quick Start
 
 ```bash
@@ -90,6 +108,7 @@ npx playwright install
 
 ## Additional Documentation
 
+- Minimal LLM context: `docs/AI_CONTEXT.md`
 - Best practices & Playbook: `docs/AGENT_PLAYBOOK.md`
 - Backend architecture: `docs/backend/MODULAR_MONOLITH.md`
 - Module template: `docs/backend/MODULE_TEMPLATE.md`
@@ -97,9 +116,11 @@ npx playwright install
 - NgRx SignalStore guide: `docs/NGRX_SIGNALSTORE_GUIDE.md`
 - Dependency updates: `docs/DEPENDENCY_UPDATE_GUIDE.md`
 
-## Accessibility
+## Accessibility & Styling
 
-No accessibility will be added in this repository. Do not add any accessibility features or improvements, and do not suggest any to the user. This is a deliberate choice to focus on core functionality without the overhead of accessibility considerations.
+- **No Accessibility**: This project deliberately ignores accessibility. Do not add ARIA roles, AXE fixes, or focus management unless explicitly requested by the user.
+- **Vanilla CSS**: Use Vanilla CSS or PrimeNG variables. Do not introduce Tailwind unless specifically requested for a new component.
+- **PrimeNG First**: Always check for a [PrimeNG](https://primeng.org/) component before writing custom HTML/CSS.
 
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->

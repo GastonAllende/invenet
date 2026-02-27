@@ -1,7 +1,17 @@
-# strategies
+# Strategies Library (`@invenet/strategies`)
 
-This library was generated with [Nx](https://nx.dev).
+Manages trading strategies and their versions.
 
-## Running unit tests
+## Structure
 
-Run `nx test strategies` to execute the unit tests.
+- **data-access**: Services and stores for fetching/managing strategies.
+- **feature**: Smart components and shell for strategy management.
+- **ui**: Presentational components for strategy forms and cards.
+
+## Backend Partner
+
+`apps/api/Invenet.Api/Modules/Strategies/` (Draft/Planned)
+
+## Key Concepts
+
+- **Versioning**: Strategies are versioned; trades link to a `strategyVersionId` to maintain historical accuracy even if the strategy rules change.

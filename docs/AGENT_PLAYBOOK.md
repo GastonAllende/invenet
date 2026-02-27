@@ -2,7 +2,7 @@
 
 ## Scope
 
-This playbook contains conventions and best practices for working in this repo. It complements `AGENT.md` and should be used when making design or implementation decisions.
+This playbook contains conventions and best practices for working in this repo. It complements `AGENTS.md` and should be used when making design or implementation decisions.
 
 ## Angular (v21.1)
 
@@ -18,7 +18,7 @@ Quick reference:
 
 ## Angular AI Prompt (Official)
 
-You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
+You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, and performant code following Angular and TypeScript best practices.
 
 ### TypeScript Best Practices
 
@@ -38,8 +38,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ### Accessibility Requirements
 
-- It MUST pass all AXE checks.
-- It MUST follow all WCAG AA minimums, including focus management, color contrast, and ARIA attributes.
+Do not add accessibility features or requirements in this repo. If a requested change would introduce accessibility work, avoid it and proceed with core functionality only.
 
 ### Components
 
