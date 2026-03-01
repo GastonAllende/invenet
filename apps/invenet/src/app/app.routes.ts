@@ -44,10 +44,6 @@ export const appRoutes: Route[] = [
         loadComponent: () => import('@invenet/trades').then((m) => m.Trades),
         data: { journalMode: 'list' },
       },
-      { path: 'trades', redirectTo: 'journal', pathMatch: 'full' },
-      { path: 'trades/new', redirectTo: 'journal/new', pathMatch: 'full' },
-      { path: 'trades/:id', redirectTo: 'journal/:id' },
-      { path: 'trades/:id/edit', redirectTo: 'journal/:id/edit' },
       {
         path: 'analytics',
         loadComponent: () =>
@@ -78,10 +74,6 @@ export const appRoutes: Route[] = [
           import('@invenet/strategies').then((m) => m.Strategies),
         data: { strategyMode: 'list' },
       },
-      { path: 'strategy', redirectTo: 'strategies', pathMatch: 'full' },
-      { path: 'strategy/new', redirectTo: 'strategies/new', pathMatch: 'full' },
-      { path: 'strategy/:id', redirectTo: 'strategies/:id' },
-      { path: 'strategy/:id/edit', redirectTo: 'strategies/:id/edit' },
       {
         path: 'accounts/new',
         loadComponent: () =>
@@ -101,9 +93,6 @@ export const appRoutes: Route[] = [
           import('@invenet/accounts').then((m) => m.Accounts),
         data: { accountMode: 'list' },
       },
-      { path: 'account/new', redirectTo: 'accounts/new', pathMatch: 'full' },
-      { path: 'account/:id', redirectTo: 'accounts/:id' },
-      { path: 'account', redirectTo: 'accounts', pathMatch: 'full' },
     ],
   },
   { path: '**', redirectTo: '' },
