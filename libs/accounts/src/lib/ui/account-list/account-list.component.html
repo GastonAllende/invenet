@@ -114,10 +114,10 @@
             }
             @if (account.isActive) {
               <p-button
-                icon="pi pi-archive"
+                icon="pi pi-folder"
                 [rounded]="true"
                 [text]="true"
-                severity="secondary"
+                severity="warn"
                 [disabled]="isLoading()"
                 (onClick)="onArchive(account.id); $event.stopPropagation()"
                 pTooltip="Archive"

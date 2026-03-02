@@ -77,10 +77,10 @@
             ></p-button>
             @if (!strategy.isArchived) {
               <p-button
-                icon="pi pi-archive"
+                icon="pi pi-folder"
                 [rounded]="true"
                 [text]="true"
-                severity="secondary"
+                severity="warn"
                 (onClick)="onArchive(strategy.id)"
                 pTooltip="Archive"
                 tooltipPosition="top"

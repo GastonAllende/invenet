@@ -13,7 +13,7 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { MenuModule } from 'primeng/menu';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '@invenet/auth';
+import { AuthService } from '@invenet/auth-data-access';
 import { QuickTradeService } from '@invenet/trades';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
@@ -231,10 +231,10 @@ export class AppTopbar implements OnInit {
 
   onLogout() {
     this.authService.logout().subscribe({
-      next: () => void this.router.navigateByUrl('/login'),
+      next: () => void this.router.navigateByUrl('/auth/login'),
       error: () => {
         this.authService.clearTokens();
-        void this.router.navigateByUrl('/login');
+        void this.router.navigateByUrl('/auth/login');
       },
     });
   }

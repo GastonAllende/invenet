@@ -169,10 +169,10 @@
               ></p-button>
             } @else {
               <p-button
-                icon="pi pi-refresh"
+                icon="pi pi-replay"
                 [rounded]="true"
                 [text]="true"
-                severity="success"
+                severity="contrast"
                 [disabled]="isLoading()"
                 (onClick)="onUnarchive(trade.id)"
                 pTooltip="Unarchive"

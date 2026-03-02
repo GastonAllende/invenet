@@ -21,7 +21,15 @@
       "@invenet/strategies": ["libs/strategies/src/index.ts"],
       "@invenet/core": ["libs/core/src/index.ts"],
       "@invenet/dashboard": ["libs/dashboard/src/index.ts"],
-      "@invenet/analytics": ["libs/analytics/src/index.ts"]
+      "@invenet/analytics": ["libs/analytics/src/index.ts"],
+      "@invenet/data-access": ["libs/trading/journal/data-access/src/index.ts"],
+      "@my-org/trading/journal/ui": ["libs/trading/journal/ui/src/index.ts"],
+      "@invenet/feature": ["libs/trading/journal/feature/src/index.ts"],
+      "@invenet/ui-layout": ["libs/shared/ui-layout/src/index.ts"],
+      "@invenet/trade-ui": ["libs/trade/ui/src/index.ts"],
+      "@invenet/shared-util-auth": ["libs/shared/util-auth/src/index.ts"],
+      "@invenet/auth-data-access": ["libs/auth/data-access/src/index.ts"],
+      "@invenet/auth-feature": ["libs/auth/feature/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

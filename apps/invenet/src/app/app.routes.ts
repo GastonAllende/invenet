@@ -1,18 +1,26 @@
 import { Route } from '@angular/router';
-import { authGuard } from '@invenet/auth';
-import { LoginComponent } from './pages/login/login.component';
-import { RegisterComponent } from './pages/register/register.component';
-import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
-import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
-import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { authGuard } from '@invenet/shared-util-auth';
 import { AppLayout } from './layout/component/app.layout';
 
 export const appRoutes: Route[] = [
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'verify-email', component: VerifyEmailComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'reset-password', component: ResetPasswordComponent },
+  {
+    path: 'auth',
+    loadChildren: () =>
+      import('@invenet/auth-feature').then((m) => m.AUTH_ROUTES),
+  },
+  { path: 'login', redirectTo: 'auth/login', pathMatch: 'full' },
+  { path: 'register', redirectTo: 'auth/register', pathMatch: 'full' },
+  { path: 'verify-email', redirectTo: 'auth/verify-email', pathMatch: 'full' },
+  {
+    path: 'forgot-password',
+    redirectTo: 'auth/forgot-password',
+    pathMatch: 'full',
+  },
+  {
+    path: 'reset-password',
+    redirectTo: 'auth/reset-password',
+    pathMatch: 'full',
+  },
   {
     path: '',
     component: AppLayout,
