@@ -8,19 +8,6 @@ export const appRoutes: Route[] = [
     loadChildren: () =>
       import('@invenet/auth-feature').then((m) => m.AUTH_ROUTES),
   },
-  { path: 'login', redirectTo: 'auth/login', pathMatch: 'full' },
-  { path: 'register', redirectTo: 'auth/register', pathMatch: 'full' },
-  { path: 'verify-email', redirectTo: 'auth/verify-email', pathMatch: 'full' },
-  {
-    path: 'forgot-password',
-    redirectTo: 'auth/forgot-password',
-    pathMatch: 'full',
-  },
-  {
-    path: 'reset-password',
-    redirectTo: 'auth/reset-password',
-    pathMatch: 'full',
-  },
   {
     path: '',
     component: AppLayout,
@@ -51,11 +38,6 @@ export const appRoutes: Route[] = [
         pathMatch: 'full',
         loadComponent: () => import('@invenet/trades').then((m) => m.Trades),
         data: { journalMode: 'list' },
-      },
-      {
-        path: 'analytics',
-        loadComponent: () =>
-          import('@invenet/analytics').then((m) => m.Analytics),
       },
       {
         path: 'strategies/new',
