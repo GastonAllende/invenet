@@ -23,7 +23,14 @@
       "@invenet/dashboard": ["libs/dashboard/src/index.ts"],
       "@invenet/shared-util-auth": ["libs/shared/util-auth/src/index.ts"],
       "@invenet/auth-data-access": ["libs/auth/data-access/src/index.ts"],
-      "@invenet/auth-feature": ["libs/auth/feature/src/index.ts"]
+      "@invenet/auth-feature": ["libs/auth/feature/src/index.ts"],
+      "@invenet/shared-ui-layout": ["libs/shared/ui-layout/src/index.ts"],
+      "@invenet/shared-feature-shell": [
+        "libs/shared/feature-shell/src/index.ts"
+      ],
+      "@invenet/trade-feature": ["libs/trade/feature/src/index.ts"],
+      "@invenet/trade-data-access": ["libs/trade/data-access/src/index.ts"],
+      "@invenet/trade-ui": ["libs/trade/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

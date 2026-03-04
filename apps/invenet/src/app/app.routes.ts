@@ -1,6 +1,5 @@
 import { Route } from '@angular/router';
 import { authGuard } from '@invenet/shared-util-auth';
-import { AppLayout } from './layout/component/app.layout';
 
 export const appRoutes: Route[] = [
   {
@@ -8,7 +7,17 @@ export const appRoutes: Route[] = [
     loadChildren: () =>
       import('@invenet/auth-feature').then((m) => m.AUTH_ROUTES),
   },
+
   {
+    path: '',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('@invenet/shared-feature-shell').then(
+        (m) => m.sharedFeatureShellRoutes,
+      ),
+  },
+
+  /*   {
     path: '',
     component: AppLayout,
     canActivate: [authGuard],
@@ -84,6 +93,7 @@ export const appRoutes: Route[] = [
         data: { accountMode: 'list' },
       },
     ],
-  },
+  }, */
+
   { path: '**', redirectTo: '' },
 ];
