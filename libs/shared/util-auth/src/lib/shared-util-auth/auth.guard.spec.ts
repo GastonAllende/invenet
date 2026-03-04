@@ -7,7 +7,7 @@ import {
   UrlTree,
 } from '@angular/router';
 import { authGuard } from './auth.guard';
-import { AuthService } from './auth.service';
+import { AuthService } from '@invenet/auth-data-access';
 
 class AuthServiceStub {
   authenticated = false;
@@ -45,6 +45,6 @@ describe('authGuard', () => {
     authService.authenticated = false;
     const result = TestBed.runInInjectionContext(() => authGuard(route, state));
     expect(result instanceof UrlTree).toBe(true);
-    expect(router.serializeUrl(result as UrlTree)).toBe('/login');
+    expect(router.serializeUrl(result as UrlTree)).toBe('/auth/login');
   });
 });

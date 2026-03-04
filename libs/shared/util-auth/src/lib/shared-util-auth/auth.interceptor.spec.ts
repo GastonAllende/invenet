@@ -11,7 +11,7 @@ import {
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { authInterceptor } from './auth.interceptor';
-import { AuthService } from './auth.service';
+import { AuthService } from '@invenet/auth-data-access';
 
 class AuthServiceStub {
   token: string | null = 'token-123';

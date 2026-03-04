@@ -1,17 +1,12 @@
 import { Route } from '@angular/router';
-import { TradeShellComponent } from './trade-feature/trade-shell/trade-shell.component';
+import { TradeListPage } from './trade-list-page/trade-list.page';
+import { TradeNewPage } from './trade-new-page/trade-new.page';
+import { TradeEditPage } from './trade-edit-page/trade-edit.page';
+import { TradeDetailPage } from './trade-detail-page/trade-detail.page';
 
 export const tradeFeatureRoutes: Route[] = [
-  { path: '', component: TradeShellComponent, data: { journalMode: 'list' } },
-  { path: 'new', component: TradeShellComponent, data: { journalMode: 'new' } },
-  {
-    path: ':id/edit',
-    component: TradeShellComponent,
-    data: { journalMode: 'edit' },
-  },
-  {
-    path: ':id',
-    component: TradeShellComponent,
-    data: { journalMode: 'detail' },
-  },
+  { path: '', component: TradeListPage },
+  { path: 'new', component: TradeNewPage },
+  { path: ':id/edit', component: TradeEditPage },
+  { path: ':id', component: TradeDetailPage },
 ];
