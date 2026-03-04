@@ -11,6 +11,13 @@ export const sharedFeatureShellRoutes: Route[] = [
         loadChildren: () =>
           import('@invenet/trade-feature').then((m) => m.tradeFeatureRoutes),
       },
+      {
+        path: 'strategies',
+        loadChildren: () =>
+          import('@invenet/strategy-feature').then(
+            (m) => m.strategyFeatureRoutes,
+          ),
+      },
     ],
   },
 ];

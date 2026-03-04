@@ -5,7 +5,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { AccountsStore, ActiveAccountStore } from '@invenet/accounts';
-import { StrategiesStore } from '@invenet/strategies';
+import { StrategiesStore } from '@invenet/strategy-data-access';
 import {
   TradeFilters,
   TradesStore,

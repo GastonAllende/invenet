@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { AccountsStore, ActiveAccountStore } from '@invenet/accounts';
-import { StrategiesStore } from '@invenet/strategies';
+import { StrategiesStore } from '@invenet/strategy-data-access';
 import {
   CreateTradeRequest,
   TradesStore,

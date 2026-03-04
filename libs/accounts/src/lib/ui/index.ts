@@ -1,2 +1,2 @@
-export { AccountFormComponent } from './lib/ui/account-form/account-form.component';
-export { AccountListComponent } from './lib/ui/account-list/account-list.component';
+export { AccountFormComponent } from './account-form/account-form.component';
+export { AccountListComponent } from './account-list/account-list.component';

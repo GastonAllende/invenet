@@ -15,7 +15,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
-import { StrategiesApiService } from '@invenet/strategies';
+import { StrategiesApiService } from '@invenet/strategy-data-access';
 import {
   CreateTradeRequest,
   Trade,

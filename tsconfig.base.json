@@ -30,7 +30,12 @@
       ],
       "@invenet/trade-feature": ["libs/trade/feature/src/index.ts"],
       "@invenet/trade-data-access": ["libs/trade/data-access/src/index.ts"],
-      "@invenet/trade-ui": ["libs/trade/ui/src/index.ts"]
+      "@invenet/trade-ui": ["libs/trade/ui/src/index.ts"],
+      "@invenet/strategy-data-access": [
+        "libs/strategy/data-access/src/index.ts"
+      ],
+      "@invenet/strategy-ui": ["libs/strategy/ui/src/index.ts"],
+      "@invenet/strategy-feature": ["libs/strategy/feature/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
