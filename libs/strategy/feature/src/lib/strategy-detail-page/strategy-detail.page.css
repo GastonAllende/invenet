@@ -142,10 +142,6 @@
   color: var(--text-color);
 }
 
-.inline-notice {
-  margin-top: -0.25rem;
-}
-
 .rules-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -182,12 +178,21 @@
   font-weight: 700;
 }
 
-:host ::ng-deep .strategy-history-table .p-datatable-tbody > tr > td:last-child {
+:host
+  ::ng-deep
+  .strategy-history-table
+  .p-datatable-tbody
+  > tr
+  > td:last-child {
   text-align: center;
 }
 
 :host ::ng-deep .strategy-history-table .p-datatable-tbody > tr:hover {
-  background: color-mix(in srgb, var(--surface-card) 92%, var(--primary-color) 8%);
+  background: color-mix(
+    in srgb,
+    var(--surface-card) 92%,
+    var(--primary-color) 8%
+  );
 }
 
 @media (max-width: 768px) {
@@ -198,9 +203,5 @@
   .strategy-actions {
     width: 100%;
     justify-content: flex-start;
-  }
-
-  .strategy-meta-separator {
-    display: none;
   }
 }

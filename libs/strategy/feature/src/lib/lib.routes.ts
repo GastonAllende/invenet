@@ -1,25 +1,12 @@
 import { Route } from '@angular/router';
-import { StrategyShellComponent } from './strategy-shell/strategy-shell.component';
+import { StrategyListPage } from './strategy-list-page/strategy-list.page';
+import { StrategyNewPage } from './strategy-new-page/strategy-new.page';
+import { StrategyDetailPage } from './strategy-detail-page/strategy-detail.page';
+import { StrategyEditPage } from './strategy-edit-page/strategy-edit.page';
 
 export const strategyFeatureRoutes: Route[] = [
-  {
-    path: '',
-    component: StrategyShellComponent,
-    data: { strategyMode: 'list' },
-  },
-  {
-    path: 'new',
-    component: StrategyShellComponent,
-    data: { strategyMode: 'new' },
-  },
-  {
-    path: ':id',
-    component: StrategyShellComponent,
-    data: { strategyMode: 'detail' },
-  },
-  {
-    path: ':id/edit',
-    component: StrategyShellComponent,
-    data: { strategyMode: 'edit' },
-  },
+  { path: '', component: StrategyListPage },
+  { path: 'new', component: StrategyNewPage },
+  { path: ':id/edit', component: StrategyEditPage },
+  { path: ':id', component: StrategyDetailPage },
 ];
