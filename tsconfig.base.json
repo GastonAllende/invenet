@@ -35,7 +35,10 @@
         "libs/strategy/data-access/src/index.ts"
       ],
       "@invenet/strategy-ui": ["libs/strategy/ui/src/index.ts"],
-      "@invenet/strategy-feature": ["libs/strategy/feature/src/index.ts"]
+      "@invenet/strategy-feature": ["libs/strategy/feature/src/index.ts"],
+      "@invenet/account-data-access": ["libs/account/data-access/src/index.ts"],
+      "@invenet/account-ui": ["libs/account/ui/src/index.ts"],
+      "@invenet/account-feature": ["libs/account/feature/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

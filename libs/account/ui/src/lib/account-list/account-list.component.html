@@ -1,0 +1,157 @@
+<div class="account-list-container">
+  <div class="list-header">
+    <h3>Accounts</h3>
+    <div class="list-controls">
+      <p-button
+        label="Create Account"
+        icon="pi pi-plus"
+        (onClick)="onCreate()"
+        [disabled]="isLoading()"
+      ></p-button>
+      <div class="archived-toggle">
+        <p-checkbox
+          [ngModel]="includeArchived()"
+          (ngModelChange)="onIncludeArchivedChange($event)"
+          [binary]="true"
+          inputId="includeArchived"
+        ></p-checkbox>
+        <label for="includeArchived">Show archived</label>
+      </div>
+    </div>
+  </div>
+
+  <p-table
+    [value]="accounts()"
+    [tableStyle]="{ 'min-width': '60rem' }"
+    styleClass="p-datatable-striped"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} accounts"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="name">
+          Name <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="broker">
+          Broker <p-sortIcon field="broker"></p-sortIcon>
+        </th>
+        <th pSortableColumn="accountType">
+          Type <p-sortIcon field="accountType"></p-sortIcon>
+        </th>
+        <th pSortableColumn="baseCurrency">Currency</th>
+        <th>Risk Per Trade</th>
+        <th>Max Daily Loss</th>
+        <th pSortableColumn="isActive">
+          Status <p-sortIcon field="isActive"></p-sortIcon>
+        </th>
+        <th style="width: 14rem">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-account>
+      <tr
+        (click)="onRowSelect(account)"
+        style="cursor: pointer"
+        [class.active-row]="isActiveAccount(account.id)"
+      >
+        <td>
+          <strong>{{ account.name }}</strong>
+          @if (isActiveAccount(account.id)) {
+            <p-tag value="Active Account" severity="success"></p-tag>
+          }
+        </td>
+        <td>{{ account.broker }}</td>
+        <td>
+          <span class="account-type-badge">{{ account.accountType }}</span>
+        </td>
+        <td>{{ account.baseCurrency }}</td>
+        <td>
+          @if (account.riskSettings) {
+            <span>{{ account.riskSettings.riskPerTradePct }}%</span>
+          } @else {
+            <span class="no-risk">—</span>
+          }
+        </td>
+        <td>
+          @if (account.riskSettings) {
+            <span>{{ account.riskSettings.maxDailyLossPct }}%</span>
+          } @else {
+            <span class="no-risk">—</span>
+          }
+        </td>
+        <td>
+          <p-tag
+            [value]="getStatusLabel(account.isActive)"
+            [severity]="getSeverity(account.isActive)"
+          ></p-tag>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <p-button
+              icon="pi pi-eye"
+              [rounded]="true"
+              [text]="true"
+              severity="info"
+              [disabled]="isLoading()"
+              (onClick)="onView(account.id); $event.stopPropagation()"
+              pTooltip="View"
+              tooltipPosition="top"
+            ></p-button>
+            @if (!isActiveAccount(account.id)) {
+              <p-button
+                icon="pi pi-star"
+                [rounded]="true"
+                [text]="true"
+                severity="help"
+                [disabled]="isLoading()"
+                (onClick)="onSetActive(account.id); $event.stopPropagation()"
+                pTooltip="Set Active"
+                tooltipPosition="top"
+              ></p-button>
+            }
+            @if (account.isActive) {
+              <p-button
+                icon="pi pi-folder"
+                [rounded]="true"
+                [text]="true"
+                severity="warn"
+                [disabled]="isLoading()"
+                (onClick)="onArchive(account.id); $event.stopPropagation()"
+                pTooltip="Archive"
+                tooltipPosition="top"
+              ></p-button>
+            } @else {
+              <p-button
+                icon="pi pi-replay"
+                [rounded]="true"
+                [text]="true"
+                severity="contrast"
+                [disabled]="isLoading()"
+                (onClick)="onUnarchive(account.id); $event.stopPropagation()"
+                pTooltip="Unarchive"
+                tooltipPosition="top"
+              ></p-button>
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="empty-message">
+          <div class="empty-state">
+            <i class="pi pi-inbox" style="font-size: 3rem"></i>
+            <p>No accounts found</p>
+            @if (!includeArchived()) {
+              <small>Try enabling "Show Archived" to see all accounts</small>
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
