@@ -32,11 +32,11 @@ export class AppMenu {
       {
         label: 'Invenet',
         items: [
-          {
+          /*        {
             label: 'Analytics',
             icon: 'pi pi-fw pi-chart-bar',
             routerLink: ['/analytics'],
-          },
+          }, */
           {
             label: 'Journal',
             icon: 'pi pi-fw pi-table',

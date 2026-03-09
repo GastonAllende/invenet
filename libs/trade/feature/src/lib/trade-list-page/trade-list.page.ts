@@ -4,7 +4,10 @@ import { CommonModule } from '@angular/common';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
-import { AccountsStore, ActiveAccountStore } from '@invenet/accounts';
+import {
+  AccountsStore,
+  ActiveAccountStore,
+} from '@invenet/account-data-access';
 import { StrategiesStore } from '@invenet/strategy-data-access';
 import {
   TradeFilters,

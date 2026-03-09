@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
-import { AccountsStore } from '@invenet/accounts';
+import { AccountsStore } from '@invenet/account-data-access';
 import { TradesStore } from '@invenet/trade-data-access';
 import { TradeDetailComponent } from '@invenet/trade-ui';
 

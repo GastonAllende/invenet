@@ -15,7 +15,10 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-import { AccountsStore, ActiveAccountStore } from '@invenet/accounts';
+import {
+  AccountsStore,
+  ActiveAccountStore,
+} from '@invenet/account-data-access';
 import {
   StrategiesApiService,
   StrategiesStore,

@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  effect,
-  inject,
-  Injector,
-  signal,
-} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -15,6 +8,8 @@ import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@invenet/auth-data-access';
 import { QuickTradeService } from '@invenet/trade-data-access';
+import { AccountsStore } from '@invenet/account-data-access';
+import { ActiveAccountStore } from '@invenet/account-data-access';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from './service/layout.service';
 
@@ -144,8 +139,7 @@ import { LayoutService } from './service/layout.service';
     </div>
   </div>`,
 })
-export class AppTopbar implements OnInit {
-  private readonly injector = inject(Injector);
+export class AppTopbar {
   items!: MenuItem[];
   profileMenuItems: MenuItem[] = [
     {
@@ -159,67 +153,21 @@ export class AppTopbar implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly quickTradeService = inject(QuickTradeService);
   private readonly router = inject(Router);
-  private accountsStore: {
-    activeAccounts: () => Array<{ id: string; name: string }>;
-    loadAccounts: (params: { includeArchived: boolean }) => void;
-    setActiveAccountOnServer: (id: string) => void;
-  } | null = null;
-  private activeAccountStore: {
-    activeAccountId: () => string | null;
-    initializeFromStorage: () => void;
-    setActiveAccount: (id: string) => void;
-  } | null = null;
+  private readonly accountsStore = inject(AccountsStore);
+  private readonly activeAccountStore = inject(ActiveAccountStore);
 
-  readonly accountOptions = signal<Array<{ id: string; name: string }>>([]);
-  readonly activeAccountId = signal<string | null>(null);
+  readonly accountOptions = this.accountsStore.activeAccounts;
+  readonly activeAccountId = this.activeAccountStore.activeAccountId;
 
-  ngOnInit(): void {
-    void this.initializeAccountsContext();
+  constructor() {
+    this.activeAccountStore.initializeFromStorage();
+    this.accountsStore.loadAccounts({ includeArchived: false });
   }
 
   onActiveAccountChange(accountId: string | null): void {
-    if (!accountId || !this.activeAccountStore || !this.accountsStore) {
-      return;
-    }
-
+    if (!accountId) return;
     this.activeAccountStore.setActiveAccount(accountId);
     this.accountsStore.setActiveAccountOnServer(accountId);
-  }
-
-  private async initializeAccountsContext(): Promise<void> {
-    const accountsModule = await import('@invenet/accounts');
-
-    this.accountsStore = this.injector.get(accountsModule.AccountsStore) as {
-      activeAccounts: () => Array<{ id: string; name: string }>;
-      loadAccounts: (params: { includeArchived: boolean }) => void;
-      setActiveAccountOnServer: (id: string) => void;
-    };
-    this.activeAccountStore = this.injector.get(
-      accountsModule.ActiveAccountStore,
-    ) as {
-      activeAccountId: () => string | null;
-      initializeFromStorage: () => void;
-      setActiveAccount: (id: string) => void;
-    };
-
-    this.activeAccountStore.initializeFromStorage();
-    this.accountsStore.loadAccounts({ includeArchived: false });
-
-    effect(
-      () => {
-        if (!this.accountsStore || !this.activeAccountStore) {
-          return;
-        }
-
-        this.accountOptions.set(
-          this.accountsStore
-            .activeAccounts()
-            .map((account) => ({ id: account.id, name: account.name })),
-        );
-        this.activeAccountId.set(this.activeAccountStore.activeAccountId());
-      },
-      { injector: this.injector, allowSignalWrites: true },
-    );
   }
 
   toggleDarkMode() {
