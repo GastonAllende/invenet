@@ -1,16 +1,16 @@
 {
-  "name": "dashboard",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/dashboard/src",
+  "name": "dashboard-ui",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/dashboard/ui/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": [],
+  "tags": ["scope:dashboard", "type:ui"],
   "targets": {
     "test": {
       "executor": "@nx/vitest:test",
       "outputs": ["{options.reportsDirectory}"],
       "options": {
-        "reportsDirectory": "../../coverage/libs/dashboard"
+        "reportsDirectory": "../../../coverage/libs/dashboard/ui"
       }
     },
     "lint": {

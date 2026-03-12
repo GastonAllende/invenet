@@ -40,38 +40,93 @@ cd apps/Invenet.Api
  dotnet watch run
 ```
 
-## Core Stack (Short)
+## Core Stack
 
-- Frontend: Angular 21.1 (Nx workspace)
-- UI library: PrimeNG
-- State management: NgRx SignalStore (`@ngrx/signals`)
-- Backend: ASP.NET Core (.NET 10) + Entity Framework Core
-  - **Architecture**: Modular Monolith (see `docs/backend/MODULAR_MONOLITH.md`)
-  - **Modules**: Auth, Trades, Health, Shared, Accounts
-- Database: PostgreSQL
+### Frontend
+- **Angular 21.1** (Nx monorepo workspace)
+- **PrimeNG** - UI component library (always check PrimeNG before building custom UI)
+- **NgRx SignalStore** (`@ngrx/signals`) - State management
+- **Vitest** - Unit testing
+- **Playwright** - E2E testing
+- **Tailwind CSS** - Styling
 
-## Libraries
+### Backend
+- **ASP.NET Core (.NET 10)** + Entity Framework Core
+- **Modular Monolith Architecture** (see `docs/backend/MODULAR_MONOLITH.md`)
+- **PostgreSQL** - Database
+- **JWT Authentication** - Token-based auth
+- **Swagger/OpenAPI** - API documentation
+- **Modules**: Auth, Trades, Accounts, Health, Shared (auto-discovered at startup)
 
-The project is broken into feature libraries under `libs/`.
+## Libraries (Nx Domain-Driven Design)
 
-- **To understand a feature**: Look at its `README.md` (e.g., `libs/trades/README.md`)
-- **Structure**: Each library generally contains its components, models, and NgRx SignalStore services
-- **Backend**: Corresponding backend features are found in `apps/api/Invenet.Api/Modules/<ModuleName>/`
+The project uses **feature-sliced libraries** under `libs/`. Each domain has 4 library types:
 
-## Common Tasks
+### Library Types
+
+| Type | Purpose | Can Depend On |
+|------|---------|---------------|
+| **feature** | Routed pages, smart/container components | data-access, ui, util (same domain) + core |
+| **data-access** | SignalStores, API services, repositories | util (same domain) + core |
+| **ui** | Presentational/dumb components | util (same domain) + core |
+| **util** | Pure helper functions, pipes, validators | Nothing (pure utilities) |
+
+**Key Rule**: No cross-domain feature dependencies (e.g., `trades-feature` → `dashboard-feature`)
+
+### Working with Libraries
+
+- **To understand a feature**: Look at its `README.md` (e.g., `libs/trade/README.md`)
+- **Backend**: Corresponding modules are in `apps/api/Invenet.Api/Modules/<ModuleName>/`
+- **Import from library's public API**: `import { TradeStore } from '@invenet/trade/data-access';`
+- **Never import from internal paths**: Don't use `src/lib/` in imports
+
+## Common Commands
+
+### Development (Run from Repo Root)
 
 ```bash
-# Frontend
-npx nx build invenet --configuration=production
-npx nx test invenet
-npx nx lint invenet
+# Run both frontend and backend
+npm run dev
 
-# Backend
-cd apps/Invenet.Api
- dotnet test
+# Frontend only
+npx nx serve invenet
 
-# E2E
-npx nx e2e invenet-e2e
+# Backend only
+cd apps/api/Invenet.Api
+dotnet watch run
+```
+
+### Frontend (Nx Commands)
+
+```bash
+npx nx serve invenet                    # Dev server
+npx nx build invenet --configuration=production  # Production build
+npx nx test invenet                     # Unit tests (Vitest)
+npx nx lint invenet                     # Linting
+npx nx e2e invenet-e2e                  # E2E tests (Playwright)
+
+# Affected commands (only changed code)
+npx nx affected:test
+npx nx affected:build
+npx nx affected:lint
+
+# Visualize project dependencies
+npx nx graph
+```
+
+### Backend (.NET Commands)
+
+```bash
+# From apps/api/Invenet.Api/
+dotnet watch run              # Dev with hot reload
+dotnet test                   # Run tests
+dotnet ef database update     # Apply migrations
+dotnet ef migrations add <name>  # Create migration
+```
+
+### Playwright
+
+```bash
 # Install browsers if missing
 npx playwright install
 ```
@@ -87,16 +142,39 @@ npx playwright install
 
 ## Workflow & Constraints
 
-- Run Nx commands from repo root.
-- Keep changes scoped and minimal.
-- Avoid editing generated files.
-- Run tests relevant to the change only.
+- Run Nx commands from repo root
+- Keep changes scoped and minimal
+- Avoid editing generated files
+- Run tests relevant to the change only
+
+## Critical Conventions
+
+### Frontend
+- **Standalone components only** - No NgModules (default in Angular 20+)
+- **Use `inject()` instead of constructor DI** - `private service = inject(Service)`
+- **Signals for state** - Use `signal()`, `computed()` for local state, SignalStore for shared
+- **Native control flow** - Use `@if`, `@for` NOT `*ngIf`, `*ngFor`
+- **OnPush change detection** - Set on all components
+- **Class/style bindings** - Use `[class]` and `[style]`, NOT `ngClass`/`ngStyle`
+- **No arrow functions in templates** - Not supported by Angular
+
+### Backend
+- **Modules are self-contained** - No direct module-to-module references
+- **Use `AsNoTracking()`** - For read-only queries
+- **Vertical slice organization** - Features organized by use case (e.g., `Register/`, `Login/`)
+- **Schema per module** - Each module uses its own database schema
 
 ## CI Reference
 
 - Frontend: lint, test, build (Nx)
 - Backend: `dotnet restore`, `dotnet build`, `dotnet test`
 - E2E: `npx nx e2e invenet-e2e`
+
+## Configuration
+
+- **JWT, Database, SendGrid**: `apps/api/Invenet.Api/appsettings*.json` or user secrets
+- **Frontend environments**: `apps/invenet/src/environments/`
+- **Nx config**: `nx.json`
 
 ## Troubleshooting (Top 5)
 

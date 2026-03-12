@@ -25,6 +25,13 @@ export const sharedFeatureShellRoutes: Route[] = [
             (m) => m.accountFeatureRoutes,
           ),
       },
+      {
+        path: '',
+        loadChildren: () =>
+          import('@invenet/dashboard-feature').then(
+            (m) => m.dashboardFeatureRoutes,
+          ),
+      },
     ],
   },
 ];

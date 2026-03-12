@@ -20,7 +20,6 @@
       "@invenet/accounts": ["libs/accounts/src/index.ts"],
       "@invenet/strategies": ["libs/strategies/src/index.ts"],
       "@invenet/core": ["libs/core/src/index.ts"],
-      "@invenet/dashboard": ["libs/dashboard/src/index.ts"],
       "@invenet/shared-util-auth": ["libs/shared/util-auth/src/index.ts"],
       "@invenet/auth-data-access": ["libs/auth/data-access/src/index.ts"],
       "@invenet/auth-feature": ["libs/auth/feature/src/index.ts"],
@@ -38,7 +37,9 @@
       "@invenet/strategy-feature": ["libs/strategy/feature/src/index.ts"],
       "@invenet/account-data-access": ["libs/account/data-access/src/index.ts"],
       "@invenet/account-ui": ["libs/account/ui/src/index.ts"],
-      "@invenet/account-feature": ["libs/account/feature/src/index.ts"]
+      "@invenet/account-feature": ["libs/account/feature/src/index.ts"],
+      "@invenet/dashboard-feature": ["libs/dashboard/feature/src/index.ts"],
+      "@invenet/dashboard-ui": ["libs/dashboard/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
