@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "npx nx run-many -t serve -p invenet invenet-api --parallel",
     "api": "npx nx serve invenet-api",
-    "web": "npx nx serve invenet"
+    "web": "npx nx serve invenet",
+    "test": "npx nx run-many -t test --parallel --exclude=invenet.API"
   },
   "private": true,
   "dependencies": {
