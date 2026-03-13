@@ -1,12 +1,14 @@
 {
-  "name": "@invenet/source",
+  "name": "invenet-workspace",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
     "dev": "npx nx run-many -t serve -p invenet invenet-api --parallel",
     "api": "npx nx serve invenet-api",
     "web": "npx nx serve invenet",
-    "test": "npx nx run-many -t test --parallel --exclude=invenet.API"
+    "test": "npx nx run-many -t test --parallel --exclude=invenet-api,invenet-workspace",
+    "test-effected": "npx nx affected -t test --exclude=invenet-api,invenet-workspace",
+    "lint-test-build": "npx nx affected -t lint test build --exclude=invenet-api,invenet-workspace,core"
   },
   "private": true,
   "dependencies": {
