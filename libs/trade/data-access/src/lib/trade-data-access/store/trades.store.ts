@@ -1,6 +1,11 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { addEntity, setAllEntities, updateEntity, withEntities } from '@ngrx/signals/entities';
+import {
+  addEntity,
+  setAllEntities,
+  updateEntity,
+  withEntities,
+} from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { EMPTY, catchError, of, pipe, switchMap, tap } from 'rxjs';
 import type {
@@ -197,6 +202,13 @@ export const TradesStore = signalStore(
 
     closeQuickModal(): void {
       patchState(store, { isQuickModalOpen: false });
+    },
+
+    selectTradeDetail(id: string): void {
+      const cached = store.entityMap()[id];
+      if (cached) {
+        patchState(store, { selectedTradeDetail: cached });
+      }
     },
 
     clearSelectedTradeDetail(): void {

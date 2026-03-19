@@ -43,7 +43,7 @@ export interface CreateTradeRequest {
   accountId: string;
   strategyId?: string;
   strategyVersionId?: string;
-  direction: TradeDirection;
+  direction: TradeDirection | string;
   openedAt: string;
   symbol: string;
   entryPrice: number;
@@ -54,13 +54,13 @@ export interface CreateTradeRequest {
   pnl?: number;
   tags?: string[];
   notes?: string;
-  status?: TradeStatus;
+  status?: TradeStatus | string;
 }
 
 export interface UpdateTradeRequest {
   strategyId?: string;
   strategyVersionId?: string;
-  direction: TradeDirection;
+  direction: TradeDirection | string;
   openedAt: string;
   symbol: string;
   entryPrice: number;
@@ -71,7 +71,7 @@ export interface UpdateTradeRequest {
   pnl?: number;
   tags?: string[];
   notes?: string;
-  status: TradeStatus;
+  status: TradeStatus | string;
 }
 export type TradeDetail = Trade;
 export type TradeResponse = Trade;

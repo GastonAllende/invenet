@@ -56,9 +56,6 @@ export class TradeNewPage {
   error = this.store.error;
 
   constructor() {
-    this.accountsStore.loadAccounts({ includeArchived: false });
-    this.strategiesStore.loadStrategies({ includeArchived: false });
-
     effect(() => {
       const savedId = this.store.lastSavedId();
       if (!savedId) return;

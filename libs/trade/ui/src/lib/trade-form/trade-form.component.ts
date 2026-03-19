@@ -15,7 +15,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
-import { StrategiesApiService } from '@invenet/strategy-data-access';
+import { StrategiesStore } from '@invenet/strategy-data-access';
 import {
   CreateTradeRequest,
   Trade,
@@ -46,7 +46,7 @@ interface SelectOption {
 })
 export class TradeFormComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly strategiesApiService = inject(StrategiesApiService);
+  private readonly strategiesStore = inject(StrategiesStore);
   private isPatchingStrategy = false;
   private initialStrategyId: string | null = null;
 
@@ -74,7 +74,7 @@ export class TradeFormComponent {
     accountId: ['', Validators.required],
     strategyId: [null as string | null],
     strategyVersionId: [null as string | null],
-    direction: this.fb.control<'Long' | 'Short'>('Long', Validators.required),
+    direction: ['Long', Validators.required],
     openedAt: [new Date(), Validators.required],
     closedAt: [null as Date | null],
     symbol: ['', [Validators.required, Validators.maxLength(20)]],
@@ -88,11 +88,12 @@ export class TradeFormComponent {
     pnl: [null as number | null],
     tags: [''],
     notes: [''],
-    status: this.fb.control<'Open' | 'Closed'>('Open', Validators.required),
+    status: ['Open', Validators.required],
   });
 
   constructor() {
     effect(() => {
+      console.log('Trade input changed:', this.trade());
       const t = this.trade();
       if (t && this.mode() === 'edit') {
         this.initialStrategyId = t.strategyId;
@@ -140,6 +141,8 @@ export class TradeFormComponent {
       const exitPrice = this.form.controls.exitPrice;
       const closedAt = this.form.controls.closedAt;
 
+      console.log('Status changed to:', status);
+
       if (status === 'Closed') {
         exitPrice.setValidators([Validators.required, Validators.min(0.0001)]);
         closedAt.setValidators([Validators.required]);
@@ -180,19 +183,17 @@ export class TradeFormComponent {
           return;
         }
 
-        this.strategiesApiService.get(strategyId).subscribe({
-          next: (strategy) => {
-            this.form.controls.strategyVersionId.setValue(
-              strategy.currentVersion?.id ?? null,
-            );
-            this.initialStrategyId = strategyId;
-          },
-          error: () => {
-            this.isPatchingStrategy = true;
-            this.form.controls.strategyId.setValue(this.initialStrategyId);
-            this.isPatchingStrategy = false;
-          },
-        });
+        const strategy = this.strategiesStore.entityMap()[strategyId];
+        if (strategy) {
+          this.form.controls.strategyVersionId.setValue(
+            strategy.currentVersion?.id ?? null,
+          );
+          this.initialStrategyId = strategyId;
+        } else {
+          this.isPatchingStrategy = true;
+          this.form.controls.strategyId.setValue(this.initialStrategyId);
+          this.isPatchingStrategy = false;
+        }
       });
   }
 

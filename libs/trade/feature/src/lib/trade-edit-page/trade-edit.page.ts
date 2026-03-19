@@ -61,11 +61,11 @@ export class TradeEditPage {
   error = this.store.error;
 
   constructor() {
-    this.accountsStore.loadAccounts({ includeArchived: false });
-    this.strategiesStore.loadStrategies({ includeArchived: false });
-
     if (this.tradeId) {
-      this.store.loadTradeDetail(this.tradeId);
+      this.store.selectTradeDetail(this.tradeId);
+      if (!this.store.entityMap()[this.tradeId]) {
+        this.store.loadTradeDetail(this.tradeId);
+      }
     }
 
     effect(() => {
@@ -82,12 +82,13 @@ export class TradeEditPage {
   }
 
   onSaveTrade(payload: CreateTradeRequest | UpdateTradeRequest): void {
+    console.log('Saving trade with payload:', payload);
+
     if (!this.tradeId) return;
     this.store.updateTrade({
       id: this.tradeId,
       request: payload as UpdateTradeRequest,
     });
-    void this.router.navigateByUrl(`/journal/${this.tradeId}`);
   }
 
   onCancel(): void {

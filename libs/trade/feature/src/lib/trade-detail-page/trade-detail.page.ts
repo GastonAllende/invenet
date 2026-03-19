@@ -47,10 +47,11 @@ export class TradeDetailPage {
   accounts = this.accountsStore.activeAccounts;
 
   constructor() {
-    this.accountsStore.loadAccounts({ includeArchived: false });
-
     if (this.tradeId) {
-      this.store.loadTradeDetail(this.tradeId);
+      this.store.selectTradeDetail(this.tradeId);
+      if (!this.store.entityMap()[this.tradeId]) {
+        this.store.loadTradeDetail(this.tradeId);
+      }
     }
   }
 
