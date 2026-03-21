@@ -47,7 +47,7 @@ public sealed class StrategiesController : ControllerBase
       return Unauthorized(new { message = "Invalid or missing user claim" });
     }
 
-    var query = _context.Strategies.AsNoTracking().Where(s => s.UserId == userId);
+    var query = _context.Set<Strategy>().AsNoTracking().Where(s => s.UserId == userId);
     if (!includeArchived)
     {
       query = query.Where(s => !s.IsArchived);
@@ -63,7 +63,7 @@ public sealed class StrategiesController : ControllerBase
             s.IsArchived,
             s.CreatedAt,
             s.UpdatedAt,
-            _context.StrategyVersions
+            _context.Set<StrategyVersion>()
                 .Where(v => v.StrategyId == s.Id)
                 .OrderByDescending(v => v.VersionNumber)
                 .Select(v => new CurrentVersionSummary(v.Id, v.VersionNumber, v.CreatedAt, v.Timeframe))
@@ -82,7 +82,7 @@ public sealed class StrategiesController : ControllerBase
       return Unauthorized(new { message = "Invalid or missing user claim" });
     }
 
-    var strategy = await _context.Strategies
+    var strategy = await _context.Set<Strategy>()
         .AsNoTracking()
         .Where(s => s.Id == id && s.UserId == userId)
         .Select(s => new
@@ -109,7 +109,7 @@ public sealed class StrategiesController : ControllerBase
     StrategyVersionDetail? currentVersion;
     if (version.HasValue)
     {
-      currentVersion = await _context.StrategyVersions
+      currentVersion = await _context.Set<StrategyVersion>()
           .AsNoTracking()
           .Where(v => v.StrategyId == id && v.VersionNumber == version.Value)
           .Select(v => new StrategyVersionDetail(
@@ -127,7 +127,7 @@ public sealed class StrategiesController : ControllerBase
     }
     else
     {
-      currentVersion = await _context.StrategyVersions
+      currentVersion = await _context.Set<StrategyVersion>()
           .AsNoTracking()
           .Where(v => v.StrategyId == id)
           .OrderByDescending(v => v.VersionNumber)
@@ -184,7 +184,7 @@ public sealed class StrategiesController : ControllerBase
       return BadRequest(new { message = "EntryRules, ExitRules and RiskRules are required" });
     }
 
-    var exists = await _context.Strategies
+    var exists = await _context.Set<Strategy>()
         .AnyAsync(s => s.UserId == userId && s.Name == trimmedName);
 
     if (exists)
@@ -233,8 +233,8 @@ public sealed class StrategiesController : ControllerBase
         CreatedByUserId = userId,
       };
 
-      _context.Strategies.Add(strategy);
-      _context.StrategyVersions.Add(version);
+      _context.Set<Strategy>().Add(strategy);
+      _context.Set<StrategyVersion>().Add(version);
       await _context.SaveChangesAsync();
       await tx.CommitAsync();
     });
@@ -282,7 +282,7 @@ public sealed class StrategiesController : ControllerBase
     {
       await using var tx = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
 
-      var strategy = await _context.Strategies.FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+      var strategy = await _context.Set<Strategy>().FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
       if (strategy == null)
       {
         failureResult = NotFound(new { message = "Strategy not found" });
@@ -295,7 +295,7 @@ public sealed class StrategiesController : ControllerBase
         return;
       }
 
-      var latestVersionNumber = await _context.StrategyVersions
+      var latestVersionNumber = await _context.Set<StrategyVersion>()
           .Where(v => v.StrategyId == id)
           .Select(v => (int?)v.VersionNumber)
           .MaxAsync() ?? 0;
@@ -316,7 +316,7 @@ public sealed class StrategiesController : ControllerBase
       };
 
       strategy.UpdatedAt = now;
-      _context.StrategyVersions.Add(newVersion);
+      _context.Set<StrategyVersion>().Add(newVersion);
 
       await _context.SaveChangesAsync();
       await tx.CommitAsync();
@@ -352,7 +352,7 @@ public sealed class StrategiesController : ControllerBase
     {
       return Unauthorized(new { message = "Invalid or missing user claim" });
     }
-    var strategy = await _context.Strategies.FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+    var strategy = await _context.Set<Strategy>().FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
 
     if (strategy == null)
     {
@@ -373,7 +373,7 @@ public sealed class StrategiesController : ControllerBase
     {
       return Unauthorized(new { message = "Invalid or missing user claim" });
     }
-    var strategy = await _context.Strategies.FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+    var strategy = await _context.Set<Strategy>().FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
 
     if (strategy == null)
     {

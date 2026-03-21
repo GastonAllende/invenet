@@ -1,6 +1,3 @@
-using Invenet.Api.Modules.Accounts.Domain;
-using Invenet.Api.Modules.Strategies.Domain;
-using Invenet.Api.Modules.Trades.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Invenet.Api.Modules.Shared.Infrastructure.Data;
@@ -8,19 +5,13 @@ namespace Invenet.Api.Modules.Shared.Infrastructure.Data;
 /// <summary>
 /// Base DbContext that will be used by all modules.
 /// Each module can configure its own entities via IEntityTypeConfiguration.
+/// Access entity sets via Set&lt;T&gt;() — no typed DbSet properties to avoid coupling Shared to module domains.
 /// </summary>
 public class ModularDbContext : DbContext
 {
   public ModularDbContext(DbContextOptions<ModularDbContext> options) : base(options)
   {
   }
-
-  // DbSets for entities
-  public DbSet<Account> Accounts => Set<Account>();
-  public DbSet<AccountRiskSettings> AccountRiskSettings => Set<AccountRiskSettings>();
-  public DbSet<Strategy> Strategies => Set<Strategy>();
-  public DbSet<StrategyVersion> StrategyVersions => Set<StrategyVersion>();
-  public DbSet<Trade> Trades => Set<Trade>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

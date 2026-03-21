@@ -13,6 +13,7 @@ using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -23,6 +24,7 @@ namespace Invenet.Api.Modules.Auth.API;
 /// </summary>
 [ApiController]
 [Route("api/auth")]
+[EnableRateLimiting("auth")]
 public sealed class AuthController : ControllerBase
 {
   private readonly UserManager<ApplicationUser> _userManager;

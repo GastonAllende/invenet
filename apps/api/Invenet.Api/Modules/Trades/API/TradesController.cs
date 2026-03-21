@@ -1,5 +1,7 @@
 using System.Security.Claims;
+using Invenet.Api.Modules.Accounts.Domain;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
+using Invenet.Api.Modules.Strategies.Domain;
 using Invenet.Api.Modules.Trades.Domain;
 using Invenet.Api.Modules.Trades.Features.CreateTrade;
 using Invenet.Api.Modules.Trades.Features.GetTrade;
@@ -25,20 +27,21 @@ public sealed class TradesController : ControllerBase
     _logger = logger;
   }
 
-  private Guid GetCurrentUserId()
+  private bool TryGetCurrentUserId(out Guid userId)
   {
+    userId = Guid.Empty;
     var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+    if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var parsedUserId))
     {
-      throw new UnauthorizedAccessException("User ID not found in claims");
+      return false;
     }
-
-    return userId;
+    userId = parsedUserId;
+    return true;
   }
 
   private async Task<bool> AccountBelongsToUser(Guid accountId, Guid userId)
   {
-    return await _context.Accounts.AnyAsync(a => a.Id == accountId && a.UserId == userId);
+    return await _context.Set<Account>().AnyAsync(a => a.Id == accountId && a.UserId == userId);
   }
 
   private sealed record StrategyVersionInfo(Guid StrategyVersionId, Guid StrategyId, string StrategyName, int VersionNumber);
@@ -52,7 +55,7 @@ public sealed class TradesController : ControllerBase
 
     if (strategyVersionId.HasValue)
     {
-      var explicitVersion = await _context.StrategyVersions
+      var explicitVersion = await _context.Set<StrategyVersion>()
           .Where(sv => sv.Id == strategyVersionId.Value && sv.Strategy.UserId == userId)
           .Select(sv => new StrategyVersionInfo(sv.Id, sv.StrategyId, sv.Strategy.Name, sv.VersionNumber))
           .SingleOrDefaultAsync();
@@ -70,7 +73,7 @@ public sealed class TradesController : ControllerBase
       return null;
     }
 
-    return await _context.StrategyVersions
+    return await _context.Set<StrategyVersion>()
         .Where(sv => sv.StrategyId == strategyId!.Value && sv.Strategy.UserId == userId)
         .OrderByDescending(sv => sv.VersionNumber)
         .Select(sv => new StrategyVersionInfo(sv.Id, sv.StrategyId, sv.Strategy.Name, sv.VersionNumber))
@@ -86,7 +89,10 @@ public sealed class TradesController : ControllerBase
       [FromQuery] DateTime? dateTo,
       [FromQuery] bool includeArchived = false)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
     if (!accountId.HasValue)
     {
@@ -109,7 +115,7 @@ public sealed class TradesController : ControllerBase
       parsedStatus = parsed;
     }
 
-    var query = _context.Trades
+    var query = _context.Set<Trade>()
         .AsNoTracking()
         .Where(t => t.AccountId == accountId.Value);
 
@@ -169,9 +175,12 @@ public sealed class TradesController : ControllerBase
   [HttpGet("{id:guid}")]
   public async Task<ActionResult<GetTradeResponse>> Get(Guid id)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    var trade = await _context.Trades
+    var trade = await _context.Set<Trade>()
         .AsNoTracking()
         .Where(t => t.Id == id)
         .Select(t => new GetTradeResponse(
@@ -215,7 +224,10 @@ public sealed class TradesController : ControllerBase
   [HttpPost]
   public async Task<ActionResult<CreateTradeResponse>> Create([FromBody] CreateTradeRequest request)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
     if (!await AccountBelongsToUser(request.AccountId, userId))
     {
@@ -260,7 +272,7 @@ public sealed class TradesController : ControllerBase
       UpdatedAt = now
     };
 
-    _context.Trades.Add(trade);
+    _context.Set<Trade>().Add(trade);
     await _context.SaveChangesAsync();
 
     _logger.LogInformation("Trade created: {TradeId} ({Symbol}) for User {UserId}", trade.Id, trade.Symbol, userId);
@@ -292,9 +304,12 @@ public sealed class TradesController : ControllerBase
   [HttpPut("{id:guid}")]
   public async Task<ActionResult<UpdateTradeResponse>> Update(Guid id, [FromBody] UpdateTradeRequest request)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    var trade = await _context.Trades
+    var trade = await _context.Set<Trade>()
         .Include(t => t.StrategyVersion)
         .ThenInclude(sv => sv!.Strategy)
         .SingleOrDefaultAsync(t => t.Id == id);
@@ -338,7 +353,7 @@ public sealed class TradesController : ControllerBase
 
     if (strategyInfo is null && trade.StrategyVersionId.HasValue)
     {
-      strategyInfo = await _context.StrategyVersions
+      strategyInfo = await _context.Set<StrategyVersion>()
           .Where(sv => sv.Id == trade.StrategyVersionId.Value)
           .Select(sv => new StrategyVersionInfo(sv.Id, sv.StrategyId, sv.Strategy.Name, sv.VersionNumber))
           .SingleOrDefaultAsync();
@@ -373,9 +388,12 @@ public sealed class TradesController : ControllerBase
   [HttpPost("{id:guid}/archive")]
   public async Task<ActionResult> Archive(Guid id)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    var trade = await _context.Trades.SingleOrDefaultAsync(t => t.Id == id);
+    var trade = await _context.Set<Trade>().SingleOrDefaultAsync(t => t.Id == id);
     if (trade is null)
     {
       return NotFound(new { message = "Trade not found" });
@@ -395,9 +413,12 @@ public sealed class TradesController : ControllerBase
   [HttpPost("{id:guid}/unarchive")]
   public async Task<ActionResult> Unarchive(Guid id)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    var trade = await _context.Trades.SingleOrDefaultAsync(t => t.Id == id);
+    var trade = await _context.Set<Trade>().SingleOrDefaultAsync(t => t.Id == id);
     if (trade is null)
     {
       return NotFound(new { message = "Trade not found" });

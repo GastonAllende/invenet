@@ -33,14 +33,16 @@ public sealed class AccountsController : ControllerBase
   /// <summary>
   /// Get the current authenticated user's ID.
   /// </summary>
-  private Guid GetCurrentUserId()
+  private bool TryGetCurrentUserId(out Guid userId)
   {
+    userId = Guid.Empty;
     var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+    if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var parsedUserId))
     {
-      throw new UnauthorizedAccessException("User ID not found in claims");
+      return false;
     }
-    return userId;
+    userId = parsedUserId;
+    return true;
   }
 
   /// <summary>
@@ -55,28 +57,17 @@ public sealed class AccountsController : ControllerBase
   public async Task<ActionResult<CreateAccountResponse>> Create(
       [FromBody] CreateAccountRequest request)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    // Validate name
     var trimmedName = request.Name?.Trim() ?? string.Empty;
-    if (string.IsNullOrWhiteSpace(trimmedName))
-    {
-      return BadRequest(new { message = "Name is required" });
-    }
-
-    if (trimmedName.Length > 200)
-    {
-      return BadRequest(new { message = "Name must be 200 characters or less" });
-    }
-
-    // Validate broker
     var trimmedBroker = request.Broker?.Trim() ?? string.Empty;
-    if (trimmedBroker.Length > 100)
-    {
-      return BadRequest(new { message = "Broker must be 100 characters or less" });
-    }
+    var trimmedCurrency = request.BaseCurrency?.Trim()?.ToUpper() ?? string.Empty;
+    var timezone = request.Timezone?.Trim() ?? "Europe/Stockholm";
 
-    // Validate account type
+    // Business-logic validation: account type allowlist
     var validAccountTypes = new[] { "Personal", "Prop Firm", "Funded", "Cash", "Margin", "Prop", "Demo" };
     if (!validAccountTypes.Contains(request.AccountType))
     {
@@ -86,48 +77,8 @@ public sealed class AccountsController : ControllerBase
       });
     }
 
-    // Validate base currency
-    var trimmedCurrency = request.BaseCurrency?.Trim()?.ToUpper() ?? string.Empty;
-    if (string.IsNullOrWhiteSpace(trimmedCurrency) || trimmedCurrency.Length != 3)
-    {
-      return BadRequest(new { message = "BaseCurrency must be a 3-character currency code" });
-    }
-
-    // Validate starting balance
-    if (request.StartingBalance < 0.01m)
-    {
-      return BadRequest(new { message = "StartingBalance must be at least 0.01" });
-    }
-
-    // Validate timezone
-    var timezone = request.Timezone?.Trim() ?? "Europe/Stockholm";
-    if (timezone.Length > 50)
-    {
-      return BadRequest(new { message = "Timezone must be 50 characters or less" });
-    }
-
-    // Validate risk settings if provided
-    if (request.RiskSettings != null)
-    {
-      var rs = request.RiskSettings;
-      if (rs.RiskPerTradePct < 0 || rs.RiskPerTradePct > 100)
-      {
-        return BadRequest(new { message = "RiskPerTradePct must be between 0 and 100" });
-      }
-
-      if (rs.MaxDailyLossPct < 0 || rs.MaxDailyLossPct > 100)
-      {
-        return BadRequest(new { message = "MaxDailyLossPct must be between 0 and 100" });
-      }
-
-      if (rs.MaxWeeklyLossPct < 0 || rs.MaxWeeklyLossPct > 100)
-      {
-        return BadRequest(new { message = "MaxWeeklyLossPct must be between 0 and 100" });
-      }
-    }
-
     // Check for duplicate name
-    var exists = await _context.Accounts
+    var exists = await _context.Set<Account>()
         .AnyAsync(a => a.UserId == userId
                     && a.Name == trimmedName
                     && a.IsActive);
@@ -143,7 +94,7 @@ public sealed class AccountsController : ControllerBase
       });
     }
 
-    var now = DateTime.UtcNow;
+    var now = DateTimeOffset.UtcNow;
     var account = new Account
     {
       Id = Guid.NewGuid(),
@@ -161,7 +112,7 @@ public sealed class AccountsController : ControllerBase
       UpdatedAt = now
     };
 
-    _context.Accounts.Add(account);
+    _context.Set<Account>().Add(account);
 
     // Create risk settings if provided
     AccountRiskSettings? riskSettings = null;
@@ -177,7 +128,7 @@ public sealed class AccountsController : ControllerBase
         EnforceLimits = request.RiskSettings.EnforceLimits
       };
 
-      _context.AccountRiskSettings.Add(riskSettings);
+      _context.Set<AccountRiskSettings>().Add(riskSettings);
     }
 
     await _context.SaveChangesAsync();
@@ -224,9 +175,12 @@ public sealed class AccountsController : ControllerBase
   public async Task<ActionResult<ListAccountsResponse>> List(
       [FromQuery] bool includeArchived = false)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    var query = _context.Accounts
+    var query = _context.Set<Account>()
         .Include(a => a.RiskSettings)
         .Where(a => a.UserId == userId);
 
@@ -272,9 +226,12 @@ public sealed class AccountsController : ControllerBase
   [HttpGet("{id:guid}")]
   public async Task<ActionResult<GetAccountResponse>> Get(Guid id)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    var account = await _context.Accounts
+    var account = await _context.Set<Account>()
         .Include(a => a.RiskSettings)
         .Where(a => a.Id == id && a.UserId == userId)
         .Select(a => new GetAccountResponse(
@@ -325,10 +282,13 @@ public sealed class AccountsController : ControllerBase
       Guid id,
       [FromBody] UpdateAccountRequest request)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
     // Find existing account
-    var account = await _context.Accounts
+    var account = await _context.Set<Account>()
         .Include(a => a.RiskSettings)
         .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
 
@@ -407,7 +367,7 @@ public sealed class AccountsController : ControllerBase
     }
 
     // Check for duplicate name (exclude current account)
-    var exists = await _context.Accounts
+    var exists = await _context.Set<Account>()
         .AnyAsync(a => a.UserId == userId
                     && a.Name == trimmedName
                     && a.Id != id
@@ -439,7 +399,7 @@ public sealed class AccountsController : ControllerBase
     }
     account.Timezone = timezone;
     account.Notes = request.Notes?.Trim();
-    account.UpdatedAt = DateTime.UtcNow;
+    account.UpdatedAt = DateTimeOffset.UtcNow;
 
     // Update or create risk settings
     if (request.RiskSettings != null)
@@ -464,7 +424,7 @@ public sealed class AccountsController : ControllerBase
           MaxWeeklyLossPct = request.RiskSettings.MaxWeeklyLossPct,
           EnforceLimits = request.RiskSettings.EnforceLimits
         };
-        _context.AccountRiskSettings.Add(account.RiskSettings);
+        _context.Set<AccountRiskSettings>().Add(account.RiskSettings);
       }
     }
 
@@ -513,9 +473,12 @@ public sealed class AccountsController : ControllerBase
   [HttpPost("{id:guid}/set-active")]
   public async Task<ActionResult> SetActive(Guid id)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    var account = await _context.Accounts
+    var account = await _context.Set<Account>()
         .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
 
     if (account == null)
@@ -536,9 +499,12 @@ public sealed class AccountsController : ControllerBase
   [HttpPost("{id:guid}/archive")]
   public async Task<ActionResult> Archive(Guid id)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    var account = await _context.Accounts
+    var account = await _context.Set<Account>()
         .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
 
     if (account == null)
@@ -547,7 +513,7 @@ public sealed class AccountsController : ControllerBase
     }
 
     account.IsActive = false;
-    account.UpdatedAt = DateTime.UtcNow;
+    account.UpdatedAt = DateTimeOffset.UtcNow;
     await _context.SaveChangesAsync();
 
     return NoContent();
@@ -559,9 +525,12 @@ public sealed class AccountsController : ControllerBase
   [HttpPost("{id:guid}/unarchive")]
   public async Task<ActionResult> Unarchive(Guid id)
   {
-    var userId = GetCurrentUserId();
+    if (!TryGetCurrentUserId(out var userId))
+    {
+      return Unauthorized(new { message = "Invalid or missing user claim" });
+    }
 
-    var account = await _context.Accounts
+    var account = await _context.Set<Account>()
         .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
 
     if (account == null)
@@ -570,7 +539,7 @@ public sealed class AccountsController : ControllerBase
     }
 
     account.IsActive = true;
-    account.UpdatedAt = DateTime.UtcNow;
+    account.UpdatedAt = DateTimeOffset.UtcNow;
     await _context.SaveChangesAsync();
 
     return NoContent();

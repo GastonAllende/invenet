@@ -35,7 +35,7 @@ public class AccountsControllerTests : IDisposable
     private void SeedAccount()
     {
         var now = DateTime.UtcNow;
-        _context.Accounts.Add(new Account
+        _context.Set<Account>().Add(new Account
         {
             Id = _accountId,
             UserId = _userId,
@@ -87,7 +87,7 @@ public class AccountsControllerTests : IDisposable
         Assert.Equal(updatedStartDate, response.StartDate);
         Assert.Equal(InitialStartingBalance, response.StartingBalance);
 
-        var account = await _context.Accounts.SingleAsync(a => a.Id == _accountId);
+        var account = await _context.Set<Account>().SingleAsync(a => a.Id == _accountId);
         Assert.Equal(updatedStartDate, account.StartDate);
         Assert.Equal(InitialStartingBalance, account.StartingBalance);
     }
@@ -112,7 +112,7 @@ public class AccountsControllerTests : IDisposable
         Assert.Equal(_initialStartDate, response.StartDate);
         Assert.Equal(updatedBalance, response.StartingBalance);
 
-        var account = await _context.Accounts.SingleAsync(a => a.Id == _accountId);
+        var account = await _context.Set<Account>().SingleAsync(a => a.Id == _accountId);
         Assert.Equal(_initialStartDate, account.StartDate);
         Assert.Equal(updatedBalance, account.StartingBalance);
     }
@@ -138,7 +138,7 @@ public class AccountsControllerTests : IDisposable
         Assert.Equal(updatedStartDate, response.StartDate);
         Assert.Equal(updatedBalance, response.StartingBalance);
 
-        var account = await _context.Accounts.SingleAsync(a => a.Id == _accountId);
+        var account = await _context.Set<Account>().SingleAsync(a => a.Id == _accountId);
         Assert.Equal(updatedStartDate, account.StartDate);
         Assert.Equal(updatedBalance, account.StartingBalance);
     }
@@ -181,7 +181,7 @@ public class AccountsControllerTests : IDisposable
         Assert.Equal(_initialStartDate, response.StartDate);
         Assert.Equal(InitialStartingBalance, response.StartingBalance);
 
-        var account = await _context.Accounts.SingleAsync(a => a.Id == _accountId);
+        var account = await _context.Set<Account>().SingleAsync(a => a.Id == _accountId);
         Assert.Equal(_initialStartDate, account.StartDate);
         Assert.Equal(InitialStartingBalance, account.StartingBalance);
     }
