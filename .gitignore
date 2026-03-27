@@ -60,5 +60,6 @@ __screenshots__/
 
 vitest.config.*.timestamp*
 
-
-
+.nx/polygraph
+.claude/worktrees
+.claude/settings.local.json
