@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -21,6 +21,7 @@ import type { StrategyListItem } from '@invenet/strategy-data-access';
   ],
   templateUrl: './strategy-list.component.html',
   styleUrls: ['./strategy-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StrategyListComponent {
   strategies = input<StrategyListItem[]>([]);

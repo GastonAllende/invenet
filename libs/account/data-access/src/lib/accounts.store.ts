@@ -66,7 +66,6 @@ export const AccountsStore = signalStore(
               });
             }),
             catchError((error: Error) => {
-              console.error('Error loading accounts:', error);
               patchState(store, {
                 isLoading: false,
                 error: error.message || 'Failed to load accounts',

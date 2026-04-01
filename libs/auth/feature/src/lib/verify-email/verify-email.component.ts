@@ -1,16 +1,20 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 import { AuthService } from '@invenet/auth-data-access';
 
 @Component({
   selector: 'lib-verify-email',
   standalone: true,
-  imports: [CardModule, MessageModule, ButtonModule, ProgressSpinnerModule],
+  imports: [CardModule, MessageModule, ButtonModule, ProgressSpinnerModule, ToastModule],
+  providers: [MessageService],
   template: `
+    <p-toast></p-toast>
     <div class="page-center">
       <p-card class="auth-card" header="Email Verification">
         @if (isLoading()) {
@@ -74,11 +78,13 @@ import { AuthService } from '@invenet/auth-data-access';
       }
     `,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VerifyEmailComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly messageService = inject(MessageService);
 
   isLoading = signal(true);
   isSuccess = signal(false);
@@ -124,11 +130,21 @@ export class VerifyEmailComponent implements OnInit {
     this.authService.resendVerification(this.email()).subscribe({
       next: () => {
         this.isResending.set(false);
-        alert('Verification email sent! Please check your inbox.');
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Email Sent',
+          detail: 'Verification email sent! Please check your inbox.',
+          life: 5000,
+        });
       },
       error: () => {
         this.isResending.set(false);
-        alert('Failed to resend verification email. Please try again.');
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to resend verification email. Please try again.',
+          life: 5000,
+        });
       },
     });
   }

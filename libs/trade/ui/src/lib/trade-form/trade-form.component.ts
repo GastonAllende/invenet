@@ -19,6 +19,8 @@ import { StrategiesStore } from '@invenet/strategy-data-access';
 import {
   CreateTradeRequest,
   Trade,
+  TradeDirection,
+  TradeStatus,
   UpdateTradeRequest,
 } from '@invenet/trade-data-access';
 
@@ -93,7 +95,6 @@ export class TradeFormComponent {
 
   constructor() {
     effect(() => {
-      console.log('Trade input changed:', this.trade());
       const t = this.trade();
       if (t && this.mode() === 'edit') {
         this.initialStrategyId = t.strategyId;
@@ -140,8 +141,6 @@ export class TradeFormComponent {
       const status = this.form.controls.status.value;
       const exitPrice = this.form.controls.exitPrice;
       const closedAt = this.form.controls.closedAt;
-
-      console.log('Status changed to:', status);
 
       if (status === 'Closed') {
         exitPrice.setValidators([Validators.required, Validators.min(0.0001)]);
@@ -223,11 +222,14 @@ export class TradeFormComponent {
       .map((value) => value.trim())
       .filter((value) => value.length > 0);
 
+    const direction = (raw.direction ?? 'Long') as TradeDirection;
+    const status = (raw.status ?? 'Open') as TradeStatus;
+
     if (this.isEditMode) {
       const request: UpdateTradeRequest = {
         strategyId: raw.strategyId ?? undefined,
         strategyVersionId: raw.strategyVersionId ?? undefined,
-        direction: raw.direction ?? 'Long',
+        direction,
         openedAt,
         closedAt,
         symbol: (raw.symbol ?? '').toUpperCase(),
@@ -238,7 +240,7 @@ export class TradeFormComponent {
         pnl: raw.pnl ?? undefined,
         tags,
         notes: raw.notes ?? undefined,
-        status: raw.status ?? 'Open',
+        status,
       };
       this.save.emit(request);
       return;
@@ -248,7 +250,7 @@ export class TradeFormComponent {
       accountId: raw.accountId ?? '',
       strategyId: raw.strategyId ?? undefined,
       strategyVersionId: raw.strategyVersionId ?? undefined,
-      direction: raw.direction ?? 'Long',
+      direction,
       openedAt,
       closedAt,
       symbol: (raw.symbol ?? '').toUpperCase(),
@@ -259,7 +261,7 @@ export class TradeFormComponent {
       pnl: raw.pnl ?? undefined,
       tags,
       notes: raw.notes ?? undefined,
-      status: raw.status ?? 'Open',
+      status,
     };
     this.save.emit(request);
   }

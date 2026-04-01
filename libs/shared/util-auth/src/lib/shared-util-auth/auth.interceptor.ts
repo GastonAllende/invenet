@@ -82,7 +82,7 @@ function handleError(
 ) {
   if (error.status === 401) {
     authService.clearTokens();
-    router.navigateByUrl('/login');
+    router.navigateByUrl('/auth/login');
   }
   return throwError(() => error);
 }
