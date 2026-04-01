@@ -248,14 +248,25 @@ public sealed class TradesController : ControllerBase
       return BadRequest(new { message = "Either strategyId or strategyVersionId must be provided" });
     }
 
+    TradeStatus resolvedStatus = TradeStatus.Open;
+    if (!string.IsNullOrWhiteSpace(request.Status) &&
+        !Enum.TryParse<TradeStatus>(request.Status, ignoreCase: true, out resolvedStatus))
+    {
+      return BadRequest(new { message = $"Invalid status '{request.Status}'. Valid values: {string.Join(", ", Enum.GetNames<TradeStatus>())}" });
+    }
+
+    if (!Enum.TryParse<TradeDirection>(request.Direction, ignoreCase: true, out var resolvedDirection))
+    {
+      return BadRequest(new { message = $"Invalid direction '{request.Direction}'. Valid values: {string.Join(", ", Enum.GetNames<TradeDirection>())}" });
+    }
+
     var now = DateTime.UtcNow;
-    var resolvedStatus = string.IsNullOrWhiteSpace(request.Status) ? TradeStatus.Open : Enum.Parse<TradeStatus>(request.Status);
     var trade = new Trade
     {
       Id = Guid.NewGuid(),
       AccountId = request.AccountId,
       StrategyVersionId = strategyInfo?.StrategyVersionId,
-      Direction = Enum.Parse<TradeDirection>(request.Direction),
+      Direction = resolvedDirection,
       OpenedAt = request.OpenedAt,
       ClosedAt = request.ClosedAt,
       Symbol = request.Symbol.Trim(),
@@ -335,7 +346,17 @@ public sealed class TradesController : ControllerBase
       trade.StrategyVersionId = strategyInfo.StrategyVersionId;
     }
 
-    trade.Direction = Enum.Parse<TradeDirection>(request.Direction);
+    if (!Enum.TryParse<TradeDirection>(request.Direction, ignoreCase: true, out var updatedDirection))
+    {
+      return BadRequest(new { message = $"Invalid direction '{request.Direction}'. Valid values: {string.Join(", ", Enum.GetNames<TradeDirection>())}" });
+    }
+
+    if (!Enum.TryParse<TradeStatus>(request.Status, ignoreCase: true, out var updatedStatus))
+    {
+      return BadRequest(new { message = $"Invalid status '{request.Status}'. Valid values: {string.Join(", ", Enum.GetNames<TradeStatus>())}" });
+    }
+
+    trade.Direction = updatedDirection;
     trade.OpenedAt = request.OpenedAt;
     trade.ClosedAt = request.ClosedAt;
     trade.Symbol = request.Symbol.Trim();
@@ -346,7 +367,7 @@ public sealed class TradesController : ControllerBase
     trade.Pnl = request.Pnl;
     trade.Tags = request.Tags;
     trade.Notes = request.Notes?.Trim();
-    trade.Status = Enum.Parse<TradeStatus>(request.Status);
+    trade.Status = updatedStatus;
     trade.UpdatedAt = DateTime.UtcNow;
 
     await _context.SaveChangesAsync();

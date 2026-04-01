@@ -27,7 +27,7 @@ builder.Services.AddCors(options =>
     policy
           .WithOrigins(allowedOrigins)
           .AllowAnyHeader()
-          .AllowAnyMethod();
+          .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
   });
 });
 
@@ -38,6 +38,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddRateLimiter(options =>
 {
   options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+  // Auth endpoints: stricter limit by IP
   options.AddPolicy("auth", httpContext =>
     RateLimitPartition.GetFixedWindowLimiter(
       partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
@@ -45,6 +47,19 @@ builder.Services.AddRateLimiter(options =>
       {
         Window = TimeSpan.FromMinutes(1),
         PermitLimit = 10,
+        QueueLimit = 0
+      }));
+
+  // Global limit: 300 req/min per authenticated user, fallback to IP
+  options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    RateLimitPartition.GetFixedWindowLimiter(
+      partitionKey: httpContext.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                   ?? httpContext.Connection.RemoteIpAddress?.ToString()
+                   ?? "unknown",
+      factory: _ => new FixedWindowRateLimiterOptions
+      {
+        Window = TimeSpan.FromMinutes(1),
+        PermitLimit = 300,
         QueueLimit = 0
       }));
 });
@@ -84,6 +99,15 @@ else
   app.UseHsts();
   app.UseHttpsRedirection();
 }
+
+app.Use(async (context, next) =>
+{
+  context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+  context.Response.Headers.Append("X-Frame-Options", "DENY");
+  context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+  context.Response.Headers.Append("Permissions-Policy", "geolocation=(), camera=(), microphone=()");
+  await next();
+});
 
 app.UseCors();
 
