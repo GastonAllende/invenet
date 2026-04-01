@@ -34,7 +34,7 @@ public class AccountsControllerTests : IDisposable
 
     private void SeedAccount()
     {
-        var now = DateTime.UtcNow;
+        var now = DateTimeOffset.UtcNow;
         _context.Set<Account>().Add(new Account
         {
             Id = _accountId,

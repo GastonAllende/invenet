@@ -3,7 +3,7 @@ namespace Invenet.Api.Modules.Strategies.Features.CreateStrategyVersion;
 public record CreateStrategyVersionResponse(
     Guid Id,
     int VersionNumber,
-    DateTime CreatedAt,
+    DateTimeOffset CreatedAt,
     Guid CreatedByUserId,
     string? Timeframe,
     string EntryRules,

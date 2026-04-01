@@ -11,8 +11,8 @@ public record UpdateTradeResponse(
     string? StrategyName,
     int? StrategyVersionNumber,
     string Direction,
-    DateTime OpenedAt,
-    DateTime? ClosedAt,
+    DateTimeOffset OpenedAt,
+    DateTimeOffset? ClosedAt,
     string Symbol,
     decimal EntryPrice,
     decimal? ExitPrice,
@@ -23,6 +23,6 @@ public record UpdateTradeResponse(
     string? Notes,
     bool IsArchived,
     string Status,
-    DateTime CreatedAt,
-    DateTime UpdatedAt
+    DateTimeOffset CreatedAt,
+    DateTimeOffset UpdatedAt
 );

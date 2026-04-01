@@ -8,14 +8,14 @@ public record StrategyVersionDetail(
     string ExitRules,
     string RiskRules,
     string? Notes,
-    DateTime CreatedAt,
+    DateTimeOffset CreatedAt,
     Guid CreatedByUserId
 );
 
 public record StrategyVersionHistoryItem(
     Guid Id,
     int VersionNumber,
-    DateTime CreatedAt,
+    DateTimeOffset CreatedAt,
     Guid CreatedByUserId
 );
 
@@ -25,8 +25,8 @@ public record GetStrategyResponse(
     string? Market,
     string? DefaultTimeframe,
     bool IsArchived,
-    DateTime CreatedAt,
-    DateTime UpdatedAt,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset UpdatedAt,
     StrategyVersionDetail? CurrentVersion,
     IEnumerable<StrategyVersionHistoryItem> Versions
 );

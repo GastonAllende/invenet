@@ -1,5 +1,5 @@
-using System.Security.Claims;
 using Invenet.Api.Modules.Accounts.Domain;
+using Invenet.Api.Modules.Shared.API;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Invenet.Api.Modules.Strategies.Domain;
 using Invenet.Api.Modules.Trades.Domain;
@@ -16,7 +16,7 @@ namespace Invenet.Api.Modules.Trades.API;
 [ApiController]
 [Route("api/trades")]
 [Authorize]
-public sealed class TradesController : ControllerBase
+public sealed class TradesController : ApiControllerBase
 {
   private readonly ModularDbContext _context;
   private readonly ILogger<TradesController> _logger;
@@ -25,18 +25,6 @@ public sealed class TradesController : ControllerBase
   {
     _context = context;
     _logger = logger;
-  }
-
-  private bool TryGetCurrentUserId(out Guid userId)
-  {
-    userId = Guid.Empty;
-    var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var parsedUserId))
-    {
-      return false;
-    }
-    userId = parsedUserId;
-    return true;
   }
 
   private async Task<bool> AccountBelongsToUser(Guid accountId, Guid userId)
@@ -260,7 +248,7 @@ public sealed class TradesController : ControllerBase
       return BadRequest(new { message = $"Invalid direction '{request.Direction}'. Valid values: {string.Join(", ", Enum.GetNames<TradeDirection>())}" });
     }
 
-    var now = DateTime.UtcNow;
+    var now = DateTimeOffset.UtcNow;
     var trade = new Trade
     {
       Id = Guid.NewGuid(),
@@ -368,7 +356,7 @@ public sealed class TradesController : ControllerBase
     trade.Tags = request.Tags;
     trade.Notes = request.Notes?.Trim();
     trade.Status = updatedStatus;
-    trade.UpdatedAt = DateTime.UtcNow;
+    trade.UpdatedAt = DateTimeOffset.UtcNow;
 
     await _context.SaveChangesAsync();
 
@@ -426,7 +414,7 @@ public sealed class TradesController : ControllerBase
     }
 
     trade.IsArchived = true;
-    trade.UpdatedAt = DateTime.UtcNow;
+    trade.UpdatedAt = DateTimeOffset.UtcNow;
     await _context.SaveChangesAsync();
     return NoContent();
   }
@@ -451,7 +439,7 @@ public sealed class TradesController : ControllerBase
     }
 
     trade.IsArchived = false;
-    trade.UpdatedAt = DateTime.UtcNow;
+    trade.UpdatedAt = DateTimeOffset.UtcNow;
     await _context.SaveChangesAsync();
     return NoContent();
   }
