@@ -95,6 +95,6 @@ describe('authInterceptor', () => {
     req.flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });
 
     expect(authService.cleared).toBe(true);
-    expect(router.navigatedTo).toBe('/login');
+    expect(router.navigatedTo).toBe('/auth/login');
   });
 });
