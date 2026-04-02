@@ -8,9 +8,8 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subject, switchMap, filter, EMPTY, catchError } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -23,6 +22,7 @@ import {
   ActiveAccountStore,
 } from '@invenet/account-data-access';
 import {
+  GetStrategyResponse,
   StrategiesApiService,
   StrategiesStore,
 } from '@invenet/strategy-data-access';
@@ -79,40 +79,36 @@ export class QuickTradeModalComponent {
     quantity: [null as number | null],
   });
 
-  readonly currentVersionNumber = signal<number | null>(null);
-  readonly currentVersionId = signal<string | null>(null);
-  readonly strategyVersionError = signal<string | null>(null);
+  readonly selectedStrategyId = signal<string | null>(null);
 
-  private readonly strategyChange$ = new Subject<string | null>();
+  private readonly strategyResource = rxResource({
+    params: () => this.selectedStrategyId() || undefined,
+    stream: ({ params: strategyId }: { params: string }) =>
+      this.strategiesApiService.get(strategyId),
+  });
+
+  readonly currentVersionId = computed(() => {
+    const strategy = this.strategyResource.value();
+    return strategy?.currentVersion?.id ?? null;
+  });
+
+  readonly currentVersionNumber = computed(() => {
+    const strategy = this.strategyResource.value();
+    return strategy?.currentVersion?.versionNumber ?? null;
+  });
+
+  readonly strategyVersionError = computed(() => {
+    if (this.strategyResource.error()) {
+      return 'Failed to resolve strategy version';
+    }
+    const strategy = this.strategyResource.value();
+    if (strategy && !strategy.currentVersion) {
+      return 'This strategy has no published version';
+    }
+    return null;
+  });
 
   constructor() {
-    this.strategyChange$
-      .pipe(
-        filter((id): id is string => !!id),
-        switchMap((strategyId) =>
-          this.strategiesApiService.get(strategyId).pipe(
-            catchError(() => {
-              this.strategyVersionError.set(
-                'Failed to resolve strategy version',
-              );
-              return EMPTY;
-            }),
-          ),
-        ),
-        takeUntilDestroyed(),
-      )
-      .subscribe((strategy) => {
-        const version = strategy.currentVersion;
-        if (!version) {
-          this.strategyVersionError.set(
-            'This strategy has no published version',
-          );
-          return;
-        }
-        this.currentVersionId.set(version.id);
-        this.currentVersionNumber.set(version.versionNumber);
-      });
-
     effect(() => {
       if (!this.isOpen()) {
         return;
@@ -131,10 +127,7 @@ export class QuickTradeModalComponent {
   }
 
   onStrategyChange(strategyId: string | null): void {
-    this.currentVersionId.set(null);
-    this.currentVersionNumber.set(null);
-    this.strategyVersionError.set(null);
-    this.strategyChange$.next(strategyId);
+    this.selectedStrategyId.set(strategyId);
   }
 
   submitQuickTrade(): void {
@@ -192,8 +185,6 @@ export class QuickTradeModalComponent {
       entryPrice: null,
       quantity: null,
     });
-    this.currentVersionId.set(null);
-    this.currentVersionNumber.set(null);
-    this.strategyVersionError.set(null);
+    this.selectedStrategyId.set(null);
   }
 }
