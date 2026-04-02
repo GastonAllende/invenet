@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MessageService } from 'primeng/api';
@@ -40,6 +40,7 @@ import { TradeFormComponent } from '@invenet/trade-ui';
       ></lib-trade-form>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradeNewPage {
   private readonly store = inject(TradesStore);

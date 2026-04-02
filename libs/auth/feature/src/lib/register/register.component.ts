@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -14,6 +14,8 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 import { AuthService } from '@invenet/auth-data-access';
 
 function matchPasswords(control: AbstractControl): ValidationErrors | null {
@@ -40,14 +42,18 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
     InputTextModule,
     MessageModule,
     PasswordModule,
+    ToastModule,
   ],
+  providers: [MessageService],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder).nonNullable;
+  private readonly messageService = inject(MessageService);
 
   readonly form = this.fb.group(
     {
@@ -92,15 +98,17 @@ export class RegisterComponent {
           this.isLoading.set(false);
           this.errorMessage = '';
           this.errorDetails = [];
-          // Show success message and redirect to login
-          alert(
-            'Registration successful! Please check your email to verify your account.',
-          );
-          void this.router.navigateByUrl('/auth/login');
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Registration Successful',
+            detail:
+              'Please check your email to verify your account.',
+            life: 5000,
+          });
+          setTimeout(() => void this.router.navigateByUrl('/auth/login'), 2000);
         },
         error: (error) => {
           this.isLoading.set(false);
-          console.error('Registration failed:', error);
           this.errorMessage =
             error?.error?.message ||
             'Unable to create account. Check your details.';

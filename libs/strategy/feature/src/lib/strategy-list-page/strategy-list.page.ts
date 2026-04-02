@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -33,6 +33,7 @@ import { StrategyListComponent } from '@invenet/strategy-ui';
       ></lib-strategy-list>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StrategyListPage {
   private readonly store = inject(StrategiesStore);

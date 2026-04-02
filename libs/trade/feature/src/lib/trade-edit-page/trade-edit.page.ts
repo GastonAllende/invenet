@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MessageService } from 'primeng/api';
@@ -41,6 +41,7 @@ import { TradeFormComponent } from '@invenet/trade-ui';
       ></lib-trade-form>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradeEditPage {
   private readonly store = inject(TradesStore);
@@ -82,8 +83,6 @@ export class TradeEditPage {
   }
 
   onSaveTrade(payload: CreateTradeRequest | UpdateTradeRequest): void {
-    console.log('Saving trade with payload:', payload);
-
     if (!this.tradeId) return;
     this.store.updateTrade({
       id: this.tradeId,

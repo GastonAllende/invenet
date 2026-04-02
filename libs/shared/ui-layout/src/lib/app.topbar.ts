@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -30,6 +31,7 @@ import { LayoutService } from './service/layout.service';
       <button
         class="layout-menu-button layout-topbar-action"
         (click)="layoutService.onMenuToggle()"
+        aria-label="Toggle menu"
       >
         <i class="pi pi-bars"></i>
       </button>
@@ -45,6 +47,7 @@ import { LayoutService } from './service/layout.service';
           type="button"
           class="layout-topbar-action"
           (click)="toggleDarkMode()"
+          aria-label="Toggle dark mode"
         >
           <i
             [ngClass]="{
@@ -57,6 +60,7 @@ import { LayoutService } from './service/layout.service';
         <div class="relative">
           <button
             class="layout-topbar-action layout-topbar-action-highlight"
+            aria-label="Theme configurator"
             pStyleClass="@next"
             enterFromClass="hidden"
             enterActiveClass="animate-scalein"
@@ -72,6 +76,7 @@ import { LayoutService } from './service/layout.service';
 
       <button
         class="layout-topbar-menu-button layout-topbar-action"
+        aria-label="More actions"
         pStyleClass="@next"
         enterFromClass="hidden"
         enterActiveClass="animate-scalein"
@@ -155,6 +160,7 @@ export class AppTopbar {
   private readonly router = inject(Router);
   private readonly accountsStore = inject(AccountsStore);
   private readonly activeAccountStore = inject(ActiveAccountStore);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly accountOptions = this.accountsStore.activeAccounts;
   readonly activeAccountId = this.activeAccountStore.activeAccountId;
@@ -178,13 +184,16 @@ export class AppTopbar {
   }
 
   onLogout() {
-    this.authService.logout().subscribe({
-      next: () => void this.router.navigateByUrl('/auth/login'),
-      error: () => {
-        this.authService.clearTokens();
-        void this.router.navigateByUrl('/auth/login');
-      },
-    });
+    this.authService
+      .logout()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => void this.router.navigateByUrl('/auth/login'),
+        error: () => {
+          this.authService.clearTokens();
+          void this.router.navigateByUrl('/auth/login');
+        },
+      });
   }
 
   onQuickLogTrade(): void {

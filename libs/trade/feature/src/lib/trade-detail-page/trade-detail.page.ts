@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -32,6 +32,7 @@ import { TradeDetailComponent } from '@invenet/trade-ui';
       ></lib-trade-detail>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradeDetailPage {
   private readonly store = inject(TradesStore);
