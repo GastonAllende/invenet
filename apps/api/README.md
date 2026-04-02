@@ -30,7 +30,7 @@ This project uses **Modular Monolith Architecture**. For detailed information:
 
 - **Architecture Guide**: [MODULAR_MONOLITH.md](../../docs/backend/MODULAR_MONOLITH.md) - Complete architecture documentation
 - **Migration Guide**: [MIGRATION_GUIDE.md](../../docs/backend/MIGRATION_GUIDE.md) - Guide for migrating from old structure
-- **Agent Instructions**: [AGENT_PLAYBOOK.md](../../docs/AGENT_PLAYBOOK.md) - Quick reference for AI agents
+- **Agent Instructions**: [AGENT_PLAYBOOK.md](../../docs/backend/QUICK_REFERENCE.md) - Quick reference for AI agents
 
 ## Project Structure
 
