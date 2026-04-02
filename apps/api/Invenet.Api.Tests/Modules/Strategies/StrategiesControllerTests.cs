@@ -37,7 +37,7 @@ public class StrategiesControllerTests : IDisposable
 
     private void SeedStrategies()
     {
-        var now = DateTime.UtcNow;
+        var now = DateTimeOffset.UtcNow;
         _context.Set<Strategy>().AddRange(
             new Strategy { Id = Guid.NewGuid(), UserId = UserA, Name = "Trend Following",  CreatedAt = now, UpdatedAt = now },
             new Strategy { Id = Guid.NewGuid(), UserId = UserA, Name = "Scalping",         CreatedAt = now, UpdatedAt = now },

@@ -91,6 +91,12 @@ public class TradeConfiguration : IEntityTypeConfiguration<Trade>
     builder.HasIndex(t => new { t.AccountId, t.OpenedAt })
         .HasDatabaseName("ix_trades_account_opened_at");
 
+    builder.HasIndex(t => new { t.AccountId, t.Status })
+        .HasDatabaseName("ix_trades_account_status");
+
+    builder.HasIndex(t => new { t.AccountId, t.IsArchived })
+        .HasDatabaseName("ix_trades_account_archived");
+
     // Relationships
 
     // Many-to-one relationship with strategy versions (nullable for legacy rows)

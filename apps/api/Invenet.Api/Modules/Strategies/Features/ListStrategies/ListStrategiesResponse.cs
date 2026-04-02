@@ -3,7 +3,7 @@ namespace Invenet.Api.Modules.Strategies.Features.ListStrategies;
 public record CurrentVersionSummary(
     Guid Id,
     int VersionNumber,
-    DateTime CreatedAt,
+    DateTimeOffset CreatedAt,
     string? Timeframe
 );
 
@@ -13,8 +13,8 @@ public record StrategyListItem(
     string? Market,
     string? DefaultTimeframe,
     bool IsArchived,
-    DateTime CreatedAt,
-    DateTime UpdatedAt,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset UpdatedAt,
     CurrentVersionSummary? CurrentVersion
 );
 

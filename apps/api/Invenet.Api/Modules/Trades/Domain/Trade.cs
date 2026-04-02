@@ -40,12 +40,12 @@ public class Trade
   /// <summary>
   /// Timestamp when the trade was opened.
   /// </summary>
-  public DateTime OpenedAt { get; set; }
+  public DateTimeOffset OpenedAt { get; set; }
 
   /// <summary>
   /// Timestamp when the trade was closed.
   /// </summary>
-  public DateTime? ClosedAt { get; set; }
+  public DateTimeOffset? ClosedAt { get; set; }
 
   /// <summary>
   /// Trading symbol/ticker (e.g., AAPL, MSFT).
@@ -100,12 +100,12 @@ public class Trade
   /// <summary>
   /// Timestamp when the trade record was created.
   /// </summary>
-  public DateTime CreatedAt { get; set; }
+  public DateTimeOffset CreatedAt { get; set; }
 
   /// <summary>
   /// Timestamp when the trade record was last updated.
   /// </summary>
-  public DateTime UpdatedAt { get; set; }
+  public DateTimeOffset UpdatedAt { get; set; }
 
   // Navigation properties
 

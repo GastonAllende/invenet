@@ -1,5 +1,5 @@
 using System.Data;
-using System.Security.Claims;
+using Invenet.Api.Modules.Shared.API;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Invenet.Api.Modules.Strategies.Domain;
 using Invenet.Api.Modules.Strategies.Features.CreateStrategy;
@@ -15,7 +15,7 @@ namespace Invenet.Api.Modules.Strategies.API;
 [ApiController]
 [Route("api/strategies")]
 [Authorize]
-public sealed class StrategiesController : ControllerBase
+public sealed class StrategiesController : ApiControllerBase
 {
   private readonly ModularDbContext _context;
   private readonly ILogger<StrategiesController> _logger;
@@ -24,19 +24,6 @@ public sealed class StrategiesController : ControllerBase
   {
     _context = context;
     _logger = logger;
-  }
-
-  private bool TryGetCurrentUserId(out Guid userId)
-  {
-    userId = Guid.Empty;
-    var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var parsedUserId))
-    {
-      return false;
-    }
-
-    userId = parsedUserId;
-    return true;
   }
 
   [HttpGet]
@@ -63,8 +50,7 @@ public sealed class StrategiesController : ControllerBase
             s.IsArchived,
             s.CreatedAt,
             s.UpdatedAt,
-            _context.Set<StrategyVersion>()
-                .Where(v => v.StrategyId == s.Id)
+            s.Versions
                 .OrderByDescending(v => v.VersionNumber)
                 .Select(v => new CurrentVersionSummary(v.Id, v.VersionNumber, v.CreatedAt, v.Timeframe))
                 .FirstOrDefault()
@@ -206,7 +192,7 @@ public sealed class StrategiesController : ControllerBase
     {
       await using var tx = await _context.Database.BeginTransactionAsync();
 
-      var now = DateTime.UtcNow;
+      var now = DateTimeOffset.UtcNow;
       strategy = new Strategy
       {
         Id = Guid.NewGuid(),
@@ -300,7 +286,7 @@ public sealed class StrategiesController : ControllerBase
           .Select(v => (int?)v.VersionNumber)
           .MaxAsync() ?? 0;
 
-      var now = DateTime.UtcNow;
+      var now = DateTimeOffset.UtcNow;
       newVersion = new StrategyVersion
       {
         Id = Guid.NewGuid(),
@@ -360,7 +346,7 @@ public sealed class StrategiesController : ControllerBase
     }
 
     strategy.IsArchived = true;
-    strategy.UpdatedAt = DateTime.UtcNow;
+    strategy.UpdatedAt = DateTimeOffset.UtcNow;
     await _context.SaveChangesAsync();
 
     return NoContent();
@@ -381,7 +367,7 @@ public sealed class StrategiesController : ControllerBase
     }
 
     strategy.IsArchived = false;
-    strategy.UpdatedAt = DateTime.UtcNow;
+    strategy.UpdatedAt = DateTimeOffset.UtcNow;
     await _context.SaveChangesAsync();
 
     return NoContent();

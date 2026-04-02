@@ -14,8 +14,8 @@ public class Strategy
   public string? Market { get; set; }
   public string? DefaultTimeframe { get; set; }
   public bool IsArchived { get; set; } = false;
-  public DateTime CreatedAt { get; set; }
-  public DateTime UpdatedAt { get; set; }
+  public DateTimeOffset CreatedAt { get; set; }
+  public DateTimeOffset UpdatedAt { get; set; }
 
   public ApplicationUser User { get; set; } = null!;
   public ICollection<StrategyVersion> Versions { get; set; } = new List<StrategyVersion>();

@@ -1,9 +1,9 @@
-using System.Security.Claims;
 using Invenet.Api.Modules.Accounts.Domain;
 using Invenet.Api.Modules.Accounts.Features.CreateAccount;
 using Invenet.Api.Modules.Accounts.Features.GetAccount;
 using Invenet.Api.Modules.Accounts.Features.ListAccounts;
 using Invenet.Api.Modules.Accounts.Features.UpdateAccount;
+using Invenet.Api.Modules.Shared.API;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +17,7 @@ namespace Invenet.Api.Modules.Accounts.API;
 [ApiController]
 [Route("api/accounts")]
 [Authorize]
-public sealed class AccountsController : ControllerBase
+public sealed class AccountsController : ApiControllerBase
 {
   private readonly ModularDbContext _context;
   private readonly ILogger<AccountsController> _logger;
@@ -28,21 +28,6 @@ public sealed class AccountsController : ControllerBase
   {
     _context = context;
     _logger = logger;
-  }
-
-  /// <summary>
-  /// Get the current authenticated user's ID.
-  /// </summary>
-  private bool TryGetCurrentUserId(out Guid userId)
-  {
-    userId = Guid.Empty;
-    var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var parsedUserId))
-    {
-      return false;
-    }
-    userId = parsedUserId;
-    return true;
   }
 
   /// <summary>

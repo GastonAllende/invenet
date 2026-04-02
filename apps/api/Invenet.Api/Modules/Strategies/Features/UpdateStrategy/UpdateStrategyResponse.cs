@@ -8,6 +8,6 @@ public record UpdateStrategyResponse(
     string Name,
     string? Description,
     bool IsDeleted,
-    DateTime CreatedAt,
-    DateTime UpdatedAt
+    DateTimeOffset CreatedAt,
+    DateTimeOffset UpdatedAt
 );

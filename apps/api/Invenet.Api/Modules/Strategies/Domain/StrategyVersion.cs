@@ -15,7 +15,7 @@ public class StrategyVersion
   public string ExitRules { get; set; } = string.Empty;
   public string RiskRules { get; set; } = string.Empty;
   public string? Notes { get; set; }
-  public DateTime CreatedAt { get; set; }
+  public DateTimeOffset CreatedAt { get; set; }
   public Guid CreatedByUserId { get; set; }
 
   public Strategy Strategy { get; set; } = null!;

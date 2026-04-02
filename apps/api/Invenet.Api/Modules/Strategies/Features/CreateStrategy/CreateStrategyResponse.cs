@@ -6,8 +6,8 @@ public record CreateStrategyResponse(
     string? Market,
     string? DefaultTimeframe,
     bool IsArchived,
-    DateTime CreatedAt,
-    DateTime UpdatedAt,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset UpdatedAt,
     Guid VersionId,
     int VersionNumber
 );
