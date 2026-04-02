@@ -5,9 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using Invenet.Api.Modules.Auth.Domain;
-using Invenet.Api.Modules.Auth.Features.Common;
-using Invenet.Api.Modules.Auth.Features.Login;
-using Invenet.Api.Modules.Auth.Features.Register;
+using Invenet.Api.Modules.Auth.Features;
 using Invenet.Api.Modules.Auth.Infrastructure.Email;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +29,7 @@ public sealed class AuthController : ControllerBase
   private readonly SignInManager<ApplicationUser> _signInManager;
   private readonly ModularDbContext _dbContext;
   private readonly IConfiguration _configuration;
-  private readonly IEmailService _emailService;
+  private readonly EmailService _emailService;
   private readonly ILogger<AuthController> _logger;
 
   public AuthController(
@@ -39,7 +37,7 @@ public sealed class AuthController : ControllerBase
       SignInManager<ApplicationUser> signInManager,
       ModularDbContext dbContext,
       IConfiguration configuration,
-      IEmailService emailService,
+      EmailService emailService,
       ILogger<AuthController> logger)
   {
     _userManager = userManager;

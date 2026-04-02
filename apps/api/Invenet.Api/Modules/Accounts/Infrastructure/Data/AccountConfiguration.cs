@@ -8,7 +8,7 @@ public sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
 {
   public void Configure(EntityTypeBuilder<Account> builder)
   {
-    builder.ToTable("accounts", schema: "accounts");
+    builder.ToTable("accounts");
 
     builder.Property(a => a.Name)
         .IsRequired()

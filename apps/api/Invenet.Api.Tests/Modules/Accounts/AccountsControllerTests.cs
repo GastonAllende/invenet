@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Invenet.Api.Modules.Accounts.API;
 using Invenet.Api.Modules.Accounts.Domain;
-using Invenet.Api.Modules.Accounts.Features.UpdateAccount;
+using Invenet.Api.Modules.Accounts.Features;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

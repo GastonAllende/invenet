@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Invenet.Api.Modules.Strategies.API;
 using Invenet.Api.Modules.Strategies.Domain;
-using Invenet.Api.Modules.Strategies.Features.ListStrategies;
+using Invenet.Api.Modules.Strategies.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

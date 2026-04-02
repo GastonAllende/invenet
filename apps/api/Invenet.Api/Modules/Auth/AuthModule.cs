@@ -19,7 +19,7 @@ public class AuthModule : IModule
   public IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration)
   {
     // Register email service
-    services.AddScoped<IEmailService, EmailService>();
+    services.AddScoped<EmailService>();
 
     // Configure Identity
     services.AddIdentityCore<ApplicationUser>(options =>

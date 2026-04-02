@@ -12,7 +12,7 @@ public class TradeConfiguration : IEntityTypeConfiguration<Trade>
   public void Configure(EntityTypeBuilder<Trade> builder)
   {
     // Table configuration
-    builder.ToTable("trades", schema: "trades");
+    builder.ToTable("trades");
 
     // Primary key
     builder.HasKey(t => t.Id);

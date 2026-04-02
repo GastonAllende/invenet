@@ -8,7 +8,7 @@ public sealed class AccountRiskSettingsConfiguration : IEntityTypeConfiguration<
 {
   public void Configure(EntityTypeBuilder<AccountRiskSettings> builder)
   {
-    builder.ToTable("account_risk_settings", schema: "accounts");
+    builder.ToTable("account_risk_settings");
 
     builder.Property(r => r.RiskPerTradePct)
         .IsRequired()

@@ -1,8 +1,5 @@
 using Invenet.Api.Modules.Accounts.Domain;
-using Invenet.Api.Modules.Accounts.Features.CreateAccount;
-using Invenet.Api.Modules.Accounts.Features.GetAccount;
-using Invenet.Api.Modules.Accounts.Features.ListAccounts;
-using Invenet.Api.Modules.Accounts.Features.UpdateAccount;
+using Invenet.Api.Modules.Accounts.Features;
 using Invenet.Api.Modules.Shared.API;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;

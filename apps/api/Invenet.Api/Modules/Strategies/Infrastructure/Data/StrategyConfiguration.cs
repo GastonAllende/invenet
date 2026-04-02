@@ -9,7 +9,7 @@ public class StrategyConfiguration : IEntityTypeConfiguration<Strategy>
 {
   public void Configure(EntityTypeBuilder<Strategy> builder)
   {
-    builder.ToTable("strategies", schema: "strategies");
+    builder.ToTable("strategies");
 
     builder.HasKey(s => s.Id);
 

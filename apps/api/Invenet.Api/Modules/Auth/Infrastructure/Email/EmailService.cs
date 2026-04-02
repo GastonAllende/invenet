@@ -6,7 +6,7 @@ namespace Invenet.Api.Modules.Auth.Infrastructure.Email;
 /// <summary>
 /// Email service implementation using SendGrid.
 /// </summary>
-public sealed class EmailService : IEmailService
+public sealed class EmailService
 {
   private readonly IConfiguration _configuration;
   private readonly ILogger<EmailService> _logger;

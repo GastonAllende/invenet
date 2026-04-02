@@ -8,7 +8,7 @@ public class StrategyVersionConfiguration : IEntityTypeConfiguration<StrategyVer
 {
   public void Configure(EntityTypeBuilder<StrategyVersion> builder)
   {
-    builder.ToTable("strategy_versions", schema: "strategies");
+    builder.ToTable("strategy_versions");
 
     builder.HasKey(v => v.Id);
 
