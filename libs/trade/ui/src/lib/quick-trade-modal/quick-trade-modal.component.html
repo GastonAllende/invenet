@@ -10,9 +10,11 @@
   [style]="{ width: '36rem' }"
   (onHide)="close()"
 >
-  <form [formGroup]="form" class="quick-form">
-    <div class="field">
-      <label for="quickAccountId">Account *</label>
+  <form [formGroup]="form" class="grid gap-4">
+    <div class="grid gap-1.5">
+      <label for="quickAccountId" class="font-semibold text-sm text-color"
+        >Account *</label
+      >
       <p-select
         inputId="quickAccountId"
         formControlName="accountId"
@@ -20,22 +22,33 @@
         optionLabel="name"
         optionValue="id"
         placeholder="Select account"
+        class="w-full"
       ></p-select>
       @if (form.get('accountId')?.invalid && form.get('accountId')?.touched) {
-        <small class="error">Account is required</small>
+        <small class="text-red-500 text-xs">Account is required</small>
       }
     </div>
 
-    <div class="field">
-      <label for="quickSymbol">Symbol *</label>
-      <input pInputText id="quickSymbol" formControlName="symbol" placeholder="e.g. AAPL" />
+    <div class="grid gap-1.5">
+      <label for="quickSymbol" class="font-semibold text-sm text-color"
+        >Symbol *</label
+      >
+      <input
+        pInputText
+        id="quickSymbol"
+        formControlName="symbol"
+        placeholder="e.g. AAPL"
+        class="w-full"
+      />
       @if (form.get('symbol')?.invalid && form.get('symbol')?.touched) {
-        <small class="error">Symbol is required</small>
+        <small class="text-red-500 text-xs">Symbol is required</small>
       }
     </div>
 
-    <div class="field">
-      <label for="quickDirection">Direction *</label>
+    <div class="grid gap-1.5">
+      <label for="quickDirection" class="font-semibold text-sm text-color"
+        >Direction *</label
+      >
       <p-select
         inputId="quickDirection"
         formControlName="direction"
@@ -45,14 +58,17 @@
         ]"
         optionLabel="label"
         optionValue="value"
+        class="w-full"
       ></p-select>
       @if (form.get('direction')?.invalid && form.get('direction')?.touched) {
-        <small class="error">Direction is required</small>
+        <small class="text-red-500 text-xs">Direction is required</small>
       }
     </div>
 
-    <div class="field">
-      <label for="quickStrategy">Strategy *</label>
+    <div class="grid gap-1.5">
+      <label for="quickStrategy" class="font-semibold text-sm text-color"
+        >Strategy *</label
+      >
       <p-select
         inputId="quickStrategy"
         formControlName="strategyId"
@@ -61,45 +77,67 @@
         optionValue="id"
         placeholder="Select strategy"
         (onChange)="onStrategyChange($event.value)"
+        class="w-full"
       ></p-select>
       @if (form.get('strategyId')?.invalid && form.get('strategyId')?.touched) {
-        <small class="error">Strategy is required</small>
+        <small class="text-red-500 text-xs">Strategy is required</small>
       }
       @if (currentVersionNumber()) {
-        <small class="version-label">Version: v{{ currentVersionNumber() }}</small>
+        <small class="text-muted-color text-xs"
+          >Version: v{{ currentVersionNumber() }}</small
+        >
       }
       @if (strategyVersionError()) {
-        <small class="error">{{ strategyVersionError() }}</small>
+        <small class="text-red-500 text-xs">{{ strategyVersionError() }}</small>
       }
     </div>
 
-    <div class="field">
-      <label for="quickEntryPrice">Entry Price *</label>
+    <div class="grid gap-1.5">
+      <label for="quickEntryPrice" class="font-semibold text-sm text-color"
+        >Entry Price *</label
+      >
       <p-inputnumber
         inputId="quickEntryPrice"
         formControlName="entryPrice"
         mode="currency"
         currency="USD"
         locale="en-US"
+        class="w-full"
       ></p-inputnumber>
       @if (form.get('entryPrice')?.invalid && form.get('entryPrice')?.touched) {
-        <small class="error">Entry price is required</small>
+        <small class="text-red-500 text-xs">Entry price is required</small>
       }
     </div>
 
-    <div class="field">
-      <label for="quickQuantity">Quantity</label>
-      <p-inputnumber inputId="quickQuantity" formControlName="quantity"></p-inputnumber>
+    <div class="grid gap-1.5">
+      <label for="quickQuantity" class="font-semibold text-sm text-color"
+        >Quantity</label
+      >
+      <p-inputnumber
+        inputId="quickQuantity"
+        formControlName="quantity"
+        class="w-full"
+      ></p-inputnumber>
     </div>
   </form>
 
   <ng-template pTemplate="footer">
-    <div class="actions">
-      <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="close()"></p-button>
+    <div class="flex justify-end gap-3">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="close()"
+      ></p-button>
       <p-button
         label="Save"
         icon="pi pi-check"
-        [disabled]="form.invalid || !currentVersionId() || !!strategyVersionError() || isLoading()"
+        [disabled]="
+          form.invalid ||
+          !currentVersionId() ||
+          !!strategyVersionError() ||
+          isLoading()
+        "
         [loading]="isLoading()"
         (onClick)="submitQuickTrade()"
       ></p-button>

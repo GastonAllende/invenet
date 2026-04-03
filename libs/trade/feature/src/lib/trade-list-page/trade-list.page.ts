@@ -22,7 +22,7 @@ import { TradeListComponent } from '@invenet/trade-ui';
   imports: [CommonModule, ToastModule, ConfirmDialogModule, TradeListComponent],
   providers: [MessageService, ConfirmationService],
   template: `
-    <div class="trade-shell entity-shell">
+    <div class="flex flex-col gap-5">
       <p-toast></p-toast>
       <p-confirmDialog></p-confirmDialog>
       <lib-trade-list

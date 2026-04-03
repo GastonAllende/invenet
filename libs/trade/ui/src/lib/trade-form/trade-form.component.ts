@@ -44,7 +44,6 @@ interface SelectOption {
     TextareaModule,
   ],
   templateUrl: './trade-form.component.html',
-  styleUrl: './trade-form.component.css',
 })
 export class TradeFormComponent {
   private readonly fb = inject(FormBuilder);

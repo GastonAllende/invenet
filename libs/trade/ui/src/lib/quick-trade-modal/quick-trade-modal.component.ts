@@ -22,7 +22,6 @@ import {
   ActiveAccountStore,
 } from '@invenet/account-data-access';
 import {
-  GetStrategyResponse,
   StrategiesApiService,
   StrategiesStore,
 } from '@invenet/strategy-data-access';
@@ -47,7 +46,6 @@ import {
   ],
   providers: [MessageService],
   templateUrl: './quick-trade-modal.component.html',
-  styleUrl: './quick-trade-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuickTradeModalComponent {

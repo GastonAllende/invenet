@@ -1,6 +1,6 @@
-<div class="page-center">
-  <p-card class="auth-card" header="Welcome back">
-    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+<div class="flex items-center justify-center min-h-screen px-4">
+  <p-card header="Welcome back" class="w-full max-w-md">
+    <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="submit()">
       <p-floatlabel variant="on">
         <input
           id="email"
@@ -53,13 +53,19 @@
           {{ errorMessage }}
         </p-message>
       }
-      <div class="auth-actions">
+      <div class="flex flex-col gap-3 mt-2">
         <button pButton type="submit" [loading]="isLoading()" class="w-full">
           Sign in
         </button>
-        <div class="auth-links">
-          <a routerLink="/auth/register" class="link">Create account</a>
-          <a routerLink="/auth/forgot-password" class="link"
+        <div class="flex justify-between text-sm mt-1">
+          <a
+            routerLink="/auth/register"
+            class="text-primary-color hover:underline font-medium"
+            >Create account</a
+          >
+          <a
+            routerLink="/auth/forgot-password"
+            class="text-primary-color hover:underline font-medium"
             >Forgot password?</a
           >
         </div>

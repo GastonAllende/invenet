@@ -18,7 +18,7 @@ import { StrategyListComponent } from '@invenet/strategy-ui';
   ],
   providers: [MessageService, ConfirmationService],
   template: `
-    <div class="strategy-shell entity-shell">
+    <div class="flex flex-col gap-5">
       <p-toast></p-toast>
       <p-confirmDialog></p-confirmDialog>
       <lib-strategy-list

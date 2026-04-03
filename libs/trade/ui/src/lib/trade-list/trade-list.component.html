@@ -1,7 +1,9 @@
-<div class="trade-list-container">
-  <div class="list-header">
-    <h3>Journal</h3>
-    <div class="list-controls">
+<div class="bg-surface-card rounded p-6">
+  <div
+    class="flex justify-between items-center mb-6 pb-4 border-b border-surface-border"
+  >
+    <h3 class="text-xl font-semibold m-0 text-color">Journal</h3>
+    <div class="flex items-center gap-4">
       <p-button
         label="Log Trade (full)"
         icon="pi pi-plus"
@@ -17,7 +19,7 @@
     </div>
   </div>
 
-  <div class="filters">
+  <div class="flex items-center gap-2 mb-8">
     <p-select
       [options]="accounts()"
       [ngModel]="selectedAccountId()"
@@ -50,7 +52,9 @@
       placeholder="Status"
       (ngModelChange)="onFilterChange()"
     ></p-select>
-    <div class="archived-toggle">
+    <div
+      class="inline-flex items-center gap-2 text-muted-color cursor-pointer text-sm"
+    >
       <p-checkbox
         [binary]="true"
         [ngModel]="includeArchived()"
@@ -96,8 +100,8 @@
       <tr>
         <td>{{ trade.openedAt | date: 'short' }}</td>
         <td>
-          <div class="symbol-container">
-            <strong class="symbol-text">{{ trade.symbol }}</strong>
+          <div class="flex items-center gap-1">
+            <strong class="font-semibold text-base">{{ trade.symbol }}</strong>
             <p-button
               icon="pi pi-external-link"
               [text]="true"
@@ -117,9 +121,10 @@
         </td>
         <td>{{ getAccountName(trade.accountId) }}</td>
         <td>
-          <span class="strategy-name">{{ trade.strategyName ?? '—' }}</span>
+          <span class="text-color">{{ trade.strategyName ?? '—' }}</span>
           @if (trade.strategyVersionNumber) {
-            <span class="strategy-version"
+            <span
+              class="text-xs px-1.5 py-0.5 bg-surface-100 rounded border border-surface-border text-muted-color ml-1.5"
               >v{{ trade.strategyVersionNumber }}</span
             >
           }
@@ -147,7 +152,7 @@
           }
         </td>
         <td>
-          <div class="action-buttons">
+          <div class="flex gap-2 items-center">
             <p-button
               icon="pi pi-pencil"
               [rounded]="true"

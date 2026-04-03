@@ -1,7 +1,7 @@
 <p-toast></p-toast>
-<div class="page-center">
-  <p-card class="auth-card" header="Create your account">
-    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+<div class="flex items-center justify-center min-h-screen px-4">
+  <p-card header="Create your account" class="w-full max-w-md">
+    <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="submit()">
       <p-floatlabel variant="on">
         <input
           id="email"
@@ -96,11 +96,14 @@
         </div>
       }
 
-      <div class="auth-actions">
+      <div class="flex flex-col gap-3 mt-2">
         <button pButton type="submit" [loading]="isLoading()" class="w-full">
           Create account
         </button>
-        <a routerLink="/auth/login" class="link text-center w-full">
+        <a
+          routerLink="/auth/login"
+          class="text-primary-color hover:underline text-sm text-center w-full"
+        >
           Already have an account?
         </a>
       </div>

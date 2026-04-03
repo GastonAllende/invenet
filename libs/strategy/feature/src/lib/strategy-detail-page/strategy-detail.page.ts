@@ -26,18 +26,20 @@ import type { StrategyVersionHistoryItem } from '@invenet/strategy-data-access';
   ],
   providers: [MessageService, ConfirmationService],
   template: `
-    <div class="strategy-shell entity-shell">
+    <div class="flex flex-col gap-5">
       <p-toast></p-toast>
       <p-confirmDialog></p-confirmDialog>
 
       @if (selectedStrategy(); as strategy) {
-        <div class="strategy-detail-layout">
-          <p-card styleClass="strategy-hero-card">
-            <div class="strategy-hero">
-              <div class="strategy-identity">
-                <div class="strategy-title-row">
-                  <h1 class="page-title entity-title strategy-title">
-                    <i class="pi pi-sitemap strategy-icon heading-icon"></i>
+        <div class="flex flex-col gap-4">
+          <p-card>
+            <div class="flex justify-between items-start gap-4">
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h1
+                    class="m-0 text-4xl font-bold text-color inline-flex items-center gap-2"
+                  >
+                    <i class="pi pi-sitemap text-primary-color text-xl"></i>
                     {{ strategy.name }}
                   </h1>
                   <p-tag
@@ -45,22 +47,28 @@ import type { StrategyVersionHistoryItem } from '@invenet/strategy-data-access';
                     [severity]="strategy.isArchived ? 'contrast' : 'success'"
                   ></p-tag>
                 </div>
-                <div class="strategy-meta-row">
+                <div class="flex items-center gap-2 flex-wrap text-muted-color">
                   @if (strategy.currentVersion; as currentVersion) {
-                    <span class="strategy-meta-label">Current version</span>
-                    <span class="strategy-meta-value"
+                    <span
+                      class="text-xs uppercase tracking-wider text-muted-color"
+                      >Current version</span
+                    >
+                    <span class="text-sm font-semibold text-color"
                       >v{{ currentVersion.versionNumber }}</span
                     >
-                    <span class="strategy-meta-separator">•</span>
-                    <span class="strategy-meta-label">Updated</span>
-                    <span class="strategy-meta-value">{{
+                    <span class="text-muted-color mx-1">•</span>
+                    <span
+                      class="text-xs uppercase tracking-wider text-muted-color"
+                      >Updated</span
+                    >
+                    <span class="text-sm font-semibold text-color">{{
                       currentVersion.createdAt | date: 'short'
                     }}</span>
                   }
                 </div>
               </div>
 
-              <div class="strategy-actions">
+              <div class="inline-flex items-center gap-2 flex-wrap self-start">
                 <p-button
                   label="Back to Strategies"
                   icon="pi pi-arrow-left"
@@ -98,42 +106,74 @@ import type { StrategyVersionHistoryItem } from '@invenet/strategy-data-access';
             </div>
           </p-card>
 
-          <p-card styleClass="strategy-version-card">
+          <p-card>
             <ng-template pTemplate="title">Current Version</ng-template>
             <ng-template pTemplate="subtitle"
               >Latest ruleset currently attached to this strategy.</ng-template
             >
             @if (strategy.currentVersion; as currentVersion) {
-              <div class="version-summary">
-                <div class="version-stat">
-                  <span class="version-stat-label">Version</span>
-                  <span class="version-stat-value"
+              <div class="grid grid-cols-2 gap-3 mb-4">
+                <div
+                  class="p-3 border border-surface-border rounded flex flex-col gap-1 bg-surface-50"
+                >
+                  <span
+                    class="text-xs uppercase tracking-wider text-muted-color"
+                    >Version</span
+                  >
+                  <span class="text-base font-semibold text-color"
                     >v{{ currentVersion.versionNumber }}</span
                   >
                 </div>
-                <div class="version-stat">
-                  <span class="version-stat-label">Created At</span>
-                  <span class="version-stat-value">{{
+                <div
+                  class="p-3 border border-surface-border rounded flex flex-col gap-1 bg-surface-50"
+                >
+                  <span
+                    class="text-xs uppercase tracking-wider text-muted-color"
+                    >Created At</span
+                  >
+                  <span class="text-base font-semibold text-color">{{
                     currentVersion.createdAt | date: 'short'
                   }}</span>
                 </div>
               </div>
-              <div class="rules-grid">
-                <div class="rule-block">
-                  <h3>Entry Rules</h3>
-                  <p>{{ currentVersion.entryRules }}</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div
+                  class="border border-surface-border rounded p-4 flex flex-col gap-2"
+                >
+                  <h3 class="m-0 text-sm font-semibold text-color">
+                    Entry Rules
+                  </h3>
+                  <p class="m-0 whitespace-pre-wrap text-muted-color text-sm">
+                    {{ currentVersion.entryRules }}
+                  </p>
                 </div>
-                <div class="rule-block">
-                  <h3>Exit Rules</h3>
-                  <p>{{ currentVersion.exitRules }}</p>
+                <div
+                  class="border border-surface-border rounded p-4 flex flex-col gap-2"
+                >
+                  <h3 class="m-0 text-sm font-semibold text-color">
+                    Exit Rules
+                  </h3>
+                  <p class="m-0 whitespace-pre-wrap text-muted-color text-sm">
+                    {{ currentVersion.exitRules }}
+                  </p>
                 </div>
-                <div class="rule-block">
-                  <h3>Risk Rules</h3>
-                  <p>{{ currentVersion.riskRules }}</p>
+                <div
+                  class="border border-surface-border rounded p-4 flex flex-col gap-2"
+                >
+                  <h3 class="m-0 text-sm font-semibold text-color">
+                    Risk Rules
+                  </h3>
+                  <p class="m-0 whitespace-pre-wrap text-muted-color text-sm">
+                    {{ currentVersion.riskRules }}
+                  </p>
                 </div>
-                <div class="rule-block">
-                  <h3>Notes</h3>
-                  <p>{{ currentVersion.notes || '—' }}</p>
+                <div
+                  class="border border-surface-border rounded p-4 flex flex-col gap-2"
+                >
+                  <h3 class="m-0 text-sm font-semibold text-color">Notes</h3>
+                  <p class="m-0 whitespace-pre-wrap text-muted-color text-sm">
+                    {{ currentVersion.notes || '—' }}
+                  </p>
                 </div>
               </div>
             } @else {
@@ -141,10 +181,9 @@ import type { StrategyVersionHistoryItem } from '@invenet/strategy-data-access';
             }
           </p-card>
 
-          <p-card styleClass="strategy-history-card">
+          <p-card>
             <ng-template pTemplate="title">Version History</ng-template>
             <p-table
-              styleClass="strategy-history-table"
               [value]="strategy.versions"
               [tableStyle]="{ 'min-width': '36rem' }"
             >
@@ -161,7 +200,7 @@ import type { StrategyVersionHistoryItem } from '@invenet/strategy-data-access';
                   <td>v{{ version.versionNumber }}</td>
                   <td>{{ version.createdAt | date: 'short' }}</td>
                   <td>
-                    <span class="created-by">{{
+                    <span class="font-mono text-xs text-muted-color">{{
                       formatUserId(version.createdByUserId)
                     }}</span>
                   </td>
@@ -182,7 +221,6 @@ import type { StrategyVersionHistoryItem } from '@invenet/strategy-data-access';
       }
     </div>
   `,
-  styleUrls: ['./strategy-detail.page.css'],
 })
 export class StrategyDetailPage {
   private readonly store = inject(StrategiesStore);

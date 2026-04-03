@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -38,8 +44,8 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
     PasswordModule,
   ],
   template: `
-    <div class="page-center">
-      <p-card class="auth-card" header="Reset Password">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <p-card class="w-full max-w-md" header="Reset Password">
         @if (!token() || !email()) {
           <p-message severity="error" text="Invalid reset link."></p-message>
           <div class="mt-4">
@@ -51,16 +57,21 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
             text="Password reset successfully! Redirecting to login..."
           ></p-message>
         } @else {
-          <p class="mb-4">Enter your new password below.</p>
+          <p class="mb-4 text-muted-color text-sm">
+            Enter your new password below.
+          </p>
 
           <form [formGroup]="form" (ngSubmit)="submit()">
-            <div class="field">
-              <label for="password">New Password</label>
+            <div class="flex flex-col gap-1.5 mb-4">
+              <label for="password" class="text-sm font-medium text-color"
+                >New Password</label
+              >
               <p-password
                 id="password"
                 formControlName="password"
                 [toggleMask]="true"
                 placeholder="••••••••"
+                class="w-full"
                 [strongRegex]="
                   '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,}$'
                 "
@@ -68,27 +79,34 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
               @if (
                 form.controls.password.touched && form.controls.password.invalid
               ) {
-                <small>
+                <small class="text-red-500 text-xs">
                   Password must be at least 10 characters with uppercase,
                   lowercase, number, and symbol.
                 </small>
               }
             </div>
 
-            <div class="field">
-              <label for="confirmPassword">Confirm Password</label>
+            <div class="flex flex-col gap-1.5 mb-4">
+              <label
+                for="confirmPassword"
+                class="text-sm font-medium text-color"
+                >Confirm Password</label
+              >
               <p-password
                 id="confirmPassword"
                 formControlName="confirmPassword"
                 [feedback]="false"
                 [toggleMask]="true"
                 placeholder="••••••••"
+                class="w-full"
               ></p-password>
               @if (
                 form.hasError('passwordsMismatch') &&
                 form.controls.confirmPassword.touched
               ) {
-                <small> Passwords must match. </small>
+                <small class="text-red-500 text-xs">
+                  Passwords must match.
+                </small>
               }
             </div>
 
@@ -96,78 +114,26 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
               <p-message severity="error" [text]="errorMessage()"></p-message>
             }
 
-            <div class="auth-actions">
-              <button pButton type="submit" [loading]="isLoading()">
+            <div class="flex flex-col gap-3 mt-2">
+              <button
+                pButton
+                type="submit"
+                class="w-full"
+                [loading]="isLoading()"
+              >
                 Reset password
               </button>
-              <a routerLink="/auth/login">Back to login</a>
+              <a
+                routerLink="/auth/login"
+                class="text-primary-color hover:underline text-sm text-center"
+                >Back to login</a
+              >
             </div>
           </form>
         }
       </p-card>
     </div>
   `,
-  styles: [
-    `
-      .page-center {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        padding: 2rem;
-      }
-
-      .auth-card {
-        width: 100%;
-        max-width: 500px;
-      }
-
-      .mb-4 {
-        margin-bottom: 1rem;
-      }
-
-      .mt-4 {
-        margin-top: 1rem;
-      }
-
-      .field {
-        margin-bottom: 1.5rem;
-      }
-
-      .field label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-      }
-
-      .field small {
-        display: block;
-        margin-top: 0.25rem;
-        color: var(--red-500);
-      }
-
-      .auth-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        margin-top: 1.5rem;
-      }
-
-      .auth-actions button {
-        width: 100%;
-      }
-
-      .auth-actions a {
-        text-align: center;
-        color: var(--primary-color);
-        text-decoration: none;
-      }
-
-      .auth-actions a:hover {
-        text-decoration: underline;
-      }
-    `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResetPasswordComponent implements OnInit {

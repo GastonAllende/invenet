@@ -23,7 +23,7 @@ type PendingOperation = 'archive' | 'unarchive' | null;
   ],
   providers: [MessageService, ConfirmationService],
   template: `
-    <div class="account-shell entity-shell">
+    <div class="flex flex-col gap-5">
       <p-toast></p-toast>
       <p-confirmDialog></p-confirmDialog>
       <lib-account-list

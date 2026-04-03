@@ -21,9 +21,9 @@ import { AuthService } from '@invenet/auth-data-access';
     MessageModule,
   ],
   template: `
-    <div class="page-center">
-      <p-card class="auth-card" header="Forgot Password">
-        <p class="mb-4">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <p-card header="Forgot Password" class="w-full max-w-md">
+        <p class="mb-4 text-muted-color text-sm">
           Enter your email address and we'll send you a link to reset your
           password.
         </p>
@@ -37,18 +37,19 @@ import { AuthService } from '@invenet/auth-data-access';
             <button pButton (click)="goToLogin()">Back to login</button>
           </div>
         } @else {
-          <form [formGroup]="form" (ngSubmit)="submit()">
-            <div class="field">
-              <label for="email">Email</label>
+          <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label for="email" class="text-sm font-medium text-color">Email</label>
               <input
                 id="email"
                 type="email"
                 pInputText
+                class="w-full"
                 formControlName="email"
                 placeholder="you@example.com"
               />
               @if (form.controls.email.touched && form.controls.email.invalid) {
-                <small> Enter a valid email address. </small>
+                <small class="text-red-500 text-xs">Enter a valid email address.</small>
               }
             </div>
 
@@ -56,82 +57,18 @@ import { AuthService } from '@invenet/auth-data-access';
               <p-message severity="error" [text]="errorMessage()"></p-message>
             }
 
-            <div class="auth-actions">
-              <button pButton type="submit" [loading]="isLoading()">
+            <div class="flex flex-col gap-3 mt-2">
+              <button pButton type="submit" [loading]="isLoading()" class="w-full">
                 Send reset link
               </button>
-              <a routerLink="/auth/login">Back to login</a>
+              <a routerLink="/auth/login" class="text-primary-color hover:underline text-sm text-center">Back to login</a>
             </div>
           </form>
         }
       </p-card>
     </div>
   `,
-  styles: [
-    `
-      .page-center {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        padding: 2rem;
-      }
 
-      .auth-card {
-        width: 100%;
-        max-width: 500px;
-      }
-
-      .mb-4 {
-        margin-bottom: 1rem;
-      }
-
-      .mt-4 {
-        margin-top: 1rem;
-      }
-
-      .field {
-        margin-bottom: 1.5rem;
-      }
-
-      .field label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-      }
-
-      .field input {
-        width: 100%;
-      }
-
-      .field small {
-        display: block;
-        margin-top: 0.25rem;
-        color: var(--red-500);
-      }
-
-      .auth-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        margin-top: 1.5rem;
-      }
-
-      .auth-actions button {
-        width: 100%;
-      }
-
-      .auth-actions a {
-        text-align: center;
-        color: var(--primary-color);
-        text-decoration: none;
-      }
-
-      .auth-actions a:hover {
-        text-decoration: underline;
-      }
-    `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPasswordComponent {

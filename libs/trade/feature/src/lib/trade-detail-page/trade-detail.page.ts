@@ -19,7 +19,7 @@ import { TradeDetailComponent } from '@invenet/trade-ui';
   ],
   providers: [MessageService, ConfirmationService],
   template: `
-    <div class="trade-shell entity-shell">
+    <div class="flex flex-col gap-5">
       <p-toast></p-toast>
       <p-confirmDialog></p-confirmDialog>
       <lib-trade-detail

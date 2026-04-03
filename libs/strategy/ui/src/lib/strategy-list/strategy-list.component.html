@@ -1,14 +1,14 @@
-<div class="strategy-list-container">
-  <div class="list-header">
-    <h3>Strategies</h3>
-    <div class="list-controls">
+<div class="bg-surface-card rounded p-6">
+  <div class="flex justify-between items-center mb-6 pb-4 border-b border-surface-border">
+    <h3 class="text-xl font-semibold m-0 text-color">Strategies</h3>
+    <div class="flex items-center gap-4">
       <p-button
         label="Create Strategy"
         icon="pi pi-plus"
         (onClick)="onCreate()"
         [disabled]="isLoading()"
       ></p-button>
-      <div class="archived-toggle">
+      <div class="inline-flex items-center gap-2 text-muted-color cursor-pointer text-sm">
         <p-checkbox
           inputId="includeArchived"
           [binary]="true"
@@ -65,7 +65,7 @@
           ></p-tag>
         </td>
         <td>
-          <div class="action-buttons">
+          <div class="flex gap-2 items-center">
             <p-button
               icon="pi pi-eye"
               [rounded]="true"
@@ -103,8 +103,8 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="7" class="empty-message">
-          <div class="empty-state">
+        <td colspan="7">
+          <div class="flex flex-col items-center gap-3 py-12 text-muted-color">
             <i class="pi pi-inbox" style="font-size: 3rem"></i>
             <p>No strategies found</p>
             <small>Click "Create Strategy" to add your first strategy</small>

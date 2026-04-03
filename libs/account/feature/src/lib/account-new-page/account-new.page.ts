@@ -19,11 +19,11 @@ import { AccountFormComponent } from '@invenet/account-ui';
   imports: [CommonModule, ToastModule, AccountFormComponent],
   providers: [MessageService],
   template: `
-    <div class="account-shell entity-shell">
+    <div class="flex flex-col gap-5">
       <p-toast></p-toast>
-      <section class="account-header entity-header">
-        <h1 class="account-title entity-title">Create Account</h1>
-        <p class="account-subtitle entity-subtitle">
+      <section class="bg-surface-card border border-surface-border rounded p-6">
+        <h1 class="text-3xl font-semibold m-0 text-color">Create Account</h1>
+        <p class="m-0 text-muted-color">
           Define your risk rules before logging trades.
         </p>
       </section>

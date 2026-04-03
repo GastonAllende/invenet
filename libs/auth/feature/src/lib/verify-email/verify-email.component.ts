@@ -15,8 +15,8 @@ import { AuthService } from '@invenet/auth-data-access';
   providers: [MessageService],
   template: `
     <p-toast></p-toast>
-    <div class="page-center">
-      <p-card class="auth-card" header="Email Verification">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <p-card class="w-full max-w-md" header="Email Verification">
         @if (isLoading()) {
           <div class="text-center">
             <p-progressSpinner
@@ -46,38 +46,7 @@ import { AuthService } from '@invenet/auth-data-access';
       </p-card>
     </div>
   `,
-  styles: [
-    `
-      .page-center {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        padding: 2rem;
-      }
 
-      .auth-card {
-        width: 100%;
-        max-width: 500px;
-      }
-
-      .text-center {
-        text-align: center;
-      }
-
-      .mt-4 {
-        margin-top: 1rem;
-      }
-
-      .flex {
-        display: flex;
-      }
-
-      .gap-2 {
-        gap: 0.5rem;
-      }
-    `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VerifyEmailComponent implements OnInit {

@@ -20,7 +20,6 @@ import type {
     ButtonModule,
   ],
   templateUrl: './strategy-form.component.html',
-  styleUrls: ['./strategy-form.component.css'],
 })
 export class StrategyFormComponent {
   private readonly fb = inject(FormBuilder);

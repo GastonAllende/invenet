@@ -21,11 +21,11 @@ import { TradeFormComponent } from '@invenet/trade-ui';
   imports: [CommonModule, ToastModule, TradeFormComponent],
   providers: [MessageService],
   template: `
-    <div class="trade-shell entity-shell">
+    <div class="flex flex-col gap-5">
       <p-toast></p-toast>
-      <section class="page-header entity-header">
-        <h1 class="page-title entity-title">Edit Trade</h1>
-        <p class="page-subtitle entity-subtitle">
+      <section class="bg-surface-card border border-surface-border rounded p-6">
+        <h1 class="text-3xl font-semibold m-0 text-color">Edit Trade</h1>
+        <p class="m-0 text-muted-color">
           Update execution and journal details for this trade.
         </p>
       </section>

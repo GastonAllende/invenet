@@ -13,11 +13,11 @@ import { AccountFormComponent } from '@invenet/account-ui';
   imports: [CommonModule, ToastModule, AccountFormComponent],
   providers: [MessageService],
   template: `
-    <div class="account-shell entity-shell">
+    <div class="flex flex-col gap-5">
       <p-toast></p-toast>
-      <section class="page-header entity-header">
-        <h1 class="page-title entity-title">Edit Account</h1>
-        <p class="page-subtitle entity-subtitle">
+      <section class="bg-surface-card border border-surface-border rounded p-6">
+        <h1 class="text-3xl font-semibold m-0 text-color">Edit Account</h1>
+        <p class="m-0 text-muted-color">
           Update your account settings and risk rules.
         </p>
       </section>

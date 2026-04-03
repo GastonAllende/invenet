@@ -14,15 +14,17 @@ import { StrategyFormComponent } from '@invenet/strategy-ui';
   imports: [CommonModule, ToastModule, MessageModule, StrategyFormComponent],
   providers: [MessageService],
   template: `
-    <div class="strategy-shell entity-shell">
+    <div class="flex flex-col gap-5">
       <p-toast></p-toast>
-      <section class="page-header entity-header">
-        <h1 class="page-title entity-title">Edit Strategy (New Version)</h1>
-        <p class="page-subtitle entity-subtitle">
+      <section class="bg-surface-card border border-surface-border rounded p-6">
+        <h1 class="text-3xl font-semibold m-0 text-color">
+          Edit Strategy (New Version)
+        </h1>
+        <p class="m-0 text-muted-color">
           This creates a new version and preserves previous ones.
         </p>
       </section>
-      <section class="inline-notice">
+      <section class="-mt-1">
         <p-message severity="warn" [closable]="false">
           Saving will create a new version. Previous versions remain unchanged.
         </p-message>
@@ -36,13 +38,6 @@ import { StrategyFormComponent } from '@invenet/strategy-ui';
       ></lib-strategy-form>
     </div>
   `,
-  styles: [
-    `
-      .inline-notice {
-        margin-top: -0.25rem;
-      }
-    `,
-  ],
 })
 export class StrategyEditPage {
   private readonly store = inject(StrategiesStore);

@@ -29,7 +29,6 @@ import type { Trade, TradeFilters } from '@invenet/trade-data-access';
     CheckboxModule,
   ],
   templateUrl: './trade-list.component.html',
-  styleUrl: './trade-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradeListComponent {

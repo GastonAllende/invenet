@@ -16,7 +16,6 @@ import { Trade } from '@invenet/trade-data-access';
   standalone: true,
   imports: [CommonModule, ButtonModule, CardModule, DividerModule, TagModule],
   templateUrl: './trade-detail.component.html',
-  styleUrl: './trade-detail.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradeDetailComponent {

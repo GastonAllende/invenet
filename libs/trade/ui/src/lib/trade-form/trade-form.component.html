@@ -1,10 +1,18 @@
-<div class="form-page">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="entity-form">
-    <section class="form-section">
-      <h3>Trade Details</h3>
-      <div class="form-grid">
-        <div class="form-field">
-          <label for="accountId">Account *</label>
+<div class="max-w-3xl mx-auto py-8 px-4">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+    <section
+      class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4"
+    >
+      <h3
+        class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border"
+      >
+        Trade Details
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        <div class="flex flex-col gap-2">
+          <label for="accountId" class="text-sm font-medium text-color"
+            >Account *</label
+          >
           <p-select
             inputId="accountId"
             formControlName="accountId"
@@ -13,12 +21,14 @@
             optionValue="id"
             placeholder="Select account"
             [disabled]="isEditMode"
-            styleClass="control-full-width"
+            class="w-full"
           ></p-select>
         </div>
 
-        <div class="form-field">
-          <label for="strategyId">Strategy *</label>
+        <div class="flex flex-col gap-2">
+          <label for="strategyId" class="text-sm font-medium text-color"
+            >Strategy *</label
+          >
           <p-select
             inputId="strategyId"
             formControlName="strategyId"
@@ -26,114 +36,192 @@
             optionLabel="name"
             optionValue="id"
             placeholder="Select strategy"
-            styleClass="control-full-width"
+            class="w-full"
           ></p-select>
           @if (isEditMode && trade()?.strategyVersionNumber) {
-            <small>Version: v{{ trade()?.strategyVersionNumber }}</small>
+            <small class="text-muted-color text-xs"
+              >Version: v{{ trade()?.strategyVersionNumber }}</small
+            >
           }
         </div>
 
-        <div class="form-field">
-          <label for="direction">Direction *</label>
+        <div class="flex flex-col gap-2">
+          <label for="direction" class="text-sm font-medium text-color"
+            >Direction *</label
+          >
           <p-select
             inputId="direction"
             formControlName="direction"
             [options]="directionOptions"
             optionLabel="label"
             optionValue="value"
-            styleClass="control-full-width"
+            class="w-full"
           ></p-select>
         </div>
 
-        <div class="form-field">
-          <label for="status">Status *</label>
+        <div class="flex flex-col gap-2">
+          <label for="status" class="text-sm font-medium text-color"
+            >Status *</label
+          >
           <p-select
             inputId="status"
             formControlName="status"
             [options]="statusOptions"
             optionLabel="label"
             optionValue="value"
-            styleClass="control-full-width"
+            class="w-full"
           ></p-select>
         </div>
 
-        <div class="form-field">
-          <label for="symbol">Symbol *</label>
-          <input pInputText id="symbol" formControlName="symbol" placeholder="e.g. AAPL" class="control-full-width" />
+        <div class="flex flex-col gap-2">
+          <label for="symbol" class="text-sm font-medium text-color"
+            >Symbol *</label
+          >
+          <input
+            pInputText
+            id="symbol"
+            formControlName="symbol"
+            placeholder="e.g. AAPL"
+            class="w-full"
+          />
         </div>
 
-        <div class="form-field">
-          <label for="openedAt">Opened At *</label>
-          <p-datepicker inputId="openedAt" formControlName="openedAt" [showIcon]="true" [showTime]="true" styleClass="control-full-width"></p-datepicker>
+        <div class="flex flex-col gap-2">
+          <label for="openedAt" class="text-sm font-medium text-color"
+            >Opened At *</label
+          >
+          <p-datepicker
+            inputId="openedAt"
+            formControlName="openedAt"
+            [showIcon]="true"
+            [showTime]="true"
+            class="w-full"
+          ></p-datepicker>
         </div>
       </div>
     </section>
 
-    <section class="form-section">
-      <h3>Execution Metrics</h3>
-      <div class="form-grid">
-        <div class="form-field">
-          <label for="entryPrice">Entry Price *</label>
+    <section
+      class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4"
+    >
+      <h3
+        class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border"
+      >
+        Execution Metrics
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        <div class="flex flex-col gap-2">
+          <label for="entryPrice" class="text-sm font-medium text-color"
+            >Entry Price *</label
+          >
           <p-inputnumber
             inputId="entryPrice"
             formControlName="entryPrice"
             mode="currency"
             currency="USD"
             locale="en-US"
-            styleClass="control-full-width"
+            class="w-full"
           ></p-inputnumber>
         </div>
 
-        <div class="form-field">
-          <label for="quantity">Quantity</label>
-          <p-inputnumber inputId="quantity" formControlName="quantity" styleClass="control-full-width"></p-inputnumber>
+        <div class="flex flex-col gap-2">
+          <label for="quantity" class="text-sm font-medium text-color"
+            >Quantity</label
+          >
+          <p-inputnumber
+            inputId="quantity"
+            formControlName="quantity"
+            class="w-full"
+          ></p-inputnumber>
         </div>
 
-        <div class="form-field">
-          <label for="closedAt">Closed At</label>
-          <p-datepicker inputId="closedAt" formControlName="closedAt" [showIcon]="true" [showTime]="true" styleClass="control-full-width"></p-datepicker>
+        <div class="flex flex-col gap-2">
+          <label for="closedAt" class="text-sm font-medium text-color"
+            >Closed At</label
+          >
+          <p-datepicker
+            inputId="closedAt"
+            formControlName="closedAt"
+            [showIcon]="true"
+            [showTime]="true"
+            class="w-full"
+          ></p-datepicker>
         </div>
 
-        <div class="form-field">
-          <label for="exitPrice">Exit Price</label>
+        <div class="flex flex-col gap-2">
+          <label for="exitPrice" class="text-sm font-medium text-color"
+            >Exit Price</label
+          >
           <p-inputnumber
             inputId="exitPrice"
             formControlName="exitPrice"
             mode="currency"
             currency="USD"
             locale="en-US"
-            styleClass="control-full-width"
+            class="w-full"
           ></p-inputnumber>
         </div>
 
-        <div class="form-field">
-          <label for="pnl">P&amp;L</label>
-          <p-inputnumber inputId="pnl" formControlName="pnl" styleClass="control-full-width"></p-inputnumber>
+        <div class="flex flex-col gap-2">
+          <label for="pnl" class="text-sm font-medium text-color"
+            >P&amp;L</label
+          >
+          <p-inputnumber
+            inputId="pnl"
+            formControlName="pnl"
+            class="w-full"
+          ></p-inputnumber>
         </div>
 
-        <div class="form-field">
-          <label for="rMultiple">R-Multiple</label>
-          <p-inputnumber inputId="rMultiple" formControlName="rMultiple" styleClass="control-full-width"></p-inputnumber>
-        </div>
-      </div>
-    </section>
-
-    <section class="form-section">
-      <h3>Journal Notes</h3>
-      <div class="form-grid">
-        <div class="form-field">
-          <label for="tags">Tags</label>
-          <input pInputText id="tags" formControlName="tags" placeholder="comma,separated,tags" class="control-full-width" />
-        </div>
-
-        <div class="form-field form-field-full">
-          <label for="notes">Notes</label>
-          <textarea pTextarea id="notes" formControlName="notes" rows="4" class="control-full-width"></textarea>
+        <div class="flex flex-col gap-2">
+          <label for="rMultiple" class="text-sm font-medium text-color"
+            >R-Multiple</label
+          >
+          <p-inputnumber
+            inputId="rMultiple"
+            formControlName="rMultiple"
+            class="w-full"
+          ></p-inputnumber>
         </div>
       </div>
     </section>
 
-    <div class="form-actions">
+    <section
+      class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4"
+    >
+      <h3
+        class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border"
+      >
+        Journal Notes
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        <div class="flex flex-col gap-2">
+          <label for="tags" class="text-sm font-medium text-color">Tags</label>
+          <input
+            pInputText
+            id="tags"
+            formControlName="tags"
+            placeholder="comma,separated,tags"
+            class="w-full"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2 md:col-span-2">
+          <label for="notes" class="text-sm font-medium text-color"
+            >Notes</label
+          >
+          <textarea
+            pTextarea
+            id="notes"
+            formControlName="notes"
+            rows="4"
+            class="w-full"
+          ></textarea>
+        </div>
+      </div>
+    </section>
+
+    <div class="flex justify-end gap-4 pt-4 border-t border-surface-border">
       <p-button
         label="Cancel"
         severity="secondary"
