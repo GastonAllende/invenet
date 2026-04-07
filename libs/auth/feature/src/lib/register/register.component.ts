@@ -1,5 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -97,8 +102,7 @@ export class RegisterComponent {
           this.messageService.add({
             severity: 'success',
             summary: 'Registration Successful',
-            detail:
-              'Please check your email to verify your account.',
+            detail: 'Please check your email to verify your account.',
             life: 5000,
           });
           setTimeout(() => void this.router.navigateByUrl('/auth/login'), 2000);

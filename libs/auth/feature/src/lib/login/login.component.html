@@ -1,33 +1,67 @@
-<div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
+<div
+  class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden"
+>
   <div class="flex flex-col items-center justify-center">
-    <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
-      <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+    <div
+      style="
+        border-radius: 56px;
+        padding: 0.3rem;
+        background: linear-gradient(
+          180deg,
+          var(--primary-color) 10%,
+          rgba(33, 150, 243, 0) 30%
+        );
+      "
+    >
+      <div
+        class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20"
+        style="border-radius: 53px"
+      >
         <div class="text-center mb-8">
           <img src="assets/logo.png" alt="Invenet" class="mb-8 w-16 mx-auto" />
-          <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Welcome to Invenet!</div>
+          <div
+            class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4"
+          >
+            Welcome to Invenet!
+          </div>
           <span class="text-muted-color font-medium">Sign in to continue</span>
         </div>
 
         <form [formGroup]="form" (ngSubmit)="submit()">
-          <label for="email" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
+          <label
+            for="email"
+            class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2"
+            >Email</label
+          >
           <input
             id="email"
             type="email"
             pInputText
             class="w-full mb-2"
             formControlName="email"
-            [invalid]="form.controls.email.touched && form.controls.email.invalid"
+            [invalid]="
+              form.controls.email.touched && form.controls.email.invalid
+            "
             autocomplete="email"
           />
           @if (form.controls.email.touched && form.controls.email.invalid) {
-            <p-message severity="error" variant="simple" size="small" class="mb-4 block">
+            <p-message
+              severity="error"
+              variant="simple"
+              size="small"
+              class="mb-4 block"
+            >
               Enter a valid email address.
             </p-message>
           } @else {
             <div class="mb-8"></div>
           }
 
-          <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+          <label
+            for="password"
+            class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2"
+            >Password</label
+          >
           <p-password
             inputId="password"
             formControlName="password"
@@ -35,33 +69,64 @@
             [toggleMask]="true"
             [fluid]="true"
             styleClass="mb-2"
-            [invalid]="form.controls.password.touched && form.controls.password.invalid"
+            [invalid]="
+              form.controls.password.touched && form.controls.password.invalid
+            "
             autocomplete="current-password"
           ></p-password>
-          @if (form.controls.password.touched && form.controls.password.invalid) {
-            <p-message severity="error" variant="simple" size="small" class="mb-4 block">
+          @if (
+            form.controls.password.touched && form.controls.password.invalid
+          ) {
+            <p-message
+              severity="error"
+              variant="simple"
+              size="small"
+              class="mb-4 block"
+            >
               Password is required.
             </p-message>
           }
 
           <div class="flex items-center justify-between mt-2 mb-8 gap-8">
             <div class="flex items-center">
-              <p-checkbox inputId="rememberMe" formControlName="rememberMe" [binary]="true" class="mr-2" />
+              <p-checkbox
+                inputId="rememberMe"
+                formControlName="rememberMe"
+                [binary]="true"
+                class="mr-2"
+              />
               <label for="rememberMe" class="cursor-pointer">Remember me</label>
             </div>
-            <a routerLink="/auth/forgot-password" class="font-medium cursor-pointer text-primary-color hover:underline">Forgot password?</a>
+            <a
+              routerLink="/auth/forgot-password"
+              class="font-medium cursor-pointer text-primary-color hover:underline"
+              >Forgot password?</a
+            >
           </div>
 
           @if (errorMessage) {
-            <p-message severity="error" icon="pi pi-times-circle" class="mb-4 block">
+            <p-message
+              severity="error"
+              icon="pi pi-times-circle"
+              class="mb-4 block"
+            >
               {{ errorMessage }}
             </p-message>
           }
 
-          <p-button label="Sign In" styleClass="w-full mb-4" type="submit" [loading]="isLoading()"></p-button>
+          <p-button
+            label="Sign In"
+            styleClass="w-full mb-4"
+            type="submit"
+            [loading]="isLoading()"
+          ></p-button>
 
           <div class="text-center">
-            <a routerLink="/auth/register" class="text-primary-color hover:underline font-medium text-sm">Don't have an account? Create one</a>
+            <a
+              routerLink="/auth/register"
+              class="text-primary-color hover:underline font-medium text-sm"
+              >Don't have an account? Create one</a
+            >
           </div>
         </form>
       </div>
