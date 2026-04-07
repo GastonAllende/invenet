@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { AuthService } from '@invenet/auth-data-access';
@@ -16,56 +15,55 @@ import { AuthService } from '@invenet/auth-data-access';
     ReactiveFormsModule,
     RouterModule,
     ButtonModule,
-    CardModule,
     InputTextModule,
     MessageModule,
   ],
   template: `
-    <div class="flex items-center justify-center min-h-screen px-4">
-      <p-card header="Forgot Password" class="w-full max-w-md">
-        <p class="mb-4 text-muted-color text-sm">
-          Enter your email address and we'll send you a link to reset your
-          password.
-        </p>
-
-        @if (isSuccess()) {
-          <p-message
-            severity="success"
-            text="Password reset link sent! Please check your email."
-          ></p-message>
-          <div class="mt-4">
-            <button pButton (click)="goToLogin()">Back to login</button>
-          </div>
-        } @else {
-          <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
-            <div class="flex flex-col gap-1.5">
-              <label for="email" class="text-sm font-medium text-color">Email</label>
-              <input
-                id="email"
-                type="email"
-                pInputText
-                class="w-full"
-                formControlName="email"
-                placeholder="you@example.com"
-              />
-              @if (form.controls.email.touched && form.controls.email.invalid) {
-                <small class="text-red-500 text-xs">Enter a valid email address.</small>
-              }
+    <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
+      <div class="flex flex-col items-center justify-center">
+        <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+          <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+            <div class="text-center mb-8">
+              <img src="assets/logo.png" alt="Invenet" class="mb-8 w-16 mx-auto" />
+              <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Forgot your password?</div>
+              <span class="text-muted-color font-medium">We'll send you a reset link</span>
             </div>
 
-            @if (errorMessage()) {
-              <p-message severity="error" [text]="errorMessage()"></p-message>
+            @if (isSuccess()) {
+              <p-message severity="success" text="Password reset link sent! Please check your email." class="block mb-6"></p-message>
+              <p-button label="Back to login" styleClass="w-full" (onClick)="goToLogin()"></p-button>
+            } @else {
+              <form [formGroup]="form" (ngSubmit)="submit()">
+                <label for="email" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  pInputText
+                  class="w-full mb-2"
+                  formControlName="email"
+                  placeholder="you@example.com"
+                />
+                @if (form.controls.email.touched && form.controls.email.invalid) {
+                  <p-message severity="error" variant="simple" size="small" class="mb-4 block">
+                    Enter a valid email address.
+                  </p-message>
+                } @else {
+                  <div class="mb-8"></div>
+                }
+
+                @if (errorMessage()) {
+                  <p-message severity="error" [text]="errorMessage()" class="block mb-4"></p-message>
+                }
+
+                <p-button label="Send Reset Link" styleClass="w-full mb-4" type="submit" [loading]="isLoading()"></p-button>
+                <div class="text-center">
+                  <a routerLink="/auth/login" class="text-primary-color hover:underline text-sm font-medium">Back to login</a>
+                </div>
+              </form>
             }
-
-            <div class="flex flex-col gap-3 mt-2">
-              <button pButton type="submit" [loading]="isLoading()" class="w-full">
-                Send reset link
-              </button>
-              <a routerLink="/auth/login" class="text-primary-color hover:underline text-sm text-center">Back to login</a>
-            </div>
-          </form>
-        }
-      </p-card>
+          </div>
+        </div>
+      </div>
     </div>
   `,
 

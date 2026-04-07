@@ -1,112 +1,110 @@
 <p-toast></p-toast>
-<div class="flex items-center justify-center min-h-screen px-4">
-  <p-card header="Create your account" class="w-full max-w-md">
-    <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="submit()">
-      <p-floatlabel variant="on">
-        <input
-          id="email"
-          type="email"
-          pInputText
-          fluid="true"
-          formControlName="email"
-          [invalid]="form.controls.email.touched && form.controls.email.invalid"
-          autocomplete="email"
-        />
-        <label for="email">Email</label>
-      </p-floatlabel>
-      @if (form.controls.email.touched && form.controls.email.invalid) {
-        <p-message severity="error" variant="simple" size="small">
-          Enter a valid email address.
-        </p-message>
-      }
+<div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
+  <div class="flex flex-col items-center justify-center">
+    <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+      <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+        <div class="text-center mb-8">
+          <img src="assets/logo.png" alt="Invenet" class="mb-8 w-16 mx-auto" />
+          <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Create your account</div>
+          <span class="text-muted-color font-medium">Start your trading journal</span>
+        </div>
 
-      <p-floatlabel variant="on">
-        <input
-          id="username"
-          type="text"
-          pInputText
-          fluid="true"
-          formControlName="username"
-          [invalid]="
-            form.controls.username.touched && form.controls.username.invalid
-          "
-          autocomplete="username"
-        />
-        <label for="username">Username</label>
-      </p-floatlabel>
-      @if (form.controls.username.touched && form.controls.username.invalid) {
-        <p-message severity="error" variant="simple" size="small">
-          Username must be at least 3 characters.
-        </p-message>
-      }
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <label for="email" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
+          <input
+            id="email"
+            type="email"
+            pInputText
+            class="w-full mb-2"
+            formControlName="email"
+            [invalid]="form.controls.email.touched && form.controls.email.invalid"
+            autocomplete="email"
+          />
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <p-message severity="error" variant="simple" size="small" class="mb-4 block">
+              Enter a valid email address.
+            </p-message>
+          } @else {
+            <div class="mb-6"></div>
+          }
 
-      <p-floatlabel variant="on">
-        <p-password
-          inputId="password"
-          fluid="true"
-          formControlName="password"
-          [toggleMask]="true"
-          [invalid]="
-            form.controls.password.touched && form.controls.password.invalid
-          "
-          autocomplete="new-password"
-        ></p-password>
-        <label for="password">Password</label>
-      </p-floatlabel>
-      @if (form.controls.password.touched && form.controls.password.invalid) {
-        <p-message severity="error" variant="simple" size="small">
-          Password must be at least 10 characters.
-        </p-message>
-      }
+          <label for="username" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Username</label>
+          <input
+            id="username"
+            type="text"
+            pInputText
+            class="w-full mb-2"
+            formControlName="username"
+            [invalid]="form.controls.username.touched && form.controls.username.invalid"
+            autocomplete="username"
+          />
+          @if (form.controls.username.touched && form.controls.username.invalid) {
+            <p-message severity="error" variant="simple" size="small" class="mb-4 block">
+              Username must be at least 3 characters.
+            </p-message>
+          } @else {
+            <div class="mb-6"></div>
+          }
 
-      <p-floatlabel variant="on">
-        <p-password
-          inputId="confirmPassword"
-          fluid="true"
-          formControlName="confirmPassword"
-          [feedback]="false"
-          [toggleMask]="true"
-          [invalid]="
-            form.controls.confirmPassword.touched &&
-            (form.controls.confirmPassword.invalid ||
-              form.errors?.['passwordsMismatch'])
-          "
-          autocomplete="new-password"
-        ></p-password>
-        <label for="confirmPassword">Confirm password</label>
-      </p-floatlabel>
-      @if (form.touched && form.errors?.['passwordsMismatch']) {
-        <p-message severity="error" variant="simple" size="small">
-          Passwords do not match.
-        </p-message>
-      }
+          <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+          <p-password
+            inputId="password"
+            formControlName="password"
+            [toggleMask]="true"
+            [fluid]="true"
+            styleClass="mb-2"
+            [invalid]="form.controls.password.touched && form.controls.password.invalid"
+            autocomplete="new-password"
+          ></p-password>
+          @if (form.controls.password.touched && form.controls.password.invalid) {
+            <p-message severity="error" variant="simple" size="small" class="mb-4 block">
+              Password must be at least 10 characters.
+            </p-message>
+          } @else {
+            <div class="mb-6"></div>
+          }
 
-      @if (errorMessage) {
-        <p-message severity="error" icon="pi pi-times-circle">
-          {{ errorMessage }}
-        </p-message>
-      }
-      @if (errorDetails.length) {
-        <div class="flex flex-col gap-2">
-          @for (detail of errorDetails; track detail) {
-            <p-message severity="error" variant="simple" size="small">
-              {{ detail }}
+          <label for="confirmPassword" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Confirm Password</label>
+          <p-password
+            inputId="confirmPassword"
+            formControlName="confirmPassword"
+            [feedback]="false"
+            [toggleMask]="true"
+            [fluid]="true"
+            styleClass="mb-2"
+            [invalid]="form.controls.confirmPassword.touched && (form.controls.confirmPassword.invalid || form.errors?.['passwordsMismatch'])"
+            autocomplete="new-password"
+          ></p-password>
+          @if (form.touched && form.errors?.['passwordsMismatch']) {
+            <p-message severity="error" variant="simple" size="small" class="mb-4 block">
+              Passwords do not match.
+            </p-message>
+          } @else {
+            <div class="mb-8"></div>
+          }
+
+          @if (errorMessage) {
+            <p-message severity="error" icon="pi pi-times-circle" class="mb-4 block">
+              {{ errorMessage }}
             </p-message>
           }
-        </div>
-      }
+          @if (errorDetails.length) {
+            <div class="flex flex-col gap-2 mb-4">
+              @for (detail of errorDetails; track detail) {
+                <p-message severity="error" variant="simple" size="small">
+                  {{ detail }}
+                </p-message>
+              }
+            </div>
+          }
 
-      <div class="flex flex-col gap-3 mt-2">
-        <button pButton type="submit" [loading]="isLoading()" class="w-full">
-          Create account
-        </button>
-        <a
-          routerLink="/auth/login"
-          class="text-primary-color hover:underline text-sm text-center w-full"
-        >
-          Already have an account?
-        </a>
+          <p-button label="Create Account" styleClass="w-full mb-4" type="submit" [loading]="isLoading()"></p-button>
+
+          <div class="text-center">
+            <a routerLink="/auth/login" class="text-primary-color hover:underline font-medium text-sm">Already have an account? Sign in</a>
+          </div>
+        </form>
       </div>
-    </form>
-  </p-card>
+    </div>
+  </div>
 </div>

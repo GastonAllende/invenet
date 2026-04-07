@@ -84,6 +84,21 @@ libs/
 - CORS origin is configured in `appsettings.json`
 - Frontend points to the API via the `API_BASE_URL` injection token, set in `app.config.ts`
 
+### Styling — Tailwind CSS v4
+
+- **Only Tailwind utility classes** in templates — no component CSS, no `styles: [...]` blocks
+- Entry point: `apps/invenet/src/tailwind.css` (`@import 'tailwindcss'` + `@plugin 'tailwindcss-primeui'`)
+- Dark mode: `dark:` prefix, triggered by `.app-dark` on `<html>`
+- Use `tailwindcss-primeui` tokens instead of hardcoded colors: `bg-surface-card`, `bg-surface-50`, `border-surface-border`, `text-color`, `text-muted-color`, `text-primary-color`, `bg-primary`
+
+### PrimeNG
+
+- **Version**: `primeng@^21`, theme: `Nora` preset (`@primeuix/themes@^2`), dark mode selector: `.app-dark`
+- Import modules individually (`CardModule`, `ButtonModule`, etc.) — no barrel imports
+- `class=""` targets the host element; `styleClass=""` targets the inner PrimeNG div — prefer `class` for layout
+- Use `pButton` directive on `<button>`, not `<p-button>` component
+- Notifications: `p-toast` + `MessageService` (add to `providers:`); confirmations: `p-confirmDialog` + `ConfirmationService`
+
 ### Testing
 
 - **Unit tests**: Vitest 4.0 + Analog testing utilities (Angular)
