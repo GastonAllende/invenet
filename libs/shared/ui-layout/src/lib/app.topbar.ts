@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { MenuModule } from 'primeng/menu';
 import { SelectModule } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@invenet/auth-data-access';
 import { QuickTradeService } from '@invenet/trade-data-access';
@@ -23,6 +24,7 @@ import { LayoutService } from './service/layout.service';
     StyleClassModule,
     MenuModule,
     SelectModule,
+    TooltipModule,
     FormsModule,
     AppConfigurator,
   ],
@@ -48,6 +50,8 @@ import { LayoutService } from './service/layout.service';
           class="layout-topbar-action"
           (click)="toggleDarkMode()"
           aria-label="Toggle dark mode"
+          pTooltip="Toggle dark mode"
+          tooltipPosition="bottom"
         >
           <i
             [ngClass]="{
@@ -61,6 +65,8 @@ import { LayoutService } from './service/layout.service';
           <button
             class="layout-topbar-action layout-topbar-action-highlight"
             aria-label="Theme configurator"
+            pTooltip="Theme"
+            tooltipPosition="bottom"
             pStyleClass="@next"
             enterFromClass="hidden"
             enterActiveClass="animate-scalein"
@@ -93,17 +99,11 @@ import { LayoutService } from './service/layout.service';
             type="button"
             class="layout-topbar-action"
             (click)="onQuickLogTrade()"
+            pTooltip="Quick log trade"
+            tooltipPosition="bottom"
           >
             <i class="pi pi-bolt"></i>
             <span>Quick Log Trade</span>
-          </button>
-          <button type="button" class="layout-topbar-action">
-            <i class="pi pi-calendar"></i>
-            <span>Calendar</span>
-          </button>
-          <button type="button" class="layout-topbar-action">
-            <i class="pi pi-inbox"></i>
-            <span>Messages</span>
           </button>
           <div
             class="active-account-switcher"
@@ -128,6 +128,8 @@ import { LayoutService } from './service/layout.service';
               type="button"
               class="layout-topbar-action"
               (click)="profileMenu.toggle($event)"
+              pTooltip="Profile"
+              tooltipPosition="bottom"
             >
               <i class="pi pi-user"></i>
               <span>Profile</span>

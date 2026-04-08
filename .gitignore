@@ -68,3 +68,5 @@ apps/invenet/src/app/pages/*
 apps/invenet/src/app/layout/*
 
 css-docs/*
+
+.env

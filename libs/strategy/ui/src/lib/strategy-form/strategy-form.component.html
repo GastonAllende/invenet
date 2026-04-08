@@ -1,169 +1,136 @@
 <div class="max-w-2xl mx-auto py-8 px-4">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
-    <div class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4">
-      <h3 class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border">Strategy Details</h3>
+  <p-fluid>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col">
+      <div class="card flex flex-col gap-4">
+        <div class="font-semibold text-xl">Strategy Details</div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="name">Name *</label>
+            <input
+              pInputText
+              id="name"
+              formControlName="name"
+              [class.opacity-50]="mode() === 'version'"
+              [attr.readonly]="mode() === 'version' ? true : null"
+            />
+            @if (mode() === 'version') {
+              <small class="text-muted-color">Managed by strategy metadata</small>
+            }
+            @if (form.controls.name.invalid && form.controls.name.touched) {
+              <p-message severity="error" variant="simple" size="small">
+                @if (form.controls.name.errors?.['required']) {
+                  Name is required
+                } @else {
+                  Name must be 200 characters or less
+                }
+              </p-message>
+            }
+          </div>
+
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="market">Market</label>
+            <input
+              pInputText
+              id="market"
+              formControlName="market"
+              [class.opacity-50]="mode() === 'version'"
+              [attr.readonly]="mode() === 'version' ? true : null"
+            />
+            @if (mode() === 'version') {
+              <small class="text-muted-color">Managed by strategy metadata</small>
+            }
+            @if (form.controls.market.invalid && form.controls.market.touched) {
+              <p-message severity="error" variant="simple" size="small">Market must be 100 characters or less</p-message>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="defaultTimeframe">Default Timeframe</label>
+            <input
+              pInputText
+              id="defaultTimeframe"
+              formControlName="defaultTimeframe"
+              [class.opacity-50]="mode() === 'version'"
+              [attr.readonly]="mode() === 'version' ? true : null"
+            />
+            @if (mode() === 'version') {
+              <small class="text-muted-color">Managed by strategy metadata</small>
+            }
+            @if (form.controls.defaultTimeframe.invalid && form.controls.defaultTimeframe.touched) {
+              <p-message severity="error" variant="simple" size="small">Default timeframe must be 50 characters or less</p-message>
+            }
+          </div>
+
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="timeframe">Version Timeframe</label>
+            <input
+              pInputText
+              id="timeframe"
+              formControlName="timeframe"
+            />
+            @if (form.controls.timeframe.invalid && form.controls.timeframe.touched) {
+              <p-message severity="error" variant="simple" size="small">Timeframe must be 50 characters or less</p-message>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="card flex flex-col gap-4">
+        <div class="font-semibold text-xl">Strategy Rules</div>
+
         <div class="flex flex-col gap-2">
-          <label for="name" class="text-sm font-medium text-color">Name <span class="text-red-500">*</span></label>
-          <input
-            pInputText
-            id="name"
-            formControlName="name"
-            class="w-full"
-            [class.opacity-50]="mode() === 'version'" [attr.readonly]="mode() === 'version' ? true : null"
-          />
-          @if (mode() === 'version') {
-            <small class="text-muted-color text-xs">Managed by strategy metadata</small>
-          }
-          @if (form.controls.name.invalid && form.controls.name.touched) {
-            <small class="text-red-500 text-xs">
-              @if (form.controls.name.errors?.['required']) {
-                Name is required
-              } @else {
-                Name must be 200 characters or less
-              }
-            </small>
+          <label for="entryRules">Entry Rules *</label>
+          <textarea pTextarea id="entryRules" rows="4" formControlName="entryRules"></textarea>
+          @if (form.controls.entryRules.invalid && form.controls.entryRules.touched) {
+            <p-message severity="error" variant="simple" size="small">Entry rules are required</p-message>
           }
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="market" class="text-sm font-medium text-color">Market</label>
-          <input
-            pInputText
-            id="market"
-            formControlName="market"
-            class="w-full"
-            [class.opacity-50]="mode() === 'version'" [attr.readonly]="mode() === 'version' ? true : null"
-          />
-          @if (mode() === 'version') {
-            <small class="text-muted-color text-xs">Managed by strategy metadata</small>
-          }
-          @if (form.controls.market.invalid && form.controls.market.touched) {
-            <small class="text-red-500 text-xs">Market must be 100 characters or less</small>
-          }
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="flex flex-col gap-2">
-          <label for="defaultTimeframe" class="text-sm font-medium text-color">Default Timeframe</label>
-          <input
-            pInputText
-            id="defaultTimeframe"
-            formControlName="defaultTimeframe"
-            class="w-full"
-            [class.opacity-50]="mode() === 'version'" [attr.readonly]="mode() === 'version' ? true : null"
-          />
-          @if (mode() === 'version') {
-            <small class="text-muted-color text-xs">Managed by strategy metadata</small>
-          }
-          @if (
-            form.controls.defaultTimeframe.invalid &&
-            form.controls.defaultTimeframe.touched
-          ) {
-            <small class="text-red-500 text-xs"
-              >Default timeframe must be 50 characters or less</small
-            >
+          <label for="exitRules">Exit Rules *</label>
+          <textarea pTextarea id="exitRules" rows="4" formControlName="exitRules"></textarea>
+          @if (form.controls.exitRules.invalid && form.controls.exitRules.touched) {
+            <p-message severity="error" variant="simple" size="small">Exit rules are required</p-message>
           }
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="timeframe" class="text-sm font-medium text-color">Version Timeframe</label>
-          <input
-            pInputText
-            id="timeframe"
-            formControlName="timeframe"
-            class="w-full"
-          />
-          @if (form.controls.timeframe.invalid && form.controls.timeframe.touched) {
-            <small class="text-red-500 text-xs">Timeframe must be 50 characters or less</small>
+          <label for="riskRules">Risk Rules *</label>
+          <textarea pTextarea id="riskRules" rows="4" formControlName="riskRules"></textarea>
+          @if (form.controls.riskRules.invalid && form.controls.riskRules.touched) {
+            <p-message severity="error" variant="simple" size="small">Risk rules are required</p-message>
           }
         </div>
       </div>
-    </div>
 
-    <div class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4">
-      <h3 class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border">Strategy Rules</h3>
+      <p-panel header="Advanced" [toggleable]="true" [collapsed]="true" styleClass="mb-8">
+        <div class="flex flex-col gap-2 pt-2">
+          <label for="notes">Notes</label>
+          <textarea pTextarea id="notes" rows="3" formControlName="notes"></textarea>
+        </div>
+      </p-panel>
 
-      <div class="flex flex-col gap-2">
-        <label for="entryRules" class="text-sm font-medium text-color"
-          >Entry Rules <span class="text-red-500">*</span></label
-        >
-        <textarea
-          pInputTextarea
-          id="entryRules"
-          rows="4"
-          formControlName="entryRules"
-          class="w-full"
-        ></textarea>
-        @if (form.controls.entryRules.invalid && form.controls.entryRules.touched) {
-          <small class="text-red-500 text-xs">Entry rules are required</small>
-        }
+      <div class="card flex justify-end gap-3">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="onCancel()"
+          [disabled]="isLoading()"
+          [fluid]="false"
+        ></p-button>
+        <p-button
+          [label]="mode() === 'create' ? 'Create Strategy' : 'Create Version'"
+          icon="pi pi-check"
+          type="submit"
+          [loading]="isLoading()"
+          [disabled]="form.invalid || isLoading()"
+          [fluid]="false"
+        ></p-button>
       </div>
-
-      <div class="flex flex-col gap-2">
-        <label for="exitRules" class="text-sm font-medium text-color"
-          >Exit Rules <span class="text-red-500">*</span></label
-        >
-        <textarea
-          pInputTextarea
-          id="exitRules"
-          rows="4"
-          formControlName="exitRules"
-          class="w-full"
-        ></textarea>
-        @if (form.controls.exitRules.invalid && form.controls.exitRules.touched) {
-          <small class="text-red-500 text-xs">Exit rules are required</small>
-        }
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label for="riskRules" class="text-sm font-medium text-color"
-          >Risk Rules <span class="text-red-500">*</span></label
-        >
-        <textarea
-          pInputTextarea
-          id="riskRules"
-          rows="4"
-          formControlName="riskRules"
-          class="w-full"
-        ></textarea>
-        @if (form.controls.riskRules.invalid && form.controls.riskRules.touched) {
-          <small class="text-red-500 text-xs">Risk rules are required</small>
-        }
-      </div>
-    </div>
-
-    <details class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4">
-      <summary><h3 class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border">Advanced</h3></summary>
-      <div class="flex flex-col gap-2">
-        <label for="notes" class="text-sm font-medium text-color">Notes</label>
-        <textarea
-          pInputTextarea
-          id="notes"
-          rows="3"
-          formControlName="notes"
-          class="w-full"
-        ></textarea>
-      </div>
-    </details>
-
-    <div class="flex justify-end gap-4 pt-4 border-t border-surface-border">
-      <p-button
-        label="Cancel"
-        severity="secondary"
-        [outlined]="true"
-        (onClick)="onCancel()"
-        [disabled]="isLoading()"
-      ></p-button>
-      <p-button
-        [label]="mode() === 'create' ? 'Create Strategy' : 'Create Version'"
-        icon="pi pi-check"
-        type="submit"
-        [loading]="isLoading()"
-        [disabled]="form.invalid || isLoading()"
-      ></p-button>
-    </div>
-  </form>
+    </form>
+  </p-fluid>
 </div>

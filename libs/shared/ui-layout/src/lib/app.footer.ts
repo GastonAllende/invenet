@@ -4,14 +4,9 @@ import { Component } from '@angular/core';
   standalone: true,
   selector: 'lib-footer',
   template: `<div class="layout-footer">
-    Invenets by
-    <a
-      href="https://primeng.org"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="text-primary font-bold hover:underline"
-      >Gaalle Group</a
-    >
+    Invenets &copy; {{ year }} Gaalle Group
   </div>`,
 })
-export class AppFooter {}
+export class AppFooter {
+  readonly year = new Date().getFullYear();
+}

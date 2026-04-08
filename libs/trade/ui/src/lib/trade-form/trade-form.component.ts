@@ -8,13 +8,14 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
+import { MessageModule } from 'primeng/message';
+import { FluidModule } from 'primeng/fluid';
 import { StrategiesStore } from '@invenet/strategy-data-access';
 import {
   CreateTradeRequest,
@@ -34,7 +35,6 @@ interface SelectOption {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     ButtonModule,
     InputTextModule,
@@ -42,6 +42,8 @@ interface SelectOption {
     SelectModule,
     DatePickerModule,
     TextareaModule,
+    MessageModule,
+    FluidModule,
   ],
   templateUrl: './trade-form.component.html',
 })

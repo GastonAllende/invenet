@@ -1,314 +1,242 @@
 <div class="max-w-2xl mx-auto py-8 px-4">
-  <form
-    [formGroup]="accountForm"
-    (ngSubmit)="onSubmit()"
-    class="flex flex-col gap-6"
-  >
-    @if (showTitle()) {
-      <h2 class="text-2xl font-semibold text-color mb-2">
-        {{ isEditMode ? 'Edit Account' : 'Create Account' }}
-      </h2>
-    }
-
-    <!-- Basic Account Information -->
-    <div
-      class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4"
-    >
-      <h3
-        class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border"
-      >
-        Account Details
-      </h3>
-
-      <div class="flex flex-col gap-2">
-        <label for="name" class="text-sm font-medium text-color"
-          >Account Name *</label
-        >
-        <input
-          pInputText
-          id="name"
-          formControlName="name"
-          placeholder="My Trading Account"
-          class="w-full"
-        />
-        @if (name?.invalid && name?.touched) {
-          <small class="text-red-500 text-xs">
-            @if (name?.errors?.['required']) {
-              Account name is required
-            }
-            @if (name?.errors?.['maxlength']) {
-              Max 200 characters allowed
-            }
-          </small>
-        }
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label for="broker" class="text-sm font-medium text-color"
-          >Broker</label
-        >
-        <p-select
-          [options]="brokers"
-          formControlName="broker"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Select broker (optional)"
-          class="w-full"
-          [showClear]="true"
-        ></p-select>
-        @if (broker?.invalid && broker?.touched) {
-          <small class="text-red-500 text-xs">
-            @if (broker?.errors?.['maxlength']) {
-              Max 100 characters allowed
-            }
-          </small>
-        }
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="flex flex-col gap-2">
-          <label for="accountType" class="text-sm font-medium text-color"
-            >Account Type *</label
-          >
-          <p-select
-            [options]="accountTypes"
-            formControlName="accountType"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Select type"
-            class="w-full"
-          ></p-select>
-          @if (accountType?.invalid && accountType?.touched) {
-            <small class="text-red-500 text-xs">Account type is required</small>
-          }
+  <p-fluid>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col">
+      @if (showTitle()) {
+        <div class="font-semibold text-2xl mb-6">
+          {{ isEditMode() ? 'Edit Account' : 'Create Account' }}
         </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="baseCurrency" class="text-sm font-medium text-color"
-            >Base Currency *</label
-          >
-          <p-select
-            [options]="currencies"
-            formControlName="baseCurrency"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Select currency"
-            class="w-full"
-          ></p-select>
-          @if (baseCurrency?.invalid && baseCurrency?.touched) {
-            <small class="text-red-500 text-xs"
-              >Base currency is required</small
-            >
-          }
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="flex flex-col gap-2">
-          <label for="startDate" class="text-sm font-medium text-color"
-            >Start Date *</label
-          >
-          <p-datepicker
-            formControlName="startDate"
-            [showIcon]="true"
-            dateFormat="yy-mm-dd"
-            class="w-full"
-          ></p-datepicker>
-          @if (startDate?.invalid && startDate?.touched) {
-            <small class="text-red-500 text-xs">Start date is required</small>
-          }
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="startingBalance" class="text-sm font-medium text-color"
-            >Starting Balance *</label
-          >
-          <p-inputNumber
-            formControlName="startingBalance"
-            mode="currency"
-            [currency]="baseCurrency?.value || 'USD'"
-            locale="en-US"
-            [minFractionDigits]="2"
-            [min]="0.01"
-            class="w-full"
-          ></p-inputNumber>
-          @if (startingBalance?.invalid && startingBalance?.touched) {
-            <small class="text-red-500 text-xs">
-              @if (startingBalance?.errors?.['required']) {
-                Starting balance is required
-              }
-              @if (startingBalance?.errors?.['min']) {
-                Minimum balance is 0.01
-              }
-            </small>
-          }
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <div class="checkbox-row">
-          <p-checkbox
-            formControlName="isActive"
-            [binary]="true"
-            inputId="isActive"
-          ></p-checkbox>
-          <label for="isActive" class="text-sm text-color"
-            >Account Active</label
-          >
-        </div>
-      </div>
-    </div>
-
-    <!-- Risk Settings -->
-    <div
-      class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4"
-      formGroupName="riskSettings"
-    >
-      <h3
-        class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border"
-      >
-        Risk Management Settings
-      </h3>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="flex flex-col gap-2">
-          <label for="riskPerTradePct" class="text-sm font-medium text-color"
-            >Risk Per Trade (%)</label
-          >
-          <p-inputNumber
-            formControlName="riskPerTradePct"
-            [min]="0"
-            [max]="100"
-            [minFractionDigits]="2"
-            [maxFractionDigits]="2"
-            suffix="%"
-            class="w-full"
-          ></p-inputNumber>
-          @if (riskPerTradePct?.invalid && riskPerTradePct?.touched) {
-            <small class="text-red-500 text-xs"
-              >Must be between 0 and 100</small
-            >
-          }
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="maxDailyLossPct" class="text-sm font-medium text-color"
-            >Max Daily Loss (%)</label
-          >
-          <p-inputNumber
-            formControlName="maxDailyLossPct"
-            [min]="0"
-            [max]="100"
-            [minFractionDigits]="2"
-            [maxFractionDigits]="2"
-            suffix="%"
-            class="w-full"
-          ></p-inputNumber>
-          @if (maxDailyLossPct?.invalid && maxDailyLossPct?.touched) {
-            <small class="text-red-500 text-xs"
-              >Must be between 0 and 100</small
-            >
-          }
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <div class="checkbox-row">
-          <p-checkbox
-            formControlName="enforceLimits"
-            [binary]="true"
-            inputId="enforceLimits"
-          ></p-checkbox>
-          <label for="enforceLimits" class="text-sm text-color"
-            >Enforce Risk Limits</label
-          >
-        </div>
-      </div>
-    </div>
-
-    <details
-      class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4"
-    >
-      <summary>
-        <h3
-          class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border"
-        >
-          Advanced
-        </h3>
-      </summary>
-
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 gap-4"
-        formGroupName="riskSettings"
-      >
-        <div class="flex flex-col gap-2">
-          <label for="maxWeeklyLossPct" class="text-sm font-medium text-color"
-            >Max Weekly Loss (%)</label
-          >
-          <p-inputNumber
-            formControlName="maxWeeklyLossPct"
-            [min]="0"
-            [max]="100"
-            [minFractionDigits]="2"
-            [maxFractionDigits]="2"
-            suffix="%"
-            class="w-full"
-          ></p-inputNumber>
-          @if (maxWeeklyLossPct?.invalid && maxWeeklyLossPct?.touched) {
-            <small class="text-red-500 text-xs"
-              >Must be between 0 and 100</small
-            >
-          }
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label for="timezone" class="text-sm font-medium text-color"
-          >Timezone</label
-        >
-        <p-select
-          [options]="timezones"
-          formControlName="timezone"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Select timezone"
-          class="w-full"
-          [showClear]="true"
-        ></p-select>
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label for="notes" class="text-sm font-medium text-color">Notes</label>
-        <textarea
-          pTextarea
-          id="notes"
-          formControlName="notes"
-          placeholder="Optional notes about this account"
-          rows="3"
-          class="w-full"
-        ></textarea>
-      </div>
-    </details>
-
-    <!-- Form Actions -->
-    <div class="flex justify-end gap-4 pt-4 border-t border-surface-border">
-      @if (showCancel()) {
-        <p-button
-          label="Cancel"
-          severity="secondary"
-          (onClick)="onCancel()"
-          [outlined]="true"
-          type="button"
-          [disabled]="isLoading()"
-        ></p-button>
       }
-      <p-button
-        [label]="resolvedSubmitLabel"
-        icon="pi pi-check"
-        type="submit"
-        [disabled]="accountForm.invalid || isLoading()"
-        [loading]="isLoading()"
-      ></p-button>
-    </div>
-  </form>
+
+      <div class="card flex flex-col gap-4">
+        <div class="font-semibold text-xl">Account Details</div>
+
+        <div class="flex flex-col gap-2">
+          <label for="name">Account Name *</label>
+          <input
+            pInputText
+            id="name"
+            formControlName="name"
+            placeholder="My Trading Account"
+            [invalid]="form.controls.name.invalid && form.controls.name.touched"
+          />
+          @if (form.controls.name.invalid && form.controls.name.touched) {
+            <p-message severity="error" variant="simple" size="small">
+              @if (form.controls.name.errors?.['required']) {
+                Account name is required
+              } @else if (form.controls.name.errors?.['maxlength']) {
+                Max 200 characters allowed
+              }
+            </p-message>
+          }
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="broker">Broker</label>
+          <p-select
+            inputId="broker"
+            [options]="brokers"
+            formControlName="broker"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select broker (optional)"
+            [showClear]="true"
+          ></p-select>
+        </div>
+
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="accountType">Account Type *</label>
+            <p-select
+              inputId="accountType"
+              [options]="accountTypes"
+              formControlName="accountType"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select type"
+              [invalid]="form.controls.accountType.invalid && form.controls.accountType.touched"
+            ></p-select>
+            @if (form.controls.accountType.invalid && form.controls.accountType.touched) {
+              <p-message severity="error" variant="simple" size="small">Account type is required</p-message>
+            }
+          </div>
+
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="baseCurrency">Base Currency *</label>
+            <p-select
+              inputId="baseCurrency"
+              [options]="currencies"
+              formControlName="baseCurrency"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select currency"
+              [invalid]="form.controls.baseCurrency.invalid && form.controls.baseCurrency.touched"
+            ></p-select>
+            @if (form.controls.baseCurrency.invalid && form.controls.baseCurrency.touched) {
+              <p-message severity="error" variant="simple" size="small">Base currency is required</p-message>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="startDate">Start Date *</label>
+            <p-datepicker
+              inputId="startDate"
+              formControlName="startDate"
+              [showIcon]="true"
+              dateFormat="yy-mm-dd"
+              [invalid]="form.controls.startDate.invalid && form.controls.startDate.touched"
+            ></p-datepicker>
+            @if (form.controls.startDate.invalid && form.controls.startDate.touched) {
+              <p-message severity="error" variant="simple" size="small">Start date is required</p-message>
+            }
+          </div>
+
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="startingBalance">Starting Balance *</label>
+            <p-inputNumber
+              inputId="startingBalance"
+              formControlName="startingBalance"
+              mode="currency"
+              [currency]="form.controls.baseCurrency.value || 'USD'"
+              locale="en-US"
+              [minFractionDigits]="2"
+              [min]="0.01"
+              [invalid]="form.controls.startingBalance.invalid && form.controls.startingBalance.touched"
+            ></p-inputNumber>
+            @if (form.controls.startingBalance.invalid && form.controls.startingBalance.touched) {
+              <p-message severity="error" variant="simple" size="small">
+                @if (form.controls.startingBalance.errors?.['required']) {
+                  Starting balance is required
+                } @else if (form.controls.startingBalance.errors?.['min']) {
+                  Minimum balance is 0.01
+                }
+              </p-message>
+            }
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <p-checkbox formControlName="isActive" [binary]="true" inputId="isActive"></p-checkbox>
+          <label for="isActive">Account Active</label>
+        </div>
+      </div>
+
+      <div class="card flex flex-col gap-4" formGroupName="riskSettings">
+        <div class="font-semibold text-xl">Risk Management</div>
+
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="riskPerTradePct">Risk Per Trade (%)</label>
+            <p-inputNumber
+              inputId="riskPerTradePct"
+              formControlName="riskPerTradePct"
+              [min]="0"
+              [max]="100"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              suffix="%"
+              [invalid]="form.controls.riskSettings.controls.riskPerTradePct.invalid && form.controls.riskSettings.controls.riskPerTradePct.touched"
+            ></p-inputNumber>
+            @if (form.controls.riskSettings.controls.riskPerTradePct.invalid && form.controls.riskSettings.controls.riskPerTradePct.touched) {
+              <p-message severity="error" variant="simple" size="small">Must be between 0 and 100</p-message>
+            }
+          </div>
+
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="maxDailyLossPct">Max Daily Loss (%)</label>
+            <p-inputNumber
+              inputId="maxDailyLossPct"
+              formControlName="maxDailyLossPct"
+              [min]="0"
+              [max]="100"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              suffix="%"
+              [invalid]="form.controls.riskSettings.controls.maxDailyLossPct.invalid && form.controls.riskSettings.controls.maxDailyLossPct.touched"
+            ></p-inputNumber>
+            @if (form.controls.riskSettings.controls.maxDailyLossPct.invalid && form.controls.riskSettings.controls.maxDailyLossPct.touched) {
+              <p-message severity="error" variant="simple" size="small">Must be between 0 and 100</p-message>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="maxWeeklyLossPct">Max Weekly Loss (%)</label>
+            <p-inputNumber
+              inputId="maxWeeklyLossPct"
+              formControlName="maxWeeklyLossPct"
+              [min]="0"
+              [max]="100"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              suffix="%"
+              [invalid]="form.controls.riskSettings.controls.maxWeeklyLossPct.invalid && form.controls.riskSettings.controls.maxWeeklyLossPct.touched"
+            ></p-inputNumber>
+            @if (form.controls.riskSettings.controls.maxWeeklyLossPct.invalid && form.controls.riskSettings.controls.maxWeeklyLossPct.touched) {
+              <p-message severity="error" variant="simple" size="small">Must be between 0 and 100</p-message>
+            }
+          </div>
+
+          <div class="flex flex-col grow basis-0 gap-2"></div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <p-checkbox formControlName="enforceLimits" [binary]="true" inputId="enforceLimits"></p-checkbox>
+          <label for="enforceLimits">Enforce Risk Limits</label>
+        </div>
+      </div>
+
+      <p-panel header="Advanced" [toggleable]="true" [collapsed]="true" styleClass="mb-8">
+        <div class="flex flex-col gap-4 pt-2">
+          <div class="flex flex-col gap-2">
+            <label for="timezone">Timezone</label>
+            <p-select
+              inputId="timezone"
+              [options]="timezones"
+              formControlName="timezone"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select timezone"
+              [showClear]="true"
+            ></p-select>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="notes">Notes</label>
+            <textarea
+              pTextarea
+              id="notes"
+              formControlName="notes"
+              placeholder="Optional notes about this account"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+      </p-panel>
+
+      <div class="card flex justify-end gap-3">
+        @if (showCancel()) {
+          <p-button
+            label="Cancel"
+            severity="secondary"
+            (onClick)="onCancel()"
+            [outlined]="true"
+            type="button"
+            [disabled]="isLoading()"
+            [fluid]="false"
+          ></p-button>
+        }
+        <p-button
+          [label]="resolvedSubmitLabel"
+          icon="pi pi-check"
+          type="submit"
+          [disabled]="form.invalid || isLoading()"
+          [loading]="isLoading()"
+          [fluid]="false"
+        ></p-button>
+      </div>
+    </form>
+  </p-fluid>
 </div>

@@ -1,241 +1,238 @@
 <div class="max-w-3xl mx-auto py-8 px-4">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
-    <section
-      class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4"
-    >
-      <h3
-        class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border"
-      >
-        Trade Details
-      </h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-        <div class="flex flex-col gap-2">
-          <label for="accountId" class="text-sm font-medium text-color"
-            >Account *</label
-          >
-          <p-select
-            inputId="accountId"
-            formControlName="accountId"
-            [options]="accounts()"
-            optionLabel="name"
-            optionValue="id"
-            placeholder="Select account"
-            [disabled]="isEditMode"
-            class="w-full"
-          ></p-select>
+  <p-fluid>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col">
+      <div class="card flex flex-col gap-4">
+        <div class="font-semibold text-xl">Trade Details</div>
+
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="accountId">Account *</label>
+            <p-select
+              inputId="accountId"
+              formControlName="accountId"
+              [options]="accounts()"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select account"
+              [disabled]="isEditMode"
+              [invalid]="form.controls.accountId.invalid && form.controls.accountId.touched"
+            ></p-select>
+            @if (form.controls.accountId.invalid && form.controls.accountId.touched) {
+              <p-message severity="error" variant="simple" size="small">Account is required</p-message>
+            }
+          </div>
+
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="strategyId">Strategy</label>
+            <p-select
+              inputId="strategyId"
+              formControlName="strategyId"
+              [options]="strategies()"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select strategy"
+              [showClear]="true"
+            ></p-select>
+            @if (isEditMode && trade()?.strategyVersionNumber) {
+              <small class="text-muted-color">Version: v{{ trade()?.strategyVersionNumber }}</small>
+            }
+          </div>
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label for="strategyId" class="text-sm font-medium text-color"
-            >Strategy *</label
-          >
-          <p-select
-            inputId="strategyId"
-            formControlName="strategyId"
-            [options]="strategies()"
-            optionLabel="name"
-            optionValue="id"
-            placeholder="Select strategy"
-            class="w-full"
-          ></p-select>
-          @if (isEditMode && trade()?.strategyVersionNumber) {
-            <small class="text-muted-color text-xs"
-              >Version: v{{ trade()?.strategyVersionNumber }}</small
-            >
-          }
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="symbol">Symbol *</label>
+            <input
+              pInputText
+              id="symbol"
+              formControlName="symbol"
+              placeholder="e.g. AAPL"
+              [invalid]="form.controls.symbol.invalid && form.controls.symbol.touched"
+            />
+            @if (form.controls.symbol.invalid && form.controls.symbol.touched) {
+              <p-message severity="error" variant="simple" size="small">
+                @if (form.controls.symbol.errors?.['required']) {
+                  Symbol is required
+                } @else if (form.controls.symbol.errors?.['maxlength']) {
+                  Symbol must be 20 characters or less
+                }
+              </p-message>
+            }
+          </div>
+
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="direction">Direction *</label>
+            <p-select
+              inputId="direction"
+              formControlName="direction"
+              [options]="directionOptions"
+              optionLabel="label"
+              optionValue="value"
+              [invalid]="form.controls.direction.invalid && form.controls.direction.touched"
+            ></p-select>
+            @if (form.controls.direction.invalid && form.controls.direction.touched) {
+              <p-message severity="error" variant="simple" size="small">Direction is required</p-message>
+            }
+          </div>
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label for="direction" class="text-sm font-medium text-color"
-            >Direction *</label
-          >
-          <p-select
-            inputId="direction"
-            formControlName="direction"
-            [options]="directionOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="w-full"
-          ></p-select>
-        </div>
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="status">Status *</label>
+            <p-select
+              inputId="status"
+              formControlName="status"
+              [options]="statusOptions"
+              optionLabel="label"
+              optionValue="value"
+              [invalid]="form.controls.status.invalid && form.controls.status.touched"
+            ></p-select>
+            @if (form.controls.status.invalid && form.controls.status.touched) {
+              <p-message severity="error" variant="simple" size="small">Status is required</p-message>
+            }
+          </div>
 
-        <div class="flex flex-col gap-2">
-          <label for="status" class="text-sm font-medium text-color"
-            >Status *</label
-          >
-          <p-select
-            inputId="status"
-            formControlName="status"
-            [options]="statusOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="w-full"
-          ></p-select>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="symbol" class="text-sm font-medium text-color"
-            >Symbol *</label
-          >
-          <input
-            pInputText
-            id="symbol"
-            formControlName="symbol"
-            placeholder="e.g. AAPL"
-            class="w-full"
-          />
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="openedAt" class="text-sm font-medium text-color"
-            >Opened At *</label
-          >
-          <p-datepicker
-            inputId="openedAt"
-            formControlName="openedAt"
-            [showIcon]="true"
-            [showTime]="true"
-            class="w-full"
-          ></p-datepicker>
-        </div>
-      </div>
-    </section>
-
-    <section
-      class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4"
-    >
-      <h3
-        class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border"
-      >
-        Execution Metrics
-      </h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-        <div class="flex flex-col gap-2">
-          <label for="entryPrice" class="text-sm font-medium text-color"
-            >Entry Price *</label
-          >
-          <p-inputnumber
-            inputId="entryPrice"
-            formControlName="entryPrice"
-            mode="currency"
-            currency="USD"
-            locale="en-US"
-            class="w-full"
-          ></p-inputnumber>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="quantity" class="text-sm font-medium text-color"
-            >Quantity</label
-          >
-          <p-inputnumber
-            inputId="quantity"
-            formControlName="quantity"
-            class="w-full"
-          ></p-inputnumber>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="closedAt" class="text-sm font-medium text-color"
-            >Closed At</label
-          >
-          <p-datepicker
-            inputId="closedAt"
-            formControlName="closedAt"
-            [showIcon]="true"
-            [showTime]="true"
-            class="w-full"
-          ></p-datepicker>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="exitPrice" class="text-sm font-medium text-color"
-            >Exit Price</label
-          >
-          <p-inputnumber
-            inputId="exitPrice"
-            formControlName="exitPrice"
-            mode="currency"
-            currency="USD"
-            locale="en-US"
-            class="w-full"
-          ></p-inputnumber>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="pnl" class="text-sm font-medium text-color"
-            >P&amp;L</label
-          >
-          <p-inputnumber
-            inputId="pnl"
-            formControlName="pnl"
-            class="w-full"
-          ></p-inputnumber>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="rMultiple" class="text-sm font-medium text-color"
-            >R-Multiple</label
-          >
-          <p-inputnumber
-            inputId="rMultiple"
-            formControlName="rMultiple"
-            class="w-full"
-          ></p-inputnumber>
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="openedAt">Opened At *</label>
+            <p-datepicker
+              inputId="openedAt"
+              formControlName="openedAt"
+              [showIcon]="true"
+              [showTime]="true"
+              [invalid]="form.controls.openedAt.invalid && form.controls.openedAt.touched"
+            ></p-datepicker>
+            @if (form.controls.openedAt.invalid && form.controls.openedAt.touched) {
+              <p-message severity="error" variant="simple" size="small">Opened date is required</p-message>
+            }
+          </div>
         </div>
       </div>
-    </section>
 
-    <section
-      class="bg-surface-card border border-surface-border rounded p-6 flex flex-col gap-4"
-    >
-      <h3
-        class="text-xl font-semibold m-0 text-color pb-3 mb-1 border-b border-surface-border"
-      >
-        Journal Notes
-      </h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+      <div class="card flex flex-col gap-4">
+        <div class="font-semibold text-xl">Execution Metrics</div>
+
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="entryPrice">Entry Price *</label>
+            <p-inputnumber
+              inputId="entryPrice"
+              formControlName="entryPrice"
+              mode="currency"
+              currency="USD"
+              locale="en-US"
+              [invalid]="form.controls.entryPrice.invalid && form.controls.entryPrice.touched"
+            ></p-inputnumber>
+            @if (form.controls.entryPrice.invalid && form.controls.entryPrice.touched) {
+              <p-message severity="error" variant="simple" size="small">
+                @if (form.controls.entryPrice.errors?.['required']) {
+                  Entry price is required
+                } @else if (form.controls.entryPrice.errors?.['min']) {
+                  Entry price must be greater than 0
+                }
+              </p-message>
+            }
+          </div>
+
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="quantity">Quantity</label>
+            <p-inputnumber
+              inputId="quantity"
+              formControlName="quantity"
+            ></p-inputnumber>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="exitPrice">
+              Exit Price@if (form.controls.status.value === 'Closed') { * }
+            </label>
+            <p-inputnumber
+              inputId="exitPrice"
+              formControlName="exitPrice"
+              mode="currency"
+              currency="USD"
+              locale="en-US"
+              [invalid]="form.controls.exitPrice.invalid && form.controls.exitPrice.touched"
+            ></p-inputnumber>
+            @if (form.controls.exitPrice.invalid && form.controls.exitPrice.touched) {
+              <p-message severity="error" variant="simple" size="small">
+                @if (form.controls.exitPrice.errors?.['required']) {
+                  Exit price is required for closed trades
+                } @else if (form.controls.exitPrice.errors?.['min']) {
+                  Exit price must be greater than 0
+                }
+              </p-message>
+            }
+          </div>
+
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="closedAt">
+              Closed At@if (form.controls.status.value === 'Closed') { * }
+            </label>
+            <p-datepicker
+              inputId="closedAt"
+              formControlName="closedAt"
+              [showIcon]="true"
+              [showTime]="true"
+              [invalid]="form.controls.closedAt.invalid && form.controls.closedAt.touched"
+            ></p-datepicker>
+            @if (form.controls.closedAt.invalid && form.controls.closedAt.touched) {
+              <p-message severity="error" variant="simple" size="small">Closed date is required for closed trades</p-message>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-6">
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="pnl">P&amp;L</label>
+            <p-inputnumber inputId="pnl" formControlName="pnl"></p-inputnumber>
+          </div>
+
+          <div class="flex flex-col grow basis-0 gap-2">
+            <label for="rMultiple">R-Multiple</label>
+            <p-inputnumber inputId="rMultiple" formControlName="rMultiple"></p-inputnumber>
+          </div>
+        </div>
+      </div>
+
+      <div class="card flex flex-col gap-4">
+        <div class="font-semibold text-xl">Journal Notes</div>
+
         <div class="flex flex-col gap-2">
-          <label for="tags" class="text-sm font-medium text-color">Tags</label>
+          <label for="tags">Tags</label>
           <input
             pInputText
             id="tags"
             formControlName="tags"
             placeholder="comma,separated,tags"
-            class="w-full"
           />
         </div>
 
-        <div class="flex flex-col gap-2 md:col-span-2">
-          <label for="notes" class="text-sm font-medium text-color"
-            >Notes</label
-          >
-          <textarea
-            pTextarea
-            id="notes"
-            formControlName="notes"
-            rows="4"
-            class="w-full"
-          ></textarea>
+        <div class="flex flex-col gap-2">
+          <label for="notes">Notes</label>
+          <textarea pTextarea id="notes" formControlName="notes" rows="4"></textarea>
         </div>
       </div>
-    </section>
 
-    <div class="flex justify-end gap-4 pt-4 border-t border-surface-border">
-      <p-button
-        label="Cancel"
-        severity="secondary"
-        [outlined]="true"
-        [disabled]="isLoading()"
-        (onClick)="onCancel()"
-      ></p-button>
-      <p-button
-        type="submit"
-        [label]="isEditMode ? 'Save Changes' : 'Create Trade'"
-        icon="pi pi-check"
-        [loading]="isLoading()"
-        [disabled]="isLoading()"
-      ></p-button>
-    </div>
-  </form>
+      <div class="card flex justify-end gap-3">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="isLoading()"
+          (onClick)="onCancel()"
+          [fluid]="false"
+        ></p-button>
+        <p-button
+          type="submit"
+          [label]="isEditMode ? 'Save Changes' : 'Create Trade'"
+          icon="pi pi-check"
+          [loading]="isLoading()"
+          [disabled]="isLoading()"
+          [fluid]="false"
+        ></p-button>
+      </div>
+    </form>
+  </p-fluid>
 </div>

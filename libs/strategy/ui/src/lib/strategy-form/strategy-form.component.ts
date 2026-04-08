@@ -1,9 +1,11 @@
-import { Component, effect, inject, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
+import { PanelModule } from 'primeng/panel';
 import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
+import { MessageModule } from 'primeng/message';
+import { FluidModule } from 'primeng/fluid';
 import type {
   CreateStrategyRequest,
   CreateStrategyVersionRequest,
@@ -12,12 +14,15 @@ import type {
 
 @Component({
   selector: 'lib-strategy-form',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     InputTextModule,
+    PanelModule,
     TextareaModule,
     ButtonModule,
+    MessageModule,
+    FluidModule,
   ],
   templateUrl: './strategy-form.component.html',
 })
