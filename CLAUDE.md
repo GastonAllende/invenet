@@ -63,12 +63,72 @@ libs/
 - **Library layers** per feature: `data-access` (services + models) → `feature` (pages + routes) → `ui` (reusable components)
 - **Imports** use `@invenet/*` path aliases defined in `tsconfig.base.json`
 
+#### State Management
+
+- **NgRx Signal Store** — primary state pattern; stores use `signalStore` with `withEntities`, `withState`, `withMethods`; all `providedIn: 'root'`
+- **Async operations** via `rxMethod` with RxJS pipelines; immutable updates via `patchState`; errors stored in state (not thrown)
+- **Local component state** — `signal()` for UI-only values, `computed()` for derived values, `effect()` for side effects
+- **One-off data loads** — use `rxResource` instead of a full store when data is fetched once and not shared
+
+#### Data-Access Services
+
+- **API services** — `providedIn: 'root'`; build base URL from `API_BASE_URL` injection token; return `Observable<T>`
+- **Error messages** are status-aware: 401 → "Authentication required", 403 → "Permission denied", 404 → "Not found"
+- Each feature library exports its store, API service, and models from a barrel `index.ts`
+
+#### Feature Route Conventions
+
+- Standard CRUD route pattern per feature: `''` → List, `/new` → Create, `/:id/edit` → Edit, `/:id` → Detail
+- Shell layout component wraps all protected feature routes; `authGuard` applied once at the shell level
+
+#### Component Patterns
+
+- **Feature pages** (smart) — inject stores and services; expose store signals as readonly component properties; use `effect()` to watch `store.error()` → show toast via `MessageService` → clear error; call store methods in response to UI events
+- **UI components** (presentational) — data in via `input()`, events out via `output()`; no service injection; all use `ChangeDetectionStrategy.OnPush`
+
+#### Form Patterns
+
+- **Reactive forms** via `FormBuilder`; use `effect()` to sync signal inputs into form state (e.g., populate form on edit)
+- **Dynamic validators** applied via `effect()` watching dependent control values
+- Emit form value via `output()` using `getRawValue()`; forms accept a `mode` input (`'create' | 'edit'`) to control behavior
+
+#### Model Organization
+
+- Each feature defines: domain entity interface, filters interface, create/update request interfaces, and list response interface
+- Enums are string union types (e.g., `type TradeDirection = 'Long' | 'Short'`)
+- All types exported from the data-access barrel `index.ts`
+
 ### Backend (.NET 10 — Modular Monolith)
 
-- **IModule pattern** — each domain (Auth, Trades, Strategies, Accounts) implements `IModule`, which registers its own services, DbContext, and maps endpoints
-- **Single `ModularDbContext`** — all entity configurations live in one EF Core context
-- **`ApiControllerBase`** — shared base class for all controllers (common response helpers)
+- **Database**: PostgreSQL via Npgsql + EF Core 10; connection string in user-secrets
+- **IModule pattern** — each domain module implements `IModule` (`RegisterModule` + `MapEndpoints`); auto-discovered via reflection in `ModuleExtensions`
+- **Single `ModularDbContext`** — no typed `DbSet<>` properties; access entities via `_context.Set<T>()`; entity configurations use `IEntityTypeConfiguration<T>` per module
+- **`ApiControllerBase`** — shared base for controllers; provides `TryGetCurrentUserId(out Guid)` helper
+- **`BaseEntity`** — base class with `Id`, `CreatedAt`, `UpdatedAt`
+- **Identity**: ASP.NET Core Identity with `ApplicationUser : IdentityUser<Guid>`; JWT Bearer auth
+- **Email**: SendGrid via `EmailService`; HTML templates in `EmailTemplates/`
+- **OpenAPI**: NSwag — Swagger UI available in development at `/swagger`
 - **Rate limiting** — auth endpoints: 10 req/min per IP; global: 300 req/min per user or IP
+
+#### Module Structure
+
+Each module under `Modules/` follows this layout:
+
+```
+Modules/<Name>/
+  <Name>Module.cs          # IModule implementation
+  API/                     # Controllers (extend ApiControllerBase)
+  Domain/                  # Entities and enums
+  Features/                # DTOs and request/response models
+  Infrastructure/Data/     # IEntityTypeConfiguration<T> classes
+```
+
+#### Conventions
+
+- All controllers use `[Authorize]` except Auth endpoints
+- Auth controller uses `[EnableRateLimiting("auth")]`
+- Route prefix: `api/<module>` (e.g., `api/trades`, `api/auth`)
+- Controllers verify resource ownership before any operation
 
 ### Auth Flow
 

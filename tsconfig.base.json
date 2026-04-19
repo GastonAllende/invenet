@@ -13,33 +13,34 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
     "paths": {
-      "@invenet/trades": ["libs/trades/src/index.ts"],
-      "@invenet/auth": ["libs/auth/src/index.ts"],
-      "@invenet/accounts": ["libs/accounts/src/index.ts"],
-      "@invenet/strategies": ["libs/strategies/src/index.ts"],
-      "@invenet/core": ["libs/core/src/index.ts"],
-      "@invenet/shared-util-auth": ["libs/shared/util-auth/src/index.ts"],
-      "@invenet/auth-data-access": ["libs/auth/data-access/src/index.ts"],
-      "@invenet/auth-feature": ["libs/auth/feature/src/index.ts"],
-      "@invenet/shared-ui-layout": ["libs/shared/ui-layout/src/index.ts"],
+      "@invenet/trades": ["./libs/trades/src/index.ts"],
+      "@invenet/auth": ["./libs/auth/src/index.ts"],
+      "@invenet/accounts": ["./libs/accounts/src/index.ts"],
+      "@invenet/strategies": ["./libs/strategies/src/index.ts"],
+      "@invenet/core": ["./libs/core/src/index.ts"],
+      "@invenet/shared-util-auth": ["./libs/shared/util-auth/src/index.ts"],
+      "@invenet/auth-data-access": ["./libs/auth/data-access/src/index.ts"],
+      "@invenet/auth-feature": ["./libs/auth/feature/src/index.ts"],
+      "@invenet/shared-ui-layout": ["./libs/shared/ui-layout/src/index.ts"],
       "@invenet/shared-feature-shell": [
-        "libs/shared/feature-shell/src/index.ts"
+        "./libs/shared/feature-shell/src/index.ts"
       ],
-      "@invenet/trade-feature": ["libs/trade/feature/src/index.ts"],
-      "@invenet/trade-data-access": ["libs/trade/data-access/src/index.ts"],
-      "@invenet/trade-ui": ["libs/trade/ui/src/index.ts"],
+      "@invenet/trade-feature": ["./libs/trade/feature/src/index.ts"],
+      "@invenet/trade-data-access": ["./libs/trade/data-access/src/index.ts"],
+      "@invenet/trade-ui": ["./libs/trade/ui/src/index.ts"],
       "@invenet/strategy-data-access": [
-        "libs/strategy/data-access/src/index.ts"
+        "./libs/strategy/data-access/src/index.ts"
       ],
-      "@invenet/strategy-ui": ["libs/strategy/ui/src/index.ts"],
-      "@invenet/strategy-feature": ["libs/strategy/feature/src/index.ts"],
-      "@invenet/account-data-access": ["libs/account/data-access/src/index.ts"],
-      "@invenet/account-ui": ["libs/account/ui/src/index.ts"],
-      "@invenet/account-feature": ["libs/account/feature/src/index.ts"],
-      "@invenet/dashboard-feature": ["libs/dashboard/feature/src/index.ts"],
-      "@invenet/dashboard-ui": ["libs/dashboard/ui/src/index.ts"]
+      "@invenet/strategy-ui": ["./libs/strategy/ui/src/index.ts"],
+      "@invenet/strategy-feature": ["./libs/strategy/feature/src/index.ts"],
+      "@invenet/account-data-access": [
+        "./libs/account/data-access/src/index.ts"
+      ],
+      "@invenet/account-ui": ["./libs/account/ui/src/index.ts"],
+      "@invenet/account-feature": ["./libs/account/feature/src/index.ts"],
+      "@invenet/dashboard-feature": ["./libs/dashboard/feature/src/index.ts"],
+      "@invenet/dashboard-ui": ["./libs/dashboard/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

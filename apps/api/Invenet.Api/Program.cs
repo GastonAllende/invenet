@@ -121,6 +121,4 @@ app.MapControllers();
 // Map module endpoints
 app.MapModules();
 
-app.MapHealthChecks("/health");
-
 app.Run();

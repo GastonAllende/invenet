@@ -1,12 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import {
-  HttpClient,
-  HttpErrorResponse,
-  HttpParams,
-} from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { API_BASE_URL } from '@invenet/core';
+import { API_BASE_URL, handleHttpError } from '@invenet/core';
 import type {
   CreateAccountRequest,
   CreateAccountResponse,
@@ -22,78 +18,42 @@ export class AccountsApiService {
   private readonly apiBaseUrl = inject(API_BASE_URL);
   private readonly baseUrl = `${this.apiBaseUrl}/api/accounts`;
 
-  /**
-   * List all accounts for the current user
-   * @param includeArchived - Whether to include archived accounts (IsActive=false)
-   */
   list(includeArchived = false): Observable<ListAccountsResponse> {
     const params = new HttpParams().set('includeArchived', includeArchived);
     return this.http.get<ListAccountsResponse>(this.baseUrl, { params }).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to load accounts';
-        if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to view accounts';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to load accounts', {
+          401: 'Authentication required',
+          403: 'You do not have permission to view accounts',
+        }),
+      ),
     );
   }
 
-  /**
-   * Get a single account by ID
-   * @param id - Account ID
-   */
   get(id: string): Observable<GetAccountResponse> {
     return this.http.get<GetAccountResponse>(`${this.baseUrl}/${id}`).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to load account';
-        if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to view this account';
-        } else if (error.status === 404) {
-          errorMessage = 'Account not found';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to load account', {
+          401: 'Authentication required',
+          403: 'You do not have permission to view this account',
+          404: 'Account not found',
+        }),
+      ),
     );
   }
 
-  /**
-   * Create a new account with risk settings
-   * @param payload - Account data including risk settings
-   */
   create(payload: CreateAccountRequest): Observable<CreateAccountResponse> {
     return this.http.post<CreateAccountResponse>(this.baseUrl, payload).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to create account';
-        if (error.status === 400 && error.error?.message) {
-          errorMessage = error.error.message; // Validation error from backend
-        } else if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to create accounts';
-        } else if (error.status === 409) {
-          errorMessage = 'Account name already exists';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to create account', {
+          401: 'Authentication required',
+          403: 'You do not have permission to create accounts',
+          409: 'Account name already exists',
+        }),
+      ),
     );
   }
 
-  /**
-   * Update an existing account and risk settings
-   * @param id - Account ID
-   * @param payload - Updated account data
-   */
   update(
     id: string,
     payload: UpdateAccountRequest,
@@ -101,89 +61,50 @@ export class AccountsApiService {
     return this.http
       .put<UpdateAccountResponse>(`${this.baseUrl}/${id}`, payload)
       .pipe(
-        catchError((error: HttpErrorResponse) => {
-          let errorMessage = 'Failed to update account';
-          if (error.status === 400 && error.error?.message) {
-            errorMessage = error.error.message; // Validation error from backend
-          } else if (error.status === 401) {
-            errorMessage = 'Authentication required';
-          } else if (error.status === 403) {
-            errorMessage = 'You do not have permission to update this account';
-          } else if (error.status === 404) {
-            errorMessage = 'Account not found';
-          } else if (error.status === 409) {
-            errorMessage = 'Account name already exists';
-          } else if (error.error?.message) {
-            errorMessage = error.error.message;
-          }
-          return throwError(() => new Error(errorMessage));
-        }),
+        catchError(
+          handleHttpError('Failed to update account', {
+            401: 'Authentication required',
+            403: 'You do not have permission to update this account',
+            404: 'Account not found',
+            409: 'Account name already exists',
+          }),
+        ),
       );
   }
 
-  /**
-   * Archive an account (soft delete - sets IsActive=false)
-   * @param id - Account ID
-   */
   archive(id: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/archive`, {}).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to archive account';
-        if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to archive this account';
-        } else if (error.status === 404) {
-          errorMessage = 'Account not found';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to archive account', {
+          401: 'Authentication required',
+          403: 'You do not have permission to archive this account',
+          404: 'Account not found',
+        }),
+      ),
     );
   }
 
-  /**
-   * Unarchive an account (restores archived account)
-   * @param id - Account ID
-   */
   unarchive(id: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/unarchive`, {}).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to unarchive account';
-        if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to unarchive this account';
-        } else if (error.status === 404) {
-          errorMessage = 'Account not found';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to unarchive account', {
+          401: 'Authentication required',
+          403: 'You do not have permission to unarchive this account',
+          404: 'Account not found',
+        }),
+      ),
     );
   }
 
-  /**
-   * Persist active account selection for the current user context
-   * @param id - Account ID
-   */
   setActive(id: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/set-active`, {}).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to set active account';
-        if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to access this account';
-        } else if (error.status === 404) {
-          errorMessage = 'Account not found';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to set active account', {
+          401: 'Authentication required',
+          403: 'You do not have permission to access this account',
+          404: 'Account not found',
+        }),
+      ),
     );
   }
 }

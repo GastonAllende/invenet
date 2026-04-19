@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { API_BASE_URL } from '@invenet/core';
+import { catchError } from 'rxjs/operators';
+import { API_BASE_URL, handleHttpError } from '@invenet/core';
 import type {
   CreateStrategyRequest,
   CreateStrategyResponse,
@@ -19,7 +20,14 @@ export class StrategiesApiService {
 
   list(includeArchived = false): Observable<ListStrategiesResponse> {
     const params = new HttpParams().set('includeArchived', includeArchived);
-    return this.http.get<ListStrategiesResponse>(this.baseUrl, { params });
+    return this.http.get<ListStrategiesResponse>(this.baseUrl, { params }).pipe(
+      catchError(
+        handleHttpError('Failed to load strategies', {
+          401: 'Authentication required',
+          403: 'You do not have permission to view strategies',
+        }),
+      ),
+    );
   }
 
   get(id: string, version?: number): Observable<GetStrategyResponse> {
@@ -28,30 +36,71 @@ export class StrategiesApiService {
       params = params.set('version', version);
     }
 
-    return this.http.get<GetStrategyResponse>(`${this.baseUrl}/${id}`, {
-      params,
-    });
+    return this.http
+      .get<GetStrategyResponse>(`${this.baseUrl}/${id}`, { params })
+      .pipe(
+        catchError(
+          handleHttpError('Failed to load strategy', {
+            401: 'Authentication required',
+            403: 'You do not have permission to view this strategy',
+            404: 'Strategy not found',
+          }),
+        ),
+      );
   }
 
   create(payload: CreateStrategyRequest): Observable<CreateStrategyResponse> {
-    return this.http.post<CreateStrategyResponse>(this.baseUrl, payload);
+    return this.http.post<CreateStrategyResponse>(this.baseUrl, payload).pipe(
+      catchError(
+        handleHttpError('Failed to create strategy', {
+          401: 'Authentication required',
+          403: 'You do not have permission to create strategies',
+        }),
+      ),
+    );
   }
 
   createVersion(
     id: string,
     payload: CreateStrategyVersionRequest,
   ): Observable<CreateStrategyVersionResponse> {
-    return this.http.post<CreateStrategyVersionResponse>(
-      `${this.baseUrl}/${id}/versions`,
-      payload,
-    );
+    return this.http
+      .post<CreateStrategyVersionResponse>(
+        `${this.baseUrl}/${id}/versions`,
+        payload,
+      )
+      .pipe(
+        catchError(
+          handleHttpError('Failed to create strategy version', {
+            401: 'Authentication required',
+            403: 'You do not have permission to update this strategy',
+            404: 'Strategy not found',
+          }),
+        ),
+      );
   }
 
   archive(id: string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/${id}/archive`, {});
+    return this.http.post<void>(`${this.baseUrl}/${id}/archive`, {}).pipe(
+      catchError(
+        handleHttpError('Failed to archive strategy', {
+          401: 'Authentication required',
+          403: 'You do not have permission to archive this strategy',
+          404: 'Strategy not found',
+        }),
+      ),
+    );
   }
 
   unarchive(id: string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/${id}/unarchive`, {});
+    return this.http.post<void>(`${this.baseUrl}/${id}/unarchive`, {}).pipe(
+      catchError(
+        handleHttpError('Failed to unarchive strategy', {
+          401: 'Authentication required',
+          403: 'You do not have permission to unarchive this strategy',
+          404: 'Strategy not found',
+        }),
+      ),
+    );
   }
 }

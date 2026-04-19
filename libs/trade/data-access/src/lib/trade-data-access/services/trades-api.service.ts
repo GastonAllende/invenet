@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { API_BASE_URL } from '@invenet/core';
+import { API_BASE_URL, handleHttpError } from '@invenet/core';
 import type {
   ListTradesResponse,
   CreateTradeRequest,
@@ -36,107 +36,72 @@ export class TradesApiService {
     }
 
     return this.http.get<ListTradesResponse>(this.baseUrl, { params }).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to load trades';
-        if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 400) {
-          errorMessage = 'Active account is required to load trades';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have access to this account';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to load trades', {
+          400: 'Active account is required to load trades',
+          401: 'Authentication required',
+          403: 'You do not have access to this account',
+        }),
+      ),
     );
   }
 
   create(request: CreateTradeRequest): Observable<TradeResponse> {
     return this.http.post<TradeResponse>(this.baseUrl, request).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to create trade';
-        if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 403) {
-          errorMessage = 'Account does not belong to you';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to create trade', {
+          401: 'Authentication required',
+          403: 'Account does not belong to you',
+        }),
+      ),
     );
   }
 
   update(id: string, request: UpdateTradeRequest): Observable<TradeResponse> {
     return this.http.put<TradeResponse>(`${this.baseUrl}/${id}`, request).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to update trade';
-        if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to update this trade';
-        } else if (error.status === 404) {
-          errorMessage = 'Trade not found';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to update trade', {
+          401: 'Authentication required',
+          403: 'You do not have permission to update this trade',
+          404: 'Trade not found',
+        }),
+      ),
     );
   }
 
   get(id: string): Observable<TradeResponse> {
     return this.http.get<TradeResponse>(`${this.baseUrl}/${id}`).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to load trade';
-        if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to access this trade';
-        } else if (error.status === 404) {
-          errorMessage = 'Trade not found';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to load trade', {
+          401: 'Authentication required',
+          403: 'You do not have permission to access this trade',
+          404: 'Trade not found',
+        }),
+      ),
     );
   }
 
   archive(id: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/archive`, {}).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to archive trade';
-        if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to archive this trade';
-        } else if (error.status === 404) {
-          errorMessage = 'Trade not found';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to archive trade', {
+          401: 'Authentication required',
+          403: 'You do not have permission to archive this trade',
+          404: 'Trade not found',
+        }),
+      ),
     );
   }
 
   unarchive(id: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/unarchive`, {}).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'Failed to unarchive trade';
-        if (error.status === 401) {
-          errorMessage = 'Authentication required';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to unarchive this trade';
-        } else if (error.status === 404) {
-          errorMessage = 'Trade not found';
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        }
-        return throwError(() => new Error(errorMessage));
-      }),
+      catchError(
+        handleHttpError('Failed to unarchive trade', {
+          401: 'Authentication required',
+          403: 'You do not have permission to unarchive this trade',
+          404: 'Trade not found',
+        }),
+      ),
     );
   }
 }
