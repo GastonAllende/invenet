@@ -5,6 +5,7 @@ import {
   inject,
   input,
   output,
+  signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -50,8 +51,8 @@ interface SelectOption {
 export class TradeFormComponent {
   private readonly fb = inject(FormBuilder);
   private readonly strategiesStore = inject(StrategiesStore);
-  private isPatchingStrategy = false;
-  private initialStrategyId: string | null = null;
+  private readonly isPatchingStrategy = signal(false);
+  private readonly initialStrategyId = signal<string | null>(null);
 
   mode = input<'create' | 'edit'>('create');
   trade = input<Trade | null>(null);
@@ -98,7 +99,7 @@ export class TradeFormComponent {
     effect(() => {
       const t = this.trade();
       if (t && this.mode() === 'edit') {
-        this.initialStrategyId = t.strategyId;
+        this.initialStrategyId.set(t.strategyId);
         this.form.patchValue({
           accountId: t.accountId,
           strategyId: t.strategyId,
@@ -117,7 +118,7 @@ export class TradeFormComponent {
           status: t.status,
         });
       } else {
-        this.initialStrategyId = null;
+        this.initialStrategyId.set(null);
         this.form.reset({
           accountId: this.defaultAccountId() ?? '',
           strategyId: null,
@@ -157,44 +158,7 @@ export class TradeFormComponent {
 
     this.form.controls.strategyId.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe((strategyId) => {
-        if (this.mode() !== 'edit' || this.isPatchingStrategy) {
-          return;
-        }
-
-        if ((strategyId ?? null) === this.initialStrategyId) {
-          return;
-        }
-
-        const confirmed = window.confirm(
-          'Changing the strategy will update the strategy version to the current version. Continue?',
-        );
-
-        if (!confirmed) {
-          this.isPatchingStrategy = true;
-          this.form.controls.strategyId.setValue(this.initialStrategyId);
-          this.isPatchingStrategy = false;
-          return;
-        }
-
-        if (!strategyId) {
-          this.form.controls.strategyVersionId.setValue(null);
-          this.initialStrategyId = null;
-          return;
-        }
-
-        const strategy = this.strategiesStore.entityMap()[strategyId];
-        if (strategy) {
-          this.form.controls.strategyVersionId.setValue(
-            strategy.currentVersion?.id ?? null,
-          );
-          this.initialStrategyId = strategyId;
-        } else {
-          this.isPatchingStrategy = true;
-          this.form.controls.strategyId.setValue(this.initialStrategyId);
-          this.isPatchingStrategy = false;
-        }
-      });
+      .subscribe((strategyId) => this.onStrategyIdChange(strategyId));
   }
 
   get isEditMode(): boolean {
@@ -206,52 +170,75 @@ export class TradeFormComponent {
       this.form.markAllAsTouched();
       return;
     }
+    this.save.emit(this.buildTradePayload());
+  }
 
-    const raw = this.form.getRawValue();
+  onCancel(): void {
+    this.formCancel.emit();
+  }
+
+  private onStrategyIdChange(strategyId: string | null): void {
+    if (this.mode() !== 'edit' || this.isPatchingStrategy()) return;
+    if ((strategyId ?? null) === this.initialStrategyId()) return;
+
+    const confirmed = window.confirm(
+      'Changing the strategy will update the strategy version to the current version. Continue?',
+    );
+
+    if (!confirmed) {
+      this.isPatchingStrategy.set(true);
+      this.form.controls.strategyId.setValue(this.initialStrategyId());
+      this.isPatchingStrategy.set(false);
+      return;
+    }
+
+    if (!strategyId) {
+      this.form.controls.strategyVersionId.setValue(null);
+      this.initialStrategyId.set(null);
+      return;
+    }
+
+    const strategy = this.strategiesStore.entityMap()[strategyId];
+    if (strategy) {
+      this.form.controls.strategyVersionId.setValue(strategy.currentVersion?.id ?? null);
+      this.initialStrategyId.set(strategyId);
+    } else {
+      this.isPatchingStrategy.set(true);
+      this.form.controls.strategyId.setValue(this.initialStrategyId());
+      this.isPatchingStrategy.set(false);
+    }
+  }
+
+  private buildTradePayload(): CreateTradeRequest | UpdateTradeRequest {
+    return this.isEditMode ? this.buildUpdateRequest() : this.buildCreateRequest();
+  }
+
+  private parseFormDates(raw: ReturnType<typeof this.form.getRawValue>) {
     const openedAt =
-      raw.openedAt instanceof Date
-        ? raw.openedAt.toISOString()
-        : `${raw.openedAt}`;
+      raw.openedAt instanceof Date ? raw.openedAt.toISOString() : `${raw.openedAt}`;
     const closedAt =
       raw.closedAt instanceof Date
         ? raw.closedAt.toISOString()
         : raw.closedAt
           ? `${raw.closedAt}`
           : undefined;
-    const tags = (raw.tags ?? '')
+    return { openedAt, closedAt };
+  }
+
+  private parseFormTags(raw: ReturnType<typeof this.form.getRawValue>): string[] {
+    return (raw.tags ?? '')
       .split(',')
-      .map((value) => value.trim())
-      .filter((value) => value.length > 0);
+      .map((v) => v.trim())
+      .filter((v) => v.length > 0);
+  }
 
-    const direction = (raw.direction ?? 'Long') as TradeDirection;
-    const status = (raw.status ?? 'Open') as TradeStatus;
-
-    if (this.isEditMode) {
-      const request: UpdateTradeRequest = {
-        strategyId: raw.strategyId ?? undefined,
-        strategyVersionId: raw.strategyVersionId ?? undefined,
-        direction,
-        openedAt,
-        closedAt,
-        symbol: (raw.symbol ?? '').toUpperCase(),
-        entryPrice: raw.entryPrice ?? 0,
-        exitPrice: raw.exitPrice ?? undefined,
-        quantity: raw.quantity ?? undefined,
-        rMultiple: raw.rMultiple ?? undefined,
-        pnl: raw.pnl ?? undefined,
-        tags,
-        notes: raw.notes ?? undefined,
-        status,
-      };
-      this.save.emit(request);
-      return;
-    }
-
-    const request: CreateTradeRequest = {
-      accountId: raw.accountId ?? '',
+  private buildUpdateRequest(): UpdateTradeRequest {
+    const raw = this.form.getRawValue();
+    const { openedAt, closedAt } = this.parseFormDates(raw);
+    return {
       strategyId: raw.strategyId ?? undefined,
       strategyVersionId: raw.strategyVersionId ?? undefined,
-      direction,
+      direction: (raw.direction ?? 'Long') as TradeDirection,
       openedAt,
       closedAt,
       symbol: (raw.symbol ?? '').toUpperCase(),
@@ -260,14 +247,31 @@ export class TradeFormComponent {
       quantity: raw.quantity ?? undefined,
       rMultiple: raw.rMultiple ?? undefined,
       pnl: raw.pnl ?? undefined,
-      tags,
+      tags: this.parseFormTags(raw),
       notes: raw.notes ?? undefined,
-      status,
+      status: (raw.status ?? 'Open') as TradeStatus,
     };
-    this.save.emit(request);
   }
 
-  onCancel(): void {
-    this.formCancel.emit();
+  private buildCreateRequest(): CreateTradeRequest {
+    const raw = this.form.getRawValue();
+    const { openedAt, closedAt } = this.parseFormDates(raw);
+    return {
+      accountId: raw.accountId ?? '',
+      strategyId: raw.strategyId ?? undefined,
+      strategyVersionId: raw.strategyVersionId ?? undefined,
+      direction: (raw.direction ?? 'Long') as TradeDirection,
+      openedAt,
+      closedAt,
+      symbol: (raw.symbol ?? '').toUpperCase(),
+      entryPrice: raw.entryPrice ?? 0,
+      exitPrice: raw.exitPrice ?? undefined,
+      quantity: raw.quantity ?? undefined,
+      rMultiple: raw.rMultiple ?? undefined,
+      pnl: raw.pnl ?? undefined,
+      tags: this.parseFormTags(raw),
+      notes: raw.notes ?? undefined,
+      status: (raw.status ?? 'Open') as TradeStatus,
+    };
   }
 }

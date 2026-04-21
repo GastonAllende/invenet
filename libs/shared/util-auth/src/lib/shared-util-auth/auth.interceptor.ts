@@ -1,79 +1,82 @@
 import { inject } from '@angular/core';
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import {
+  HttpErrorResponse,
+  HttpInterceptorFn,
+  HttpRequest,
+  HttpHandlerFn,
+} from '@angular/common/http';
 import { Router } from '@angular/router';
-import { catchError, throwError, switchMap, take } from 'rxjs';
+import { catchError, throwError, switchMap, take, Observable } from 'rxjs';
 import { AuthService } from '@invenet/auth-data-access';
+
+const AUTH_ENDPOINTS = [
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/refresh',
+  '/api/auth/confirm-email',
+  '/api/auth/forgot-password',
+  '/api/auth/reset-password',
+] as const;
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // Skip interceptor for auth endpoints
-  if (
-    req.url.includes('/api/auth/login') ||
-    req.url.includes('/api/auth/register') ||
-    req.url.includes('/api/auth/refresh') ||
-    req.url.includes('/api/auth/confirm-email') ||
-    req.url.includes('/api/auth/forgot-password') ||
-    req.url.includes('/api/auth/reset-password')
-  ) {
+  if (AUTH_ENDPOINTS.some((path) => req.url.includes(path))) {
     return next(req);
   }
 
-  // Check if token should be refreshed proactively
+  const attachToken = (r: typeof req) => {
+    const token = authService.getAccessToken();
+    return token ? r.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : r;
+  };
+
   if (authService.shouldRefreshToken() && authService.isAuthenticated()) {
     return authService.refreshToken().pipe(
       take(1),
-      switchMap(() => {
-        // After refresh, attach new token and proceed
-        const token = authService.getAccessToken();
-        const authReq = token
-          ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-          : req;
-        return next(authReq).pipe(
+      switchMap(() =>
+        next(attachToken(req)).pipe(
           catchError((error: HttpErrorResponse) =>
-            handleError(error, authService, router),
+            error.status === 401
+              ? handleTokenRefreshOn401(req, next, authService, router)
+              : handleError(error, authService, router),
           ),
-        );
-      }),
-      catchError((error: HttpErrorResponse) =>
-        handleError(error, authService, router),
+        ),
       ),
+      catchError((error: HttpErrorResponse) => handleError(error, authService, router)),
     );
   }
 
-  // Attach token if available
-  const token = authService.getAccessToken();
-  const authReq = token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
-
-  return next(authReq).pipe(
+  return next(attachToken(req)).pipe(
     catchError((error: HttpErrorResponse) => {
-      // On 401, try to refresh token once
       if (error.status === 401 && authService.getRefreshToken()) {
-        return authService.refreshToken().pipe(
-          take(1),
-          switchMap(() => {
-            // Retry original request with new token
-            const newToken = authService.getAccessToken();
-            const retryReq = newToken
-              ? req.clone({
-                  setHeaders: { Authorization: `Bearer ${newToken}` },
-                })
-              : req;
-            return next(retryReq);
-          }),
-          catchError((refreshError: HttpErrorResponse) =>
-            handleError(refreshError, authService, router),
-          ),
-        );
+        return handleTokenRefreshOn401(req, next, authService, router);
       }
-
       return handleError(error, authService, router);
     }),
   );
 };
+
+function handleTokenRefreshOn401(
+  originalReq: HttpRequest<unknown>,
+  next: HttpHandlerFn,
+  authService: AuthService,
+  router: Router,
+): Observable<unknown> {
+  return authService.refreshToken().pipe(
+    take(1),
+    switchMap(() => {
+      const newToken = authService.getAccessToken();
+      const retryReq = newToken
+        ? originalReq.clone({ setHeaders: { Authorization: `Bearer ${newToken}` } })
+        : originalReq;
+      return next(retryReq);
+    }),
+    catchError((refreshError: HttpErrorResponse) =>
+      handleError(refreshError, authService, router),
+    ),
+  );
+}
 
 function handleError(
   error: HttpErrorResponse,

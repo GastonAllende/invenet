@@ -39,23 +39,22 @@ export const TradesStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withEntities<Trade>(),
-  withMethods((store, apiService = inject(TradesApiService)) => ({
+  withMethods((store, apiService = inject(TradesApiService)) => {
+    const startLoading = () => patchState(store, { isLoading: true, error: null });
+    const setError = (error: Error, fallback: string) =>
+      patchState(store, { isLoading: false, error: error.message || fallback });
+
+    return {
     loadTrades: rxMethod<TradeFilters>(
       pipe(
-        tap(() => patchState(store, { isLoading: true, error: null })),
+        tap(startLoading),
         switchMap((filters) =>
           apiService.list(filters).pipe(
             tap((response: ListTradesResponse) => {
-              patchState(store, setAllEntities(response.trades), {
-                isLoading: false,
-                error: null,
-              });
+              patchState(store, setAllEntities(response.trades), { isLoading: false, error: null });
             }),
             catchError((error: Error) => {
-              patchState(store, {
-                isLoading: false,
-                error: error.message || 'Failed to load trades',
-              });
+              setError(error, 'Failed to load trades');
               return of(null);
             }),
           ),
@@ -65,7 +64,7 @@ export const TradesStore = signalStore(
 
     createTrade: rxMethod<CreateTradeRequest>(
       pipe(
-        tap(() => patchState(store, { isLoading: true, error: null })),
+        tap(startLoading),
         switchMap((request) =>
           apiService.create(request).pipe(
             tap((response: TradeResponse) => {
@@ -76,10 +75,7 @@ export const TradesStore = signalStore(
               });
             }),
             catchError((error: Error) => {
-              patchState(store, {
-                isLoading: false,
-                error: error.message || 'Failed to create trade',
-              });
+              setError(error, 'Failed to create trade');
               return EMPTY;
             }),
           ),
@@ -89,7 +85,7 @@ export const TradesStore = signalStore(
 
     updateTrade: rxMethod<{ id: string; request: UpdateTradeRequest }>(
       pipe(
-        tap(() => patchState(store, { isLoading: true, error: null })),
+        tap(startLoading),
         switchMap(({ id, request }) =>
           apiService.update(id, request).pipe(
             tap((response: TradeResponse) => {
@@ -100,10 +96,7 @@ export const TradesStore = signalStore(
               );
             }),
             catchError((error: Error) => {
-              patchState(store, {
-                isLoading: false,
-                error: error.message || 'Failed to update trade',
-              });
+              setError(error, 'Failed to update trade');
               return EMPTY;
             }),
           ),
@@ -113,25 +106,18 @@ export const TradesStore = signalStore(
 
     archiveTrade: rxMethod<string>(
       pipe(
-        tap(() => patchState(store, { isLoading: true, error: null })),
+        tap(startLoading),
         switchMap((id) =>
           apiService.archive(id).pipe(
             tap(() => {
               patchState(
                 store,
                 updateEntity({ id, changes: { isArchived: true } }),
-                {
-                  isLoading: false,
-                  error: null,
-                  lastSavedId: id,
-                },
+                { isLoading: false, error: null, lastSavedId: id },
               );
             }),
             catchError((error: Error) => {
-              patchState(store, {
-                isLoading: false,
-                error: error.message || 'Failed to archive trade',
-              });
+              setError(error, 'Failed to archive trade');
               return EMPTY;
             }),
           ),
@@ -141,25 +127,18 @@ export const TradesStore = signalStore(
 
     unarchiveTrade: rxMethod<string>(
       pipe(
-        tap(() => patchState(store, { isLoading: true, error: null })),
+        tap(startLoading),
         switchMap((id) =>
           apiService.unarchive(id).pipe(
             tap(() => {
               patchState(
                 store,
                 updateEntity({ id, changes: { isArchived: false } }),
-                {
-                  isLoading: false,
-                  error: null,
-                  lastSavedId: id,
-                },
+                { isLoading: false, error: null, lastSavedId: id },
               );
             }),
             catchError((error: Error) => {
-              patchState(store, {
-                isLoading: false,
-                error: error.message || 'Failed to unarchive trade',
-              });
+              setError(error, 'Failed to unarchive trade');
               return EMPTY;
             }),
           ),
@@ -169,18 +148,14 @@ export const TradesStore = signalStore(
 
     loadTradeDetail: rxMethod<string>(
       pipe(
-        tap(() => patchState(store, { isLoading: true, error: null })),
+        tap(startLoading),
         switchMap((id) =>
           apiService.get(id).pipe(
             tap((response: TradeResponse) => {
               patchState(
                 store,
                 updateEntity({ id: response.id, changes: { ...response } }),
-                {
-                  isLoading: false,
-                  error: null,
-                  selectedTradeDetail: response,
-                },
+                { isLoading: false, error: null, selectedTradeDetail: response },
               );
             }),
             catchError((error: Error) => {
@@ -229,5 +204,6 @@ export const TradesStore = signalStore(
         error: null,
       });
     },
-  })),
+  };
+  }),
 );

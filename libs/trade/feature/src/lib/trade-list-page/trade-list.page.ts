@@ -136,12 +136,19 @@ export class TradeListPage {
   }
 
   onUnarchive(tradeId: string): void {
-    this.store.unarchiveTrade(tradeId);
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Trade unarchived',
-      life: 3000,
+    this.confirmationService.confirm({
+      message: 'Restore this archived trade?',
+      header: 'Restore Trade',
+      icon: 'pi pi-info-circle',
+      accept: () => {
+        this.store.unarchiveTrade(tradeId);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Trade unarchived',
+          life: 3000,
+        });
+      },
     });
   }
 }
