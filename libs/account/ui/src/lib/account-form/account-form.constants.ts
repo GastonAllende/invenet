@@ -9,13 +9,13 @@ export const BROKER_OPTIONS = [
   { label: 'Saxo Bank', value: 'Saxo Bank' },
   { label: 'FTMO', value: 'FTMO' },
   { label: 'Other', value: 'Other' },
-] as const;
+];
 
 export const ACCOUNT_TYPE_OPTIONS = [
   { label: 'Personal', value: 'Personal' },
   { label: 'Prop Firm', value: 'Prop Firm' },
   { label: 'Funded', value: 'Funded' },
-] as const;
+];
 
 export const CURRENCY_OPTIONS = [
   { label: 'USD', value: 'USD' },
@@ -28,7 +28,7 @@ export const CURRENCY_OPTIONS = [
   { label: 'NZD', value: 'NZD' },
   { label: 'SEK', value: 'SEK' },
   { label: 'NOK', value: 'NOK' },
-] as const;
+];
 
 export const TIMEZONE_OPTIONS = [
   { label: 'UTC', value: 'UTC' },
@@ -43,4 +43,4 @@ export const TIMEZONE_OPTIONS = [
   { label: 'Asia/Singapore', value: 'Asia/Singapore' },
   { label: 'Australia/Sydney', value: 'Australia/Sydney' },
   { label: 'Pacific/Auckland', value: 'Pacific/Auckland' },
-] as const;
+];

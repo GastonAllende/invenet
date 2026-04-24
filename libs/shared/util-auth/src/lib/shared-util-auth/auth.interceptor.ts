@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import {
   HttpErrorResponse,
+  HttpEvent,
   HttpInterceptorFn,
   HttpRequest,
   HttpHandlerFn,
@@ -28,7 +29,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const attachToken = (r: typeof req) => {
     const token = authService.getAccessToken();
-    return token ? r.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : r;
+    return token
+      ? r.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+      : r;
   };
 
   if (authService.shouldRefreshToken() && authService.isAuthenticated()) {
@@ -43,7 +46,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           ),
         ),
       ),
-      catchError((error: HttpErrorResponse) => handleError(error, authService, router)),
+      catchError((error: HttpErrorResponse) =>
+        handleError(error, authService, router),
+      ),
     );
   }
 
@@ -62,13 +67,15 @@ function handleTokenRefreshOn401(
   next: HttpHandlerFn,
   authService: AuthService,
   router: Router,
-): Observable<unknown> {
+): Observable<HttpEvent<unknown>> {
   return authService.refreshToken().pipe(
     take(1),
     switchMap(() => {
       const newToken = authService.getAccessToken();
       const retryReq = newToken
-        ? originalReq.clone({ setHeaders: { Authorization: `Bearer ${newToken}` } })
+        ? originalReq.clone({
+            setHeaders: { Authorization: `Bearer ${newToken}` },
+          })
         : originalReq;
       return next(retryReq);
     }),
