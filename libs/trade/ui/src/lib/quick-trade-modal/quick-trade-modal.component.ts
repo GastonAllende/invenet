@@ -133,44 +133,54 @@ export class QuickTradeModalComponent {
       this.form.markAllAsTouched();
       return;
     }
+    this.executeQuickTrade();
+  }
 
+  private buildTradePayload() {
     const value = this.form.getRawValue();
+    return {
+      accountId: value.accountId ?? '',
+      strategyVersionId: this.currentVersionId() ?? undefined,
+      symbol: value.symbol?.trim().toUpperCase() ?? '',
+      direction: value.direction ?? 'Long',
+      entryPrice: value.entryPrice ?? 0,
+      openedAt: new Date().toISOString(),
+      quantity: value.quantity ?? undefined,
+      status: 'Open' as const,
+    };
+  }
+
+  private executeQuickTrade(): void {
+    const payload = this.buildTradePayload();
     this.tradesApiService
-      .create({
-        accountId: value.accountId ?? '',
-        strategyVersionId: this.currentVersionId() ?? undefined,
-        symbol: value.symbol?.trim().toUpperCase() ?? '',
-        direction: value.direction ?? 'Long',
-        entryPrice: value.entryPrice ?? 0,
-        openedAt: new Date().toISOString(),
-        quantity: value.quantity ?? undefined,
-        status: 'Open',
-      })
+      .create(payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Trade logged',
-            life: 3000,
-          });
-
-          const accountId = value.accountId ?? '';
-          if (accountId) {
-            this.tradesStore.loadTrades({ accountId });
-          }
-          this.close();
-        },
-        error: (error: Error) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: error.message || 'Failed to log trade',
-            life: 5000,
-          });
-        },
+        next: () => this.onTradeSuccess(payload.accountId),
+        error: (error: Error) => this.onTradeError(error),
       });
+  }
+
+  private onTradeSuccess(accountId: string): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Trade logged',
+      life: 3000,
+    });
+    if (accountId) {
+      this.tradesStore.loadTrades({ accountId });
+    }
+    this.close();
+  }
+
+  private onTradeError(error: Error): void {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: error.message || 'Failed to log trade',
+      life: 5000,
+    });
   }
 
   close(): void {

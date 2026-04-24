@@ -44,13 +44,11 @@ export class LoginComponent {
     rememberMe: this.fb.control(false),
   });
 
-  errorMessage = '';
-  isLoading = signal(false); // create a signal to track loading state
-
-  // create a signal to track form submission state
+  readonly errorMessage = signal('');
+  readonly isLoading = signal(false);
 
   submit(): void {
-    this.errorMessage = '';
+    this.errorMessage.set('');
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -64,7 +62,7 @@ export class LoginComponent {
       },
       error: () => {
         this.isLoading.set(false);
-        this.errorMessage = 'Invalid email or password.';
+        this.errorMessage.set('Invalid email or password.');
       },
     });
   }

@@ -92,14 +92,14 @@
           }
         </div>
 
-        @if (errorMessage) {
+        @if (errorMessage()) {
           <p-message severity="error" icon="pi pi-times-circle">
-            {{ errorMessage }}
+            {{ errorMessage() }}
           </p-message>
         }
-        @if (errorDetails.length) {
+        @if (errorDetails().length) {
           <div class="flex flex-col gap-2">
-            @for (detail of errorDetails; track detail) {
+            @for (detail of errorDetails(); track detail) {
               <p-message severity="error" variant="simple" size="small">
                 {{ detail }}
               </p-message>

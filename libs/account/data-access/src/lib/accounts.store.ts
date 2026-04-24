@@ -25,6 +25,38 @@ import type {
 } from './models';
 import { AccountsApiService } from './accounts-api.service';
 
+function mapCreateResponseToAccount(r: CreateAccountResponse): GetAccountResponse {
+  return {
+    id: r.id,
+    name: r.name,
+    broker: r.broker,
+    accountType: r.accountType,
+    baseCurrency: r.baseCurrency,
+    startDate: r.startDate,
+    startingBalance: r.startingBalance,
+    timezone: r.timezone,
+    notes: r.notes,
+    isActive: r.isActive,
+    createdAt: r.createdAt,
+    updatedAt: r.createdAt,
+    riskSettings: r.riskSettings,
+  };
+}
+
+function mapUpdateResponseToAccountChanges(r: UpdateAccountResponse): Partial<GetAccountResponse> {
+  return {
+    name: r.name,
+    broker: r.broker,
+    accountType: r.accountType,
+    baseCurrency: r.baseCurrency,
+    timezone: r.timezone,
+    notes: r.notes,
+    isActive: r.isActive,
+    updatedAt: r.updatedAt,
+    riskSettings: r.riskSettings,
+  };
+}
+
 type AccountsState = {
   isLoading: boolean;
   error: string | null;
@@ -115,21 +147,7 @@ export const AccountsStore = signalStore(
         switchMap((payload) =>
           apiService.create(payload).pipe(
             tap((response: CreateAccountResponse) => {
-              const newAccount: GetAccountResponse = {
-                id: response.id,
-                name: response.name,
-                broker: response.broker,
-                accountType: response.accountType,
-                baseCurrency: response.baseCurrency,
-                startDate: response.startDate,
-                startingBalance: response.startingBalance,
-                timezone: response.timezone,
-                notes: response.notes,
-                isActive: response.isActive,
-                createdAt: response.createdAt,
-                updatedAt: response.createdAt,
-                riskSettings: response.riskSettings,
-              };
+              const newAccount = mapCreateResponseToAccount(response);
               patchState(store, addEntities([newAccount]), {
                 isLoading: false,
                 error: null,
@@ -161,20 +179,7 @@ export const AccountsStore = signalStore(
             tap((response: UpdateAccountResponse) => {
               patchState(
                 store,
-                updateEntity({
-                  id,
-                  changes: {
-                    name: response.name,
-                    broker: response.broker,
-                    accountType: response.accountType,
-                    baseCurrency: response.baseCurrency,
-                    timezone: response.timezone,
-                    notes: response.notes,
-                    isActive: response.isActive,
-                    updatedAt: response.updatedAt,
-                    riskSettings: response.riskSettings,
-                  },
-                }),
+                updateEntity({ id, changes: mapUpdateResponseToAccountChanges(response) }),
                 { isLoading: false, error: null },
               );
             }),

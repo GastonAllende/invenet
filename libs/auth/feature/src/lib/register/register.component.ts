@@ -74,13 +74,13 @@ export class RegisterComponent {
     { validators: matchPasswords },
   );
 
-  errorMessage = '';
-  errorDetails: string[] = [];
-  isLoading = signal(false); // create a signal to track loading state
+  readonly errorMessage = signal('');
+  readonly errorDetails = signal<string[]>([]);
+  readonly isLoading = signal(false);
 
   submit(): void {
-    this.errorMessage = '';
-    this.errorDetails = [];
+    this.errorMessage.set('');
+    this.errorDetails.set([]);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -97,8 +97,8 @@ export class RegisterComponent {
       .subscribe({
         next: () => {
           this.isLoading.set(false);
-          this.errorMessage = '';
-          this.errorDetails = [];
+          this.errorMessage.set('');
+          this.errorDetails.set([]);
           this.messageService.add({
             severity: 'success',
             summary: 'Registration Successful',
@@ -109,14 +109,17 @@ export class RegisterComponent {
         },
         error: (error) => {
           this.isLoading.set(false);
-          this.errorMessage =
+          this.errorMessage.set(
             error?.error?.message ||
-            'Unable to create account. Check your details.';
+            'Unable to create account. Check your details.',
+          );
           const errors = error?.error;
           if (Array.isArray(errors)) {
-            this.errorDetails = errors
-              .map((item) => item?.description)
-              .filter((message): message is string => Boolean(message));
+            this.errorDetails.set(
+              errors
+                .map((item) => item?.description)
+                .filter((message): message is string => Boolean(message)),
+            );
           }
         },
       });

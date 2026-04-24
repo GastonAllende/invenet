@@ -83,26 +83,7 @@ export class AccountListPage {
       if (this.isLoading()) return;
       const operation = this.pendingOperation();
       if (!operation) return;
-
-      if (operation === 'archive') {
-        this.store.loadAccounts({ includeArchived: this.includeArchived() });
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Account archived',
-          life: 3000,
-        });
-      }
-      if (operation === 'unarchive') {
-        this.store.loadAccounts({ includeArchived: this.includeArchived() });
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Account restored',
-          life: 3000,
-        });
-      }
-      this.pendingOperation.set(null);
+      this.handleArchiveStateChange(operation);
     });
 
     effect(() => {
@@ -136,6 +117,13 @@ export class AccountListPage {
       detail: 'Active account updated',
       life: 2500,
     });
+  }
+
+  private handleArchiveStateChange(operation: PendingOperation): void {
+    const detail = operation === 'archive' ? 'Account archived' : 'Account restored';
+    this.store.loadAccounts({ includeArchived: this.includeArchived() });
+    this.messageService.add({ severity: 'success', summary: 'Success', detail, life: 3000 });
+    this.pendingOperation.set(null);
   }
 
   onArchiveAccount(id: string): void {
