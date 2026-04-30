@@ -1,8 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { API_BASE_URL, handleHttpError } from '@invenet/core';
+import { Observable, catchError, throwError } from 'rxjs';
+import { API_BASE_URL, getHttpErrorMessage } from '@invenet/core';
 import type {
   ListTradesResponse,
   CreateTradeRequest,
@@ -36,71 +35,101 @@ export class TradesApiService {
     }
 
     return this.http.get<ListTradesResponse>(this.baseUrl, { params }).pipe(
-      catchError(
-        handleHttpError('Failed to load trades', {
-          400: 'Active account is required to load trades',
-          401: 'Authentication required',
-          403: 'You do not have access to this account',
-        }),
+      catchError((error) =>
+        throwError(
+          () =>
+            new Error(
+              getHttpErrorMessage(error, 'Failed to load trades', {
+                400: 'Active account required',
+                401: 'Authentication required',
+                403: 'You do not have permission to view trades',
+              }),
+            ),
+        ),
       ),
     );
   }
 
   create(request: CreateTradeRequest): Observable<TradeResponse> {
     return this.http.post<TradeResponse>(this.baseUrl, request).pipe(
-      catchError(
-        handleHttpError('Failed to create trade', {
-          401: 'Authentication required',
-          403: 'Account does not belong to you',
-        }),
+      catchError((error) =>
+        throwError(
+          () =>
+            new Error(
+              getHttpErrorMessage(error, 'Failed to create trade', {
+                401: 'Authentication required',
+                403: 'Account does not belong to you',
+              }),
+            ),
+        ),
       ),
     );
   }
 
   update(id: string, request: UpdateTradeRequest): Observable<TradeResponse> {
     return this.http.put<TradeResponse>(`${this.baseUrl}/${id}`, request).pipe(
-      catchError(
-        handleHttpError('Failed to update trade', {
-          401: 'Authentication required',
-          403: 'You do not have permission to update this trade',
-          404: 'Trade not found',
-        }),
+      catchError((error) =>
+        throwError(
+          () =>
+            new Error(
+              getHttpErrorMessage(error, 'Failed to update trade', {
+                401: 'Authentication required',
+                403: 'You do not have permission to update this trade',
+                404: 'Trade not found',
+              }),
+            ),
+        ),
       ),
     );
   }
 
   get(id: string): Observable<TradeResponse> {
     return this.http.get<TradeResponse>(`${this.baseUrl}/${id}`).pipe(
-      catchError(
-        handleHttpError('Failed to load trade', {
-          401: 'Authentication required',
-          403: 'You do not have permission to access this trade',
-          404: 'Trade not found',
-        }),
+      catchError((error) =>
+        throwError(
+          () =>
+            new Error(
+              getHttpErrorMessage(error, 'Failed to load trade', {
+                401: 'Authentication required',
+                403: 'You do not have permission to access this trade',
+                404: 'Trade not found',
+              }),
+            ),
+        ),
       ),
     );
   }
 
   archive(id: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/archive`, {}).pipe(
-      catchError(
-        handleHttpError('Failed to archive trade', {
-          401: 'Authentication required',
-          403: 'You do not have permission to archive this trade',
-          404: 'Trade not found',
-        }),
+      catchError((error) =>
+        throwError(
+          () =>
+            new Error(
+              getHttpErrorMessage(error, 'Failed to archive trade', {
+                401: 'Authentication required',
+                403: 'You do not have permission to archive this trade',
+                404: 'Trade not found',
+              }),
+            ),
+        ),
       ),
     );
   }
 
   unarchive(id: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/unarchive`, {}).pipe(
-      catchError(
-        handleHttpError('Failed to unarchive trade', {
-          401: 'Authentication required',
-          403: 'You do not have permission to unarchive this trade',
-          404: 'Trade not found',
-        }),
+      catchError((error) =>
+        throwError(
+          () =>
+            new Error(
+              getHttpErrorMessage(error, 'Failed to unarchive trade', {
+                401: 'Authentication required',
+                403: 'You do not have permission to unarchive this trade',
+                404: 'Trade not found',
+              }),
+            ),
+        ),
       ),
     );
   }

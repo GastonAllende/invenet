@@ -14,7 +14,8 @@ import {
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, of, pipe, switchMap, tap } from 'rxjs';
+import { pipe, switchMap, tap } from 'rxjs';
+import { tapResponse } from '@ngrx/operators';
 import type {
   GetAccountResponse,
   ListAccountsResponse,
@@ -25,7 +26,9 @@ import type {
 } from './models';
 import { AccountsApiService } from './accounts-api.service';
 
-function mapCreateResponseToAccount(r: CreateAccountResponse): GetAccountResponse {
+function mapCreateResponseToAccount(
+  r: CreateAccountResponse,
+): GetAccountResponse {
   return {
     id: r.id,
     name: r.name,
@@ -43,7 +46,9 @@ function mapCreateResponseToAccount(r: CreateAccountResponse): GetAccountRespons
   };
 }
 
-function mapUpdateResponseToAccountChanges(r: UpdateAccountResponse): Partial<GetAccountResponse> {
+function mapUpdateResponseToAccountChanges(
+  r: UpdateAccountResponse,
+): Partial<GetAccountResponse> {
   return {
     name: r.name,
     broker: r.broker,
@@ -91,18 +96,19 @@ export const AccountsStore = signalStore(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap(({ includeArchived = false }) =>
           apiService.list(includeArchived).pipe(
-            tap((response: ListAccountsResponse) => {
-              patchState(store, setAllEntities(response.accounts), {
-                isLoading: false,
-                error: null,
-              });
-            }),
-            catchError((error: Error) => {
-              patchState(store, {
-                isLoading: false,
-                error: error.message || 'Failed to load accounts',
-              });
-              return of(null);
+            tapResponse({
+              next: (response: ListAccountsResponse) => {
+                patchState(store, setAllEntities(response.accounts), {
+                  isLoading: false,
+                  error: null,
+                });
+              },
+              error: (error: unknown) => {
+                patchState(store, {
+                  isLoading: false,
+                  error: (error as Error).message,
+                });
+              },
             }),
           ),
         ),
@@ -118,19 +124,20 @@ export const AccountsStore = signalStore(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((id) =>
           apiService.get(id).pipe(
-            tap((account: GetAccountResponse) => {
-              patchState(store, addEntities([account]), {
-                isLoading: false,
-                error: null,
-                selectedAccountId: account.id,
-              });
-            }),
-            catchError((error: Error) => {
-              patchState(store, {
-                isLoading: false,
-                error: error.message || 'Failed to load account',
-              });
-              return of(null);
+            tapResponse({
+              next: (account: GetAccountResponse) => {
+                patchState(store, addEntities([account]), {
+                  isLoading: false,
+                  error: null,
+                  selectedAccountId: account.id,
+                });
+              },
+              error: (error: unknown) => {
+                patchState(store, {
+                  isLoading: false,
+                  error: (error as Error).message,
+                });
+              },
             }),
           ),
         ),
@@ -146,20 +153,21 @@ export const AccountsStore = signalStore(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((payload) =>
           apiService.create(payload).pipe(
-            tap((response: CreateAccountResponse) => {
-              const newAccount = mapCreateResponseToAccount(response);
-              patchState(store, addEntities([newAccount]), {
-                isLoading: false,
-                error: null,
-                selectedAccountId: newAccount.id,
-              });
-            }),
-            catchError((error: Error) => {
-              patchState(store, {
-                isLoading: false,
-                error: error.message || 'Failed to create account',
-              });
-              return of(null);
+            tapResponse({
+              next: (response: CreateAccountResponse) => {
+                const newAccount = mapCreateResponseToAccount(response);
+                patchState(store, addEntities([newAccount]), {
+                  isLoading: false,
+                  error: null,
+                  selectedAccountId: newAccount.id,
+                });
+              },
+              error: (error: unknown) => {
+                patchState(store, {
+                  isLoading: false,
+                  error: (error as Error).message,
+                });
+              },
             }),
           ),
         ),
@@ -176,19 +184,23 @@ export const AccountsStore = signalStore(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap(({ id, payload }) =>
           apiService.update(id, payload).pipe(
-            tap((response: UpdateAccountResponse) => {
-              patchState(
-                store,
-                updateEntity({ id, changes: mapUpdateResponseToAccountChanges(response) }),
-                { isLoading: false, error: null },
-              );
-            }),
-            catchError((error: Error) => {
-              patchState(store, {
-                isLoading: false,
-                error: error.message || 'Failed to update account',
-              });
-              return of(null);
+            tapResponse({
+              next: (response: UpdateAccountResponse) => {
+                patchState(
+                  store,
+                  updateEntity({
+                    id,
+                    changes: mapUpdateResponseToAccountChanges(response),
+                  }),
+                  { isLoading: false, error: null },
+                );
+              },
+              error: (error: unknown) => {
+                patchState(store, {
+                  isLoading: false,
+                  error: (error as Error).message,
+                });
+              },
             }),
           ),
         ),
@@ -204,22 +216,23 @@ export const AccountsStore = signalStore(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((id) =>
           apiService.archive(id).pipe(
-            tap(() => {
-              patchState(
-                store,
-                updateEntity({
-                  id,
-                  changes: { isActive: false },
-                }),
-                { isLoading: false, error: null },
-              );
-            }),
-            catchError((error: Error) => {
-              patchState(store, {
-                isLoading: false,
-                error: error.message || 'Failed to archive account',
-              });
-              return of(null);
+            tapResponse({
+              next: () => {
+                patchState(
+                  store,
+                  updateEntity({
+                    id,
+                    changes: { isActive: false },
+                  }),
+                  { isLoading: false, error: null },
+                );
+              },
+              error: (error: unknown) => {
+                patchState(store, {
+                  isLoading: false,
+                  error: (error as Error).message,
+                });
+              },
             }),
           ),
         ),
@@ -235,22 +248,23 @@ export const AccountsStore = signalStore(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((id) =>
           apiService.unarchive(id).pipe(
-            tap(() => {
-              patchState(
-                store,
-                updateEntity({
-                  id,
-                  changes: { isActive: true },
-                }),
-                { isLoading: false, error: null },
-              );
-            }),
-            catchError((error: Error) => {
-              patchState(store, {
-                isLoading: false,
-                error: error.message || 'Failed to unarchive account',
-              });
-              return of(null);
+            tapResponse({
+              next: () => {
+                patchState(
+                  store,
+                  updateEntity({
+                    id,
+                    changes: { isActive: true },
+                  }),
+                  { isLoading: false, error: null },
+                );
+              },
+              error: (error: unknown) => {
+                patchState(store, {
+                  isLoading: false,
+                  error: (error as Error).message,
+                });
+              },
             }),
           ),
         ),
@@ -265,11 +279,15 @@ export const AccountsStore = signalStore(
       pipe(
         switchMap((id) =>
           apiService.setActive(id).pipe(
-            catchError((error: Error) => {
-              patchState(store, {
-                error: error.message || 'Failed to set active account',
-              });
-              return of(null);
+            tapResponse({
+              next: () => {
+                // No state update needed on success
+              },
+              error: (error: unknown) => {
+                patchState(store, {
+                  error: (error as Error).message,
+                });
+              },
             }),
           ),
         ),

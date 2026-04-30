@@ -14,7 +14,8 @@ import {
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, of, pipe, switchMap, tap } from 'rxjs';
+import { pipe, switchMap, tap } from 'rxjs';
+import { tapResponse } from '@ngrx/operators';
 import type {
   CreateStrategyRequest,
   CreateStrategyResponse,
@@ -55,207 +56,252 @@ export const StrategiesStore = signalStore(
     archivedStrategies: computed(() => entities().filter((s) => s.isArchived)),
   })),
   withMethods((store, apiService = inject(StrategiesApiService)) => {
-    const startLoading = () => patchState(store, { isLoading: true, error: null });
-    const setError = (error: Error, fallback: string) =>
-      patchState(store, { isLoading: false, error: error.message || fallback });
+    const startLoading = () =>
+      patchState(store, { isLoading: true, error: null });
 
     return {
-    selectStrategy(id: string | null): void {
-      patchState(store, { selectedStrategyId: id });
-    },
+      selectStrategy(id: string | null): void {
+        patchState(store, { selectedStrategyId: id });
+      },
 
-    clearLastCreatedStrategyId(): void {
-      patchState(store, { lastCreatedStrategyId: null });
-    },
+      clearLastCreatedStrategyId(): void {
+        patchState(store, { lastCreatedStrategyId: null });
+      },
 
-    loadStrategies: rxMethod<{ includeArchived?: boolean }>(
-      pipe(
-        tap(startLoading),
-        switchMap(({ includeArchived = false }) =>
-          apiService.list(includeArchived).pipe(
-            tap((response: ListStrategiesResponse) => {
-              patchState(store, setAllEntities(response.strategies), { isLoading: false, error: null });
-            }),
-            catchError((error: Error) => {
-              setError(error, 'Failed to load strategies');
-              return of(null);
-            }),
-          ),
-        ),
-      ),
-    ),
-
-    loadStrategyDetail: rxMethod<{ id: string; version?: number }>(
-      pipe(
-        tap(({ id }) => patchState(store, { isLoading: true, error: null, selectedStrategyId: id })),
-        switchMap(({ id, version }) =>
-          apiService.get(id, version).pipe(
-            tap((strategy: GetStrategyResponse) => {
-              patchState(store, {
-                isLoading: false,
-                error: null,
-                selectedStrategyDetail: strategy,
-              });
-              patchState(
-                store,
-                updateEntity({
-                  id: strategy.id,
-                  changes: {
-                    id: strategy.id,
-                    name: strategy.name,
-                    market: strategy.market,
-                    defaultTimeframe: strategy.defaultTimeframe,
-                    isArchived: strategy.isArchived,
-                    createdAt: strategy.createdAt,
-                    updatedAt: strategy.updatedAt,
-                    currentVersion: strategy.currentVersion
-                      ? {
-                          id: strategy.currentVersion.id,
-                          versionNumber: strategy.currentVersion.versionNumber,
-                          createdAt: strategy.currentVersion.createdAt,
-                          timeframe: strategy.currentVersion.timeframe,
-                        }
-                      : null,
-                  },
-                }),
-              );
-            }),
-            catchError((error: Error) => {
-              setError(error, 'Failed to load strategy detail');
-              return of(null);
-            }),
-          ),
-        ),
-      ),
-    ),
-
-    createStrategy: rxMethod<CreateStrategyRequest>(
-      pipe(
-        tap(startLoading),
-        switchMap((payload) =>
-          apiService.create(payload).pipe(
-            tap((response: CreateStrategyResponse) => {
-              const createdStrategy: StrategyListItem = {
-                id: response.id,
-                name: response.name,
-                market: response.market,
-                defaultTimeframe: response.defaultTimeframe,
-                isArchived: response.isArchived,
-                createdAt: response.createdAt,
-                updatedAt: response.updatedAt,
-                currentVersion: {
-                  id: response.versionId,
-                  versionNumber: response.versionNumber,
-                  createdAt: response.createdAt,
-                  timeframe: payload.timeframe ?? null,
+      loadStrategies: rxMethod<{ includeArchived?: boolean }>(
+        pipe(
+          tap(startLoading),
+          switchMap(({ includeArchived = false }) =>
+            apiService.list(includeArchived).pipe(
+              tapResponse({
+                next: (response: ListStrategiesResponse) => {
+                  patchState(store, setAllEntities(response.strategies), {
+                    isLoading: false,
+                    error: null,
+                  });
                 },
-              };
-              patchState(store, addEntities<StrategyListItem>([createdStrategy]), {
-                isLoading: false,
-                error: null,
-                selectedStrategyId: response.id,
-                lastCreatedStrategyId: response.id,
-              });
-            }),
-            catchError((error: Error) => {
-              setError(error, 'Failed to create strategy');
-              return of(null);
-            }),
+                error: (error: unknown) => {
+                  patchState(store, {
+                    isLoading: false,
+                    error: (error as Error).message,
+                  });
+                },
+              }),
+            ),
           ),
         ),
       ),
-    ),
 
-    createStrategyVersion: rxMethod<{ id: string; payload: CreateStrategyVersionRequest }>(
-      pipe(
-        tap(startLoading),
-        switchMap(({ id, payload }) =>
-          apiService.createVersion(id, payload).pipe(
-            tap((response) => {
-              patchState(
-                store,
-                updateEntity({
-                  id,
-                  changes: {
-                    updatedAt: response.createdAt,
+      loadStrategyDetail: rxMethod<{ id: string; version?: number }>(
+        pipe(
+          tap(({ id }) =>
+            patchState(store, {
+              isLoading: true,
+              error: null,
+              selectedStrategyId: id,
+            }),
+          ),
+          switchMap(({ id, version }) =>
+            apiService.get(id, version).pipe(
+              tapResponse({
+                next: (strategy: GetStrategyResponse) => {
+                  patchState(store, {
+                    isLoading: false,
+                    error: null,
+                    selectedStrategyDetail: strategy,
+                  });
+                  patchState(
+                    store,
+                    updateEntity({
+                      id: strategy.id,
+                      changes: {
+                        id: strategy.id,
+                        name: strategy.name,
+                        market: strategy.market,
+                        defaultTimeframe: strategy.defaultTimeframe,
+                        isArchived: strategy.isArchived,
+                        createdAt: strategy.createdAt,
+                        updatedAt: strategy.updatedAt,
+                        currentVersion: strategy.currentVersion
+                          ? {
+                              id: strategy.currentVersion.id,
+                              versionNumber:
+                                strategy.currentVersion.versionNumber,
+                              createdAt: strategy.currentVersion.createdAt,
+                              timeframe: strategy.currentVersion.timeframe,
+                            }
+                          : null,
+                      },
+                    }),
+                  );
+                },
+                error: (error: unknown) => {
+                  patchState(store, {
+                    isLoading: false,
+                    error: (error as Error).message,
+                    selectedStrategyDetail: null,
+                  });
+                },
+              }),
+            ),
+          ),
+        ),
+      ),
+
+      createStrategy: rxMethod<CreateStrategyRequest>(
+        pipe(
+          tap(startLoading),
+          switchMap((payload) =>
+            apiService.create(payload).pipe(
+              tapResponse({
+                next: (response: CreateStrategyResponse) => {
+                  const createdStrategy: StrategyListItem = {
+                    id: response.id,
+                    name: response.name,
+                    market: response.market,
+                    defaultTimeframe: response.defaultTimeframe,
+                    isArchived: response.isArchived,
+                    createdAt: response.createdAt,
+                    updatedAt: response.updatedAt,
                     currentVersion: {
-                      id: response.id,
+                      id: response.versionId,
                       versionNumber: response.versionNumber,
                       createdAt: response.createdAt,
-                      timeframe: response.timeframe,
+                      timeframe: payload.timeframe ?? null,
                     },
-                  },
-                }),
-                { isLoading: false, error: null },
-              );
-            }),
-            catchError((error: Error) => {
-              setError(error, 'Failed to create strategy version');
-              return of(null);
-            }),
-          ),
-        ),
-      ),
-    ),
-
-    archiveStrategy: rxMethod<string>(
-      pipe(
-        tap(startLoading),
-        switchMap((id) =>
-          apiService.archive(id).pipe(
-            tap(() => {
-              const detail = store.selectedStrategyDetail();
-              patchState(
-                store,
-                updateEntity({ id, changes: { isArchived: true } }),
-                {
-                  isLoading: false,
-                  error: null,
-                  selectedStrategyDetail:
-                    detail && detail.id === id ? { ...detail, isArchived: true } : detail,
+                  };
+                  patchState(
+                    store,
+                    addEntities<StrategyListItem>([createdStrategy]),
+                    {
+                      isLoading: false,
+                      error: null,
+                      selectedStrategyId: response.id,
+                      lastCreatedStrategyId: response.id,
+                    },
+                  );
                 },
-              );
-            }),
-            catchError((error: Error) => {
-              setError(error, 'Failed to archive strategy');
-              return of(null);
-            }),
-          ),
-        ),
-      ),
-    ),
-
-    unarchiveStrategy: rxMethod<string>(
-      pipe(
-        tap(startLoading),
-        switchMap((id) =>
-          apiService.unarchive(id).pipe(
-            tap(() => {
-              const detail = store.selectedStrategyDetail();
-              patchState(
-                store,
-                updateEntity({ id, changes: { isArchived: false } }),
-                {
-                  isLoading: false,
-                  error: null,
-                  selectedStrategyDetail:
-                    detail && detail.id === id ? { ...detail, isArchived: false } : detail,
+                error: (error: unknown) => {
+                  patchState(store, {
+                    isLoading: false,
+                    error: (error as Error).message,
+                  });
                 },
-              );
-            }),
-            catchError((error: Error) => {
-              setError(error, 'Failed to unarchive strategy');
-              return of(null);
-            }),
+              }),
+            ),
           ),
         ),
       ),
-    ),
 
-    clearError(): void {
-      patchState(store, { error: null });
-    },
-  };
+      createStrategyVersion: rxMethod<{
+        id: string;
+        payload: CreateStrategyVersionRequest;
+      }>(
+        pipe(
+          tap(startLoading),
+          switchMap(({ id, payload }) =>
+            apiService.createVersion(id, payload).pipe(
+              tapResponse({
+                next: (response) => {
+                  patchState(
+                    store,
+                    updateEntity({
+                      id,
+                      changes: {
+                        updatedAt: response.createdAt,
+                        currentVersion: {
+                          id: response.id,
+                          versionNumber: response.versionNumber,
+                          createdAt: response.createdAt,
+                          timeframe: response.timeframe,
+                        },
+                      },
+                    }),
+                    { isLoading: false, error: null },
+                  );
+                },
+                error: (error: unknown) => {
+                  patchState(store, {
+                    isLoading: false,
+                    error: (error as Error).message,
+                  });
+                },
+              }),
+            ),
+          ),
+        ),
+      ),
+
+      archiveStrategy: rxMethod<string>(
+        pipe(
+          tap(startLoading),
+          switchMap((id) =>
+            apiService.archive(id).pipe(
+              tapResponse({
+                next: () => {
+                  const detail = store.selectedStrategyDetail();
+                  patchState(
+                    store,
+                    updateEntity({ id, changes: { isArchived: true } }),
+                    {
+                      isLoading: false,
+                      error: null,
+                      selectedStrategyDetail:
+                        detail && detail.id === id
+                          ? { ...detail, isArchived: true }
+                          : detail,
+                    },
+                  );
+                },
+                error: (error: unknown) => {
+                  patchState(store, {
+                    isLoading: false,
+                    error: (error as Error).message,
+                  });
+                },
+              }),
+            ),
+          ),
+        ),
+      ),
+
+      unarchiveStrategy: rxMethod<string>(
+        pipe(
+          tap(startLoading),
+          switchMap((id) =>
+            apiService.unarchive(id).pipe(
+              tapResponse({
+                next: () => {
+                  const detail = store.selectedStrategyDetail();
+                  patchState(
+                    store,
+                    updateEntity({ id, changes: { isArchived: false } }),
+                    {
+                      isLoading: false,
+                      error: null,
+                      selectedStrategyDetail:
+                        detail && detail.id === id
+                          ? { ...detail, isArchived: false }
+                          : detail,
+                    },
+                  );
+                },
+                error: (error: unknown) => {
+                  patchState(store, {
+                    isLoading: false,
+                    error: (error as Error).message,
+                  });
+                },
+              }),
+            ),
+          ),
+        ),
+      ),
+
+      clearError(): void {
+        patchState(store, { error: null });
+      },
+    };
   }),
   withHooks({
     onInit(store) {
