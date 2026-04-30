@@ -1,22 +1,24 @@
-using SendGrid;
-using SendGrid.Helpers.Mail;
+using Resend;
 
 namespace Invenet.Api.Modules.Auth.Infrastructure.Email;
 
 /// <summary>
-/// Email service implementation using SendGrid.
+/// Email service implementation using the official Resend .NET SDK.
 /// </summary>
 public sealed class EmailService
 {
+  private readonly IResend _resend;
   private readonly IConfiguration _configuration;
   private readonly ILogger<EmailService> _logger;
   private readonly IWebHostEnvironment _environment;
 
   public EmailService(
+      IResend resend,
       IConfiguration configuration,
       ILogger<EmailService> logger,
       IWebHostEnvironment environment)
   {
+    _resend = resend;
     _configuration = configuration;
     _logger = logger;
     _environment = environment;
@@ -28,11 +30,7 @@ public sealed class EmailService
     var htmlContent = await File.ReadAllTextAsync(templatePath);
     htmlContent = htmlContent.Replace("{{CONFIRMATION_LINK}}", confirmationLink);
 
-    await SendEmailAsync(
-        toEmail,
-        "Confirm your email",
-        htmlContent
-    );
+    await SendEmailAsync(toEmail, "Confirm your email", htmlContent);
   }
 
   public async Task SendPasswordResetEmailAsync(string toEmail, string resetLink)
@@ -41,41 +39,45 @@ public sealed class EmailService
     var htmlContent = await File.ReadAllTextAsync(templatePath);
     htmlContent = htmlContent.Replace("{{RESET_LINK}}", resetLink);
 
-    await SendEmailAsync(
-        toEmail,
-        "Reset your password",
-        htmlContent
-    );
+    await SendEmailAsync(toEmail, "Reset your password", htmlContent);
   }
 
   private async Task SendEmailAsync(string toEmail, string subject, string htmlContent)
   {
-    var apiKey = _configuration["SendGrid:ApiKey"];
-    var fromEmail = _configuration["SendGrid:FromEmail"];
-    var fromName = _configuration["SendGrid:FromName"];
+    var apiKey = _configuration["Resend:ApiKey"];
+    var fromEmail = _configuration["Resend:FromEmail"];
+    var fromName = _configuration["Resend:FromName"];
 
-    if (string.IsNullOrWhiteSpace(apiKey))
+    if (string.IsNullOrWhiteSpace(apiKey) || apiKey.StartsWith("SET_VIA"))
     {
-      _logger.LogWarning("SendGrid API key not configured. Email not sent to {Email}", toEmail);
+      _logger.LogWarning("Resend API key not configured. Email not sent to {Email}", toEmail);
+      if (_environment.IsDevelopment())
+      {
+        _logger.LogInformation("[DEV EMAIL] To: {Email} | Subject: {Subject}\n{Content}", toEmail, subject, htmlContent);
+      }
       return;
     }
 
-    var client = new SendGridClient(apiKey);
-    var from = new EmailAddress(fromEmail, fromName);
-    var to = new EmailAddress(toEmail);
-    var msg = MailHelper.CreateSingleEmail(from, to, subject, null, htmlContent);
+    var from = string.IsNullOrWhiteSpace(fromName)
+        ? fromEmail!
+        : $"{fromName} <{fromEmail}>";
 
-    var response = await client.SendEmailAsync(msg);
+    var message = new EmailMessage
+    {
+      From = from,
+      Subject = subject,
+      HtmlBody = htmlContent
+    };
+    message.To.Add(toEmail);
 
-    if (!response.IsSuccessStatusCode)
+    try
     {
-      var body = await response.Body.ReadAsStringAsync();
-      _logger.LogError("Failed to send email to {Email}. Status: {Status}, Body: {Body}",
-          toEmail, response.StatusCode, body);
-    }
-    else
-    {
+      await _resend.EmailSendAsync(message);
       _logger.LogInformation("Email sent successfully to {Email}", toEmail);
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, "Failed to send email to {Email}", toEmail);
     }
   }
 }

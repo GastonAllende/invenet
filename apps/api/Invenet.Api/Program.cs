@@ -1,9 +1,15 @@
 using System.Threading.RateLimiting;
 using Invenet.Api.Modules.Shared.Infrastructure;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Persist Data Protection keys so Identity tokens survive API restarts
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "DataProtection-Keys")))
+    .SetApplicationName("Invenet");
 
 // Register shared infrastructure
 builder.Services.AddDbContext<ModularDbContext>(options =>
@@ -50,18 +56,21 @@ builder.Services.AddRateLimiter(options =>
         QueueLimit = 0
       }));
 
-  // Global limit: 300 req/min per authenticated user, fallback to IP
-  options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
-    RateLimitPartition.GetFixedWindowLimiter(
-      partitionKey: httpContext.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
-                   ?? httpContext.Connection.RemoteIpAddress?.ToString()
-                   ?? "unknown",
-      factory: _ => new FixedWindowRateLimiterOptions
-      {
-        Window = TimeSpan.FromMinutes(1),
-        PermitLimit = 300,
-        QueueLimit = 0
-      }));
+  // Global limit: 300 req/min per authenticated user, fallback to IP (disabled in development)
+  if (!builder.Environment.IsDevelopment())
+  {
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+      RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: httpContext.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                     ?? httpContext.Connection.RemoteIpAddress?.ToString()
+                     ?? "unknown",
+        factory: _ => new FixedWindowRateLimiterOptions
+        {
+          Window = TimeSpan.FromMinutes(1),
+          PermitLimit = 300,
+          QueueLimit = 0
+        }));
+  }
 });
 
 // Add controllers

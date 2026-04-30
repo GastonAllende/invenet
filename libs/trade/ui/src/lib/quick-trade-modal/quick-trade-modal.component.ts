@@ -117,11 +117,9 @@ export class QuickTradeModalComponent {
       this.form.patchValue({ accountId: preferred ?? activeAccountId ?? '' });
     });
 
-    effect(() => {
-      if (this.strategies().length === 0) {
-        this.strategiesStore.loadStrategies({ includeArchived: false });
-      }
-    });
+    if (this.strategies().length === 0) {
+      this.strategiesStore.loadStrategies({ includeArchived: false });
+    }
   }
 
   onStrategyChange(strategyId: string | null): void {

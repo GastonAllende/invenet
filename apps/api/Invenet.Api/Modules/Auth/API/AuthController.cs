@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web;
+using Microsoft.AspNetCore.WebUtilities;
 using Invenet.Api.Modules.Auth.Domain;
 using Invenet.Api.Modules.Auth.Features;
 using Invenet.Api.Modules.Auth.Infrastructure.Email;
@@ -131,7 +131,8 @@ public sealed class AuthController : ControllerBase
       return BadRequest(new MessageResponse("Invalid confirmation link."));
     }
 
-    var result = await _userManager.ConfirmEmailAsync(user, request.Token);
+    var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
+    var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
     if (!result.Succeeded)
     {
       return BadRequest(new MessageResponse("Email confirmation failed."));
@@ -191,7 +192,8 @@ public sealed class AuthController : ControllerBase
       return BadRequest(new MessageResponse("Invalid reset link."));
     }
 
-    var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+    var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
+    var result = await _userManager.ResetPasswordAsync(user, decodedToken, request.NewPassword);
     if (!result.Succeeded)
     {
       return BadRequest(result.Errors);
@@ -320,14 +322,14 @@ public sealed class AuthController : ControllerBase
 
   private async Task SendConfirmationEmailAsync(ApplicationUser user, string token)
   {
-    var encodedToken = HttpUtility.UrlEncode(token);
+    var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
     var confirmationLink = $"{_configuration["Frontend:Url"]}/verify-email?email={user.Email}&token={encodedToken}";
     await _emailService.SendEmailConfirmationAsync(user.Email!, confirmationLink);
   }
 
   private async Task SendPasswordResetEmailAsync(ApplicationUser user, string token)
   {
-    var encodedToken = HttpUtility.UrlEncode(token);
+    var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
     var resetLink = $"{_configuration["Frontend:Url"]}/reset-password?email={user.Email}&token={encodedToken}";
     await _emailService.SendPasswordResetEmailAsync(user.Email!, resetLink);
   }

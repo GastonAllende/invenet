@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Resend;
 using System.Text;
 using Invenet.Api.Modules.Shared.Infrastructure.Data;
 
@@ -18,7 +19,14 @@ public class AuthModule : IModule
 {
   public IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration)
   {
-    // Register email service
+    // Register Resend email client
+    services.AddOptions();
+    services.AddHttpClient<ResendClient>();
+    services.Configure<ResendClientOptions>(o =>
+    {
+      o.ApiToken = configuration["Resend:ApiKey"]!;
+    });
+    services.AddTransient<IResend, ResendClient>();
     services.AddScoped<EmailService>();
 
     // Configure Identity
