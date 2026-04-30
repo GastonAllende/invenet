@@ -41,8 +41,6 @@ export class TradesApiService {
             new Error(
               getHttpErrorMessage(error, 'Failed to load trades', {
                 400: 'Active account required',
-                401: 'Authentication required',
-                403: 'You do not have permission to view trades',
               }),
             ),
         ),
@@ -51,19 +49,16 @@ export class TradesApiService {
   }
 
   create(request: CreateTradeRequest): Observable<TradeResponse> {
-    return this.http.post<TradeResponse>(this.baseUrl, request).pipe(
-      catchError((error) =>
-        throwError(
-          () =>
-            new Error(
-              getHttpErrorMessage(error, 'Failed to create trade', {
-                401: 'Authentication required',
-                403: 'Account does not belong to you',
-              }),
-            ),
+    return this.http
+      .post<TradeResponse>(this.baseUrl, request)
+      .pipe(
+        catchError((error) =>
+          throwError(
+            () =>
+              new Error(getHttpErrorMessage(error, 'Failed to create trade')),
+          ),
         ),
-      ),
-    );
+      );
   }
 
   update(id: string, request: UpdateTradeRequest): Observable<TradeResponse> {
@@ -73,8 +68,6 @@ export class TradesApiService {
           () =>
             new Error(
               getHttpErrorMessage(error, 'Failed to update trade', {
-                401: 'Authentication required',
-                403: 'You do not have permission to update this trade',
                 404: 'Trade not found',
               }),
             ),
@@ -90,8 +83,6 @@ export class TradesApiService {
           () =>
             new Error(
               getHttpErrorMessage(error, 'Failed to load trade', {
-                401: 'Authentication required',
-                403: 'You do not have permission to access this trade',
                 404: 'Trade not found',
               }),
             ),
@@ -107,8 +98,6 @@ export class TradesApiService {
           () =>
             new Error(
               getHttpErrorMessage(error, 'Failed to archive trade', {
-                401: 'Authentication required',
-                403: 'You do not have permission to archive this trade',
                 404: 'Trade not found',
               }),
             ),
@@ -124,8 +113,6 @@ export class TradesApiService {
           () =>
             new Error(
               getHttpErrorMessage(error, 'Failed to unarchive trade', {
-                401: 'Authentication required',
-                403: 'You do not have permission to unarchive this trade',
                 404: 'Trade not found',
               }),
             ),

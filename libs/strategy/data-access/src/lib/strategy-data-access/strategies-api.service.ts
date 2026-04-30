@@ -19,19 +19,18 @@ export class StrategiesApiService {
 
   list(includeArchived = false): Observable<ListStrategiesResponse> {
     const params = new HttpParams().set('includeArchived', includeArchived);
-    return this.http.get<ListStrategiesResponse>(this.baseUrl, { params }).pipe(
-      catchError((error) =>
-        throwError(
-          () =>
-            new Error(
-              getHttpErrorMessage(error, 'Failed to load strategies', {
-                401: 'Authentication required',
-                403: 'You do not have permission to view strategies',
-              }),
-            ),
+    return this.http
+      .get<ListStrategiesResponse>(this.baseUrl, { params })
+      .pipe(
+        catchError((error) =>
+          throwError(
+            () =>
+              new Error(
+                getHttpErrorMessage(error, 'Failed to load strategies'),
+              ),
+          ),
         ),
-      ),
-    );
+      );
   }
 
   get(id: string, version?: number): Observable<GetStrategyResponse> {
@@ -48,8 +47,6 @@ export class StrategiesApiService {
             () =>
               new Error(
                 getHttpErrorMessage(error, 'Failed to load strategy detail', {
-                  401: 'Authentication required',
-                  403: 'You do not have permission to view this strategy',
                   404: 'Strategy not found',
                 }),
               ),
@@ -59,19 +56,18 @@ export class StrategiesApiService {
   }
 
   create(payload: CreateStrategyRequest): Observable<CreateStrategyResponse> {
-    return this.http.post<CreateStrategyResponse>(this.baseUrl, payload).pipe(
-      catchError((error) =>
-        throwError(
-          () =>
-            new Error(
-              getHttpErrorMessage(error, 'Failed to create strategy', {
-                401: 'Authentication required',
-                403: 'You do not have permission to create strategies',
-              }),
-            ),
+    return this.http
+      .post<CreateStrategyResponse>(this.baseUrl, payload)
+      .pipe(
+        catchError((error) =>
+          throwError(
+            () =>
+              new Error(
+                getHttpErrorMessage(error, 'Failed to create strategy'),
+              ),
+          ),
         ),
-      ),
-    );
+      );
   }
 
   createVersion(
@@ -92,8 +88,6 @@ export class StrategiesApiService {
                   error,
                   'Failed to create strategy version',
                   {
-                    401: 'Authentication required',
-                    403: 'You do not have permission to update this strategy',
                     404: 'Strategy not found',
                   },
                 ),
@@ -110,8 +104,6 @@ export class StrategiesApiService {
           () =>
             new Error(
               getHttpErrorMessage(error, 'Failed to archive strategy', {
-                401: 'Authentication required',
-                403: 'You do not have permission to archive this strategy',
                 404: 'Strategy not found',
               }),
             ),
@@ -127,8 +119,6 @@ export class StrategiesApiService {
           () =>
             new Error(
               getHttpErrorMessage(error, 'Failed to unarchive strategy', {
-                401: 'Authentication required',
-                403: 'You do not have permission to unarchive this strategy',
                 404: 'Strategy not found',
               }),
             ),

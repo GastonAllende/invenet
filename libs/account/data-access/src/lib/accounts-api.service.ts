@@ -19,19 +19,16 @@ export class AccountsApiService {
 
   list(includeArchived = false): Observable<ListAccountsResponse> {
     const params = new HttpParams().set('includeArchived', includeArchived);
-    return this.http.get<ListAccountsResponse>(this.baseUrl, { params }).pipe(
-      catchError((error) =>
-        throwError(
-          () =>
-            new Error(
-              getHttpErrorMessage(error, 'Failed to load accounts', {
-                401: 'Authentication required',
-                403: 'You do not have permission to view accounts',
-              }),
-            ),
+    return this.http
+      .get<ListAccountsResponse>(this.baseUrl, { params })
+      .pipe(
+        catchError((error) =>
+          throwError(
+            () =>
+              new Error(getHttpErrorMessage(error, 'Failed to load accounts')),
+          ),
         ),
-      ),
-    );
+      );
   }
 
   get(id: string): Observable<GetAccountResponse> {
@@ -41,8 +38,6 @@ export class AccountsApiService {
           () =>
             new Error(
               getHttpErrorMessage(error, 'Failed to load account', {
-                401: 'Authentication required',
-                403: 'You do not have permission to view this account',
                 404: 'Account not found',
               }),
             ),
@@ -58,8 +53,6 @@ export class AccountsApiService {
           () =>
             new Error(
               getHttpErrorMessage(error, 'Failed to create account', {
-                401: 'Authentication required',
-                403: 'You do not have permission to create accounts',
                 409: 'Account name already exists',
               }),
             ),
@@ -80,8 +73,6 @@ export class AccountsApiService {
             () =>
               new Error(
                 getHttpErrorMessage(error, 'Failed to update account', {
-                  401: 'Authentication required',
-                  403: 'You do not have permission to update this account',
                   404: 'Account not found',
                   409: 'Account name already exists',
                 }),
@@ -98,8 +89,6 @@ export class AccountsApiService {
           () =>
             new Error(
               getHttpErrorMessage(error, 'Failed to archive account', {
-                401: 'Authentication required',
-                403: 'You do not have permission to archive this account',
                 404: 'Account not found',
               }),
             ),
@@ -115,8 +104,6 @@ export class AccountsApiService {
           () =>
             new Error(
               getHttpErrorMessage(error, 'Failed to unarchive account', {
-                401: 'Authentication required',
-                403: 'You do not have permission to unarchive this account',
                 404: 'Account not found',
               }),
             ),
@@ -132,8 +119,6 @@ export class AccountsApiService {
           () =>
             new Error(
               getHttpErrorMessage(error, 'Failed to set active account', {
-                401: 'Authentication required',
-                403: 'You do not have permission to access this account',
                 404: 'Account not found',
               }),
             ),

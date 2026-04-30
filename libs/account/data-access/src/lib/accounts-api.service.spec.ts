@@ -81,30 +81,6 @@ describe('AccountsApiService', () => {
       );
       req.flush({ accounts: [] });
     });
-
-    it('maps 401 to authentication error', () => {
-      service.list().subscribe({
-        error: (err: Error) =>
-          expect(err.message).toBe('Authentication required'),
-      });
-
-      httpMock
-        .expectOne((r) => r.url === accountsUrl)
-        .flush(null, { status: 401, statusText: 'Unauthorized' });
-    });
-
-    it('maps 403 to permission error', () => {
-      service.list().subscribe({
-        error: (err: Error) =>
-          expect(err.message).toBe(
-            'You do not have permission to view accounts',
-          ),
-      });
-
-      httpMock
-        .expectOne((r) => r.url === accountsUrl)
-        .flush(null, { status: 403, statusText: 'Forbidden' });
-    });
   });
 
   describe('get()', () => {
