@@ -163,3 +163,10 @@ Modules/<Name>/
 
 - **Unit tests**: Vitest 4.0 + Analog testing utilities (Angular)
 - **E2E**: Playwright (`apps/invenet-e2e/`)
+
+### Rules
+
+- Always check that the code will be used in the codebase before adding it. If the code is not used, do not add it.
+- Do not suggest code that has been deleted in recent edits.
+- When suggesting code, ensure it follows the architectural patterns and conventions outlined above.
+- Check CLAUADE.md in libs/\* when adding code in a library to ensure it aligns with the library's structure and patterns.
