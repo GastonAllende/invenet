@@ -7,14 +7,26 @@
   "tags": ["scope:strategy", "type:data-access"],
   "targets": {
     "test": {
-      "executor": "@nx/vitest:test",
-      "outputs": ["{options.reportsDirectory}"],
+      "outputs": [
+        "{projectRoot}/{options.coverage.reportsDirectory}",
+        "{workspaceRoot}/coverage/libs/strategy/data-access"
+      ],
       "options": {
-        "reportsDirectory": "../../../coverage/libs/strategy/data-access"
+        "coverage.reportsDirectory": "../../../../../coverage/libs/strategy/data-access"
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint"
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/.eslintignore",
+        "{workspaceRoot}/eslint.config.mjs",
+        "{workspaceRoot}/tools/eslint-rules/**/*",
+        {
+          "externalDependencies": ["eslint"]
+        }
+      ]
     }
   }
 }

@@ -19,21 +19,20 @@ import { AuthService } from '@invenet/auth-data-access';
       <p-card class="w-full max-w-md" header="Email Verification">
         @if (isLoading()) {
           <div class="text-center">
-            <p-progressSpinner
+            <p-progress-spinner
               styleClass="w-4rem h-4rem"
               strokeWidth="4"
-            ></p-progressSpinner>
+            ></p-progress-spinner>
             <p>Verifying your email...</p>
           </div>
         } @else if (isSuccess()) {
           <div class="text-center">
-            <p-message
-              severity="success"
-              text="Email verified successfully! Redirecting to home..."
-            ></p-message>
+            <p-message severity="success">
+              Email verified successfully! Redirecting to home...
+            </p-message>
           </div>
         } @else {
-          <p-message severity="error" [text]="errorMessage()"></p-message>
+          <p-message severity="error">{{ errorMessage() }}</p-message>
           <div class="mt-4 flex gap-2">
             <button pButton (click)="resendEmail()" [loading]="isResending()">
               Resend verification email

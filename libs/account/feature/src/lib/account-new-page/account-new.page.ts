@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -18,6 +18,7 @@ import { AccountFormComponent } from '@invenet/account-ui';
   standalone: true,
   imports: [CommonModule, ToastModule, AccountFormComponent],
   providers: [MessageService],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex flex-col gap-5">
       <p-toast></p-toast>

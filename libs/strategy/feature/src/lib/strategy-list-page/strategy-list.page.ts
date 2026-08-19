@@ -20,7 +20,7 @@ import { StrategyListComponent } from '@invenet/strategy-ui';
   template: `
     <div class="flex flex-col gap-5">
       <p-toast></p-toast>
-      <p-confirmDialog></p-confirmDialog>
+      <p-confirmdialog></p-confirmdialog>
       <lib-strategy-list
         [strategies]="strategies()"
         [isLoading]="isLoading()"

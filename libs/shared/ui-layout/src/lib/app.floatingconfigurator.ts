@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'lib-floating-configurator',
   imports: [CommonModule, ButtonModule, StyleClassModule, AppConfigurator],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex gap-4 top-8 right-8" [ngClass]="{ fixed: float() }">
       <p-button

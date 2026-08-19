@@ -24,6 +24,8 @@ export default [
           style: 'kebab-case',
         },
       ],
+      // Newly enforced by angular-eslint v22's recommended preset; opt-in OnPush migration tracked separately.
+      '@angular-eslint/prefer-on-push-component-change-detection': 'off',
     },
   },
   {

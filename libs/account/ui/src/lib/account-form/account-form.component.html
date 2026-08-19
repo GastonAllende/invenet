@@ -94,7 +94,7 @@
 
           <div class="flex flex-col grow basis-0 gap-2">
             <label for="startingBalance">Starting Balance *</label>
-            <p-inputNumber
+            <p-inputnumber
               inputId="startingBalance"
               formControlName="startingBalance"
               mode="currency"
@@ -103,7 +103,7 @@
               [minFractionDigits]="2"
               [min]="0.01"
               [invalid]="form.controls.startingBalance.invalid && form.controls.startingBalance.touched"
-            ></p-inputNumber>
+            ></p-inputnumber>
             @if (form.controls.startingBalance.invalid && form.controls.startingBalance.touched) {
               <p-message severity="error" variant="simple" size="small">
                 @if (form.controls.startingBalance.errors?.['required']) {
@@ -128,7 +128,7 @@
         <div class="flex flex-wrap gap-6">
           <div class="flex flex-col grow basis-0 gap-2">
             <label for="riskPerTradePct">Risk Per Trade (%)</label>
-            <p-inputNumber
+            <p-inputnumber
               inputId="riskPerTradePct"
               formControlName="riskPerTradePct"
               [min]="0"
@@ -137,7 +137,7 @@
               [maxFractionDigits]="2"
               suffix="%"
               [invalid]="form.controls.riskSettings.controls.riskPerTradePct.invalid && form.controls.riskSettings.controls.riskPerTradePct.touched"
-            ></p-inputNumber>
+            ></p-inputnumber>
             @if (form.controls.riskSettings.controls.riskPerTradePct.invalid && form.controls.riskSettings.controls.riskPerTradePct.touched) {
               <p-message severity="error" variant="simple" size="small">Must be between 0 and 100</p-message>
             }
@@ -145,7 +145,7 @@
 
           <div class="flex flex-col grow basis-0 gap-2">
             <label for="maxDailyLossPct">Max Daily Loss (%)</label>
-            <p-inputNumber
+            <p-inputnumber
               inputId="maxDailyLossPct"
               formControlName="maxDailyLossPct"
               [min]="0"
@@ -154,7 +154,7 @@
               [maxFractionDigits]="2"
               suffix="%"
               [invalid]="form.controls.riskSettings.controls.maxDailyLossPct.invalid && form.controls.riskSettings.controls.maxDailyLossPct.touched"
-            ></p-inputNumber>
+            ></p-inputnumber>
             @if (form.controls.riskSettings.controls.maxDailyLossPct.invalid && form.controls.riskSettings.controls.maxDailyLossPct.touched) {
               <p-message severity="error" variant="simple" size="small">Must be between 0 and 100</p-message>
             }
@@ -164,7 +164,7 @@
         <div class="flex flex-wrap gap-6">
           <div class="flex flex-col grow basis-0 gap-2">
             <label for="maxWeeklyLossPct">Max Weekly Loss (%)</label>
-            <p-inputNumber
+            <p-inputnumber
               inputId="maxWeeklyLossPct"
               formControlName="maxWeeklyLossPct"
               [min]="0"
@@ -173,7 +173,7 @@
               [maxFractionDigits]="2"
               suffix="%"
               [invalid]="form.controls.riskSettings.controls.maxWeeklyLossPct.invalid && form.controls.riskSettings.controls.maxWeeklyLossPct.touched"
-            ></p-inputNumber>
+            ></p-inputnumber>
             @if (form.controls.riskSettings.controls.maxWeeklyLossPct.invalid && form.controls.riskSettings.controls.maxWeeklyLossPct.touched) {
               <p-message severity="error" variant="simple" size="small">Must be between 0 and 100</p-message>
             }

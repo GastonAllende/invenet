@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Invenet is a trading journal application — an **Nx monorepo** with an **Angular 21 frontend** and a **.NET 10 backend API**.
+Invenet is a trading journal application — an **Nx monorepo** with an **Angular 22 frontend** and a **.NET 10 backend API**.
 
 ## Commands
 
@@ -55,10 +55,10 @@ libs/
     ui-layout/       # Shared layout components
 ```
 
-### Frontend (Angular 21)
+### Frontend (Angular 22)
 
 - **Standalone components** — no NgModules
-- **Zoneless change detection** — uses Angular Signals + `provideExperimentalZonelessChangeDetection()`
+- **Zoneless change detection** — uses Angular Signals + `provideZonelessChangeDetection()`
 - **Lazy-loaded routes** — each feature loaded via `loadChildren`; all protected routes guarded by `authGuard`
 - **Library layers** per feature: `data-access` (services + models) → `feature` (pages + routes) → `ui` (reusable components)
 - **Imports** use `@invenet/*` path aliases defined in `tsconfig.base.json`
@@ -153,11 +153,12 @@ Modules/<Name>/
 
 ### PrimeNG
 
-- **Version**: `primeng@^21`, theme: `Nora` preset (`@primeuix/themes@^2`), dark mode selector: `.app-dark`
+- **Version**: `primeng@^22`, theme: `Nora` preset (`@primeuix/themes@^3`), dark mode selector: `.app-dark`
 - Import modules individually (`CardModule`, `ButtonModule`, etc.) — no barrel imports
 - `class=""` targets the host element; `styleClass=""` targets the inner PrimeNG div — prefer `class` for layout
 - Use `pButton` directive on `<button>`, not `<p-button>` component
-- Notifications: `p-toast` + `MessageService` (add to `providers:`); confirmations: `p-confirmDialog` + `ConfirmationService`
+- Notifications: `p-toast` + `MessageService` (add to `providers:`); confirmations: `p-confirmdialog` + `ConfirmationService`
+- Component selectors are all-lowercase, not camelCase (e.g. `p-inputnumber`, `p-confirmdialog`, `p-sort-icon`) — PrimeNG v22 removed the deprecated camelCase selector aliases
 
 ### Testing
 

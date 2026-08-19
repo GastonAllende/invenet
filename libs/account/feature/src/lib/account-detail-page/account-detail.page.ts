@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -27,9 +27,10 @@ import {
   ],
   providers: [MessageService, ConfirmationService],
   styleUrl: './account-detail.page.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <p-toast></p-toast>
-    <p-confirmDialog></p-confirmDialog>
+    <p-confirmdialog></p-confirmdialog>
 
     @if (selectedAccount(); as account) {
       <div class="flex flex-col gap-4">

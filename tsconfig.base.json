@@ -41,7 +41,12 @@
       "@invenet/account-feature": ["./libs/account/feature/src/index.ts"],
       "@invenet/dashboard-feature": ["./libs/dashboard/feature/src/index.ts"],
       "@invenet/dashboard-ui": ["./libs/dashboard/ui/src/index.ts"]
-    }
+    },
+    "strict": false,
+    "noUncheckedSideEffectImports": false,
+    "types": ["*"],
+    "esModuleInterop": false,
+    "ignoreDeprecations": "6.0"
   },
   "exclude": ["node_modules", "tmp"]
 }

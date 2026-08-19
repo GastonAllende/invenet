@@ -5,6 +5,7 @@ import {
   inject,
   OnDestroy,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
@@ -15,6 +16,7 @@ import { LayoutService } from './service/layout.service';
   selector: 'lib-sidebar',
   standalone: true,
   imports: [AppMenu, RouterModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="layout-sidebar">
       <lib-menu></lib-menu>

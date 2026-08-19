@@ -47,7 +47,7 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
     <div class="flex items-center justify-center min-h-screen px-4">
       <p-card class="w-full max-w-md" header="Reset Password">
         @if (!token() || !email()) {
-          <p-message severity="error" text="Invalid reset link."></p-message>
+          <p-message severity="error">Invalid reset link.</p-message>
           <div class="mt-4">
             <button pButton (click)="goToLogin()">Back to login</button>
           </div>
@@ -111,7 +111,7 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
             </div>
 
             @if (errorMessage()) {
-              <p-message severity="error" [text]="errorMessage()"></p-message>
+              <p-message severity="error">{{ errorMessage() }}</p-message>
             }
 
             <div class="flex flex-col gap-3 mt-2">

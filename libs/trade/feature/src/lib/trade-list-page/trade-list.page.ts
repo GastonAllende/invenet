@@ -24,7 +24,7 @@ import { TradeListComponent } from '@invenet/trade-ui';
   template: `
     <div class="flex flex-col gap-5">
       <p-toast></p-toast>
-      <p-confirmDialog></p-confirmDialog>
+      <p-confirmdialog></p-confirmdialog>
       <lib-trade-list
         [trades]="trades()"
         [isLoading]="isLoading()"

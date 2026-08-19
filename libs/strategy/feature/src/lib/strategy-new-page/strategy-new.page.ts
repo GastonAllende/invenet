@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -15,6 +15,7 @@ import { StrategyFormComponent } from '@invenet/strategy-ui';
   standalone: true,
   imports: [CommonModule, ToastModule, StrategyFormComponent],
   providers: [MessageService],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex flex-col gap-5">
       <p-toast></p-toast>
