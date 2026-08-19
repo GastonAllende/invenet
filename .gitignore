@@ -73,3 +73,5 @@ css-docs/*
 
 .nx/self-healing
 .nx/migrate-runs
+
+apps/api/Invenet.Api/DataProtection-Keys/

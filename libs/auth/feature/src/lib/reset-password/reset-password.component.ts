@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   inject,
   OnInit,
   signal,
@@ -13,7 +14,7 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { MessageModule } from 'primeng/message';
@@ -31,6 +32,19 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
   return password === confirmPassword ? null : { passwordsMismatch: true };
 }
 
+/** Supabase encodes the recovery session (or an error) in the URL hash fragment. */
+function parseRecoveryHash(hash: string): {
+  hasRecoverySession: boolean;
+  errorDescription: string | null;
+} {
+  const params = new URLSearchParams(hash.replace(/^#/, ''));
+  return {
+    hasRecoverySession:
+      params.get('type') === 'recovery' || params.has('access_token'),
+    errorDescription: params.get('error_description'),
+  };
+}
+
 @Component({
   selector: 'lib-reset-password',
   standalone: true,
@@ -46,16 +60,19 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
   template: `
     <div class="flex items-center justify-center min-h-screen px-4">
       <p-card class="w-full max-w-md" header="Reset Password">
-        @if (!token() || !email()) {
-          <p-message severity="error">Invalid reset link.</p-message>
+        @if (isVerifyingLink()) {
+          <p class="text-muted-color text-sm">Verifying your reset link...</p>
+        } @else if (!isValidLink()) {
+          <p-message severity="error">{{
+            errorMessage() || 'Invalid or expired reset link.'
+          }}</p-message>
           <div class="mt-4">
             <button pButton (click)="goToLogin()">Back to login</button>
           </div>
         } @else if (isSuccess()) {
-          <p-message
-            severity="success"
-            text="Password reset successfully! Redirecting to login..."
-          ></p-message>
+          <p-message severity="success">
+            Password reset successfully! Redirecting to login...
+          </p-message>
         } @else {
           <p class="mb-4 text-muted-color text-sm">
             Enter your new password below.
@@ -119,7 +136,7 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
                 pButton
                 type="submit"
                 class="w-full"
-                [loading]="isLoading()"
+                [loading]="isSubmitting()"
               >
                 Reset password
               </button>
@@ -138,12 +155,9 @@ function matchPasswords(control: AbstractControl): ValidationErrors | null {
 })
 export class ResetPasswordComponent implements OnInit {
   private readonly authService = inject(AuthService);
-  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder).nonNullable;
-
-  token = signal('');
-  email = signal('');
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly form = this.fb.group(
     {
@@ -157,18 +171,37 @@ export class ResetPasswordComponent implements OnInit {
     { validators: matchPasswords },
   );
 
-  errorMessage = signal('');
-  isLoading = signal(false);
+  isVerifyingLink = signal(true);
+  isValidLink = signal(false);
+  isSubmitting = signal(false);
   isSuccess = signal(false);
+  errorMessage = signal('');
 
   ngOnInit(): void {
-    const token = this.route.snapshot.queryParamMap.get('token');
-    const email = this.route.snapshot.queryParamMap.get('email');
+    const { hasRecoverySession, errorDescription } = parseRecoveryHash(
+      window.location.hash,
+    );
 
-    if (token && email) {
-      this.token.set(token);
-      this.email.set(email);
+    if (errorDescription) {
+      this.errorMessage.set(errorDescription);
+      this.isVerifyingLink.set(false);
+      return;
     }
+
+    if (!hasRecoverySession) {
+      this.isVerifyingLink.set(false);
+      return;
+    }
+
+    const subscription = this.authService
+      .authStateChanges()
+      .subscribe(({ event }) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          this.isValidLink.set(true);
+          this.isVerifyingLink.set(false);
+        }
+      });
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   submit(): void {
@@ -178,28 +211,26 @@ export class ResetPasswordComponent implements OnInit {
       return;
     }
 
-    this.isLoading.set(true);
     const password = this.form.value.password;
     if (!password) return;
 
-    this.authService
-      .resetPassword(this.email(), this.token(), password)
-      .subscribe({
-        next: () => {
-          this.isSuccess.set(true);
-          this.isLoading.set(false);
-          setTimeout(() => {
-            void this.router.navigateByUrl('/auth/login');
-          }, 2000);
-        },
-        error: (error) => {
-          this.isLoading.set(false);
-          this.errorMessage.set(
-            error?.error?.message ||
-              'Password reset failed. The link may be invalid or expired.',
-          );
-        },
-      });
+    this.isSubmitting.set(true);
+    this.authService.updatePassword(password).subscribe({
+      next: () => {
+        this.isSuccess.set(true);
+        this.isSubmitting.set(false);
+        setTimeout(() => {
+          void this.router.navigateByUrl('/auth/login');
+        }, 2000);
+      },
+      error: (error) => {
+        this.isSubmitting.set(false);
+        this.errorMessage.set(
+          error?.message ||
+            'Password reset failed. The link may be invalid or expired.',
+        );
+      },
+    });
   }
 
   goToLogin(): void {

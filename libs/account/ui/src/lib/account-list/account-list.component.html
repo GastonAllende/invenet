@@ -34,7 +34,7 @@
     [showCurrentPageReport]="true"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} accounts"
   >
-    <ng-template pTemplate="header">
+    <ng-template #header>
       <tr>
         <th pSortableColumn="name">
           Name <p-sort-icon field="name"></p-sort-icon>
@@ -55,7 +55,7 @@
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="body" let-account>
+    <ng-template #body let-account>
       <tr
         (click)="onRowSelect(account)"
         style="cursor: pointer"
@@ -147,7 +147,7 @@
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="emptymessage">
+    <ng-template #emptymessage>
       <tr>
         <td colspan="8" class="empty-message">
           <div class="empty-state">

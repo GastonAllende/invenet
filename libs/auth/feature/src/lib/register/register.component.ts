@@ -75,12 +75,10 @@ export class RegisterComponent {
   );
 
   readonly errorMessage = signal('');
-  readonly errorDetails = signal<string[]>([]);
   readonly isLoading = signal(false);
 
   submit(): void {
     this.errorMessage.set('');
-    this.errorDetails.set([]);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -98,7 +96,6 @@ export class RegisterComponent {
         next: () => {
           this.isLoading.set(false);
           this.errorMessage.set('');
-          this.errorDetails.set([]);
           this.messageService.add({
             severity: 'success',
             summary: 'Registration Successful',
@@ -110,17 +107,8 @@ export class RegisterComponent {
         error: (error) => {
           this.isLoading.set(false);
           this.errorMessage.set(
-            error?.error?.message ||
-            'Unable to create account. Check your details.',
+            error?.message || 'Unable to create account. Check your details.',
           );
-          const errors = error?.error;
-          if (Array.isArray(errors)) {
-            this.errorDetails.set(
-              errors
-                .map((item) => item?.description)
-                .filter((message): message is string => Boolean(message)),
-            );
-          }
         },
       });
   }

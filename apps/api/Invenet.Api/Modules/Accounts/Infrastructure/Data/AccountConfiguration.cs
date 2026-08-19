@@ -42,12 +42,10 @@ public sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
         .IsRequired()
         .HasDefaultValue(true);
 
-    // Relationships
-    builder.HasOne(a => a.User)
-        .WithMany()
-        .HasForeignKey(a => a.UserId)
-        .OnDelete(DeleteBehavior.Cascade);
+    builder.Property(a => a.UserId)
+        .IsRequired();
 
+    // Relationships
     builder.HasOne(a => a.RiskSettings)
         .WithOne(r => r.Account)
         .HasForeignKey<AccountRiskSettings>(r => r.AccountId)

@@ -1,10 +1,10 @@
-using Invenet.Api.Modules.Auth.Domain;
 using Invenet.Api.Modules.Shared.Domain;
 
 namespace Invenet.Api.Modules.Accounts.Domain;
 
 /// <summary>
 /// Represents a brokerage account belonging to a user.
+/// UserId references auth.users(id) (Supabase Auth) via a DB-level FK not modeled in EF.
 /// </summary>
 public sealed class Account : BaseEntity
 {
@@ -20,6 +20,5 @@ public sealed class Account : BaseEntity
   public bool IsActive { get; set; } = true;
 
   // Navigation properties
-  public ApplicationUser User { get; set; } = null!;
   public AccountRiskSettings RiskSettings { get; set; } = null!;
 }

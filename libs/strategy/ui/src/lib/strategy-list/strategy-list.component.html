@@ -31,7 +31,7 @@
     [tableStyle]="{ 'min-width': '70rem' }"
     styleClass="p-datatable-striped"
   >
-    <ng-template pTemplate="header">
+    <ng-template #header>
       <tr>
         <th>Name</th>
         <th>Market</th>
@@ -43,7 +43,7 @@
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="body" let-strategy>
+    <ng-template #body let-strategy>
       <tr>
         <td>
           <strong>{{ strategy.name }}</strong>
@@ -101,7 +101,7 @@
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="emptymessage">
+    <ng-template #emptymessage>
       <tr>
         <td colspan="7">
           <div class="flex flex-col items-center gap-3 py-12 text-muted-color">

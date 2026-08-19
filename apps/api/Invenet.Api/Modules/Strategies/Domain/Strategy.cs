@@ -1,10 +1,9 @@
-using Invenet.Api.Modules.Auth.Domain;
-
 namespace Invenet.Api.Modules.Strategies.Domain;
 
 /// <summary>
 /// Strategy container entity (identity and lifecycle metadata).
 /// Rule content is stored in immutable StrategyVersion snapshots.
+/// UserId references auth.users(id) (Supabase Auth) via a DB-level FK not modeled in EF.
 /// </summary>
 public class Strategy
 {
@@ -17,6 +16,5 @@ public class Strategy
   public DateTimeOffset CreatedAt { get; set; }
   public DateTimeOffset UpdatedAt { get; set; }
 
-  public ApplicationUser User { get; set; } = null!;
   public ICollection<StrategyVersion> Versions { get; set; } = new List<StrategyVersion>();
 }

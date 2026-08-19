@@ -1,187 +1,106 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import {
-  Observable,
-  tap,
-  catchError,
-  throwError,
-  timer,
-  switchMap,
-} from 'rxjs';
-import { API_BASE_URL } from '@invenet/core';
-import type {
-  AuthResponse,
-  AuthTokens,
-  LoginRequest,
-  LogoutRequest,
-  RegisterRequest,
-  RefreshRequest,
-  MessageResponse,
-  ForgotPasswordRequest,
-  ResetPasswordRequest,
-  ConfirmEmailRequest,
-  ResendVerificationRequest,
-} from './auth.models';
+  AuthChangeEvent,
+  AuthError,
+  createClient,
+  Session,
+  SupabaseClient,
+} from '@supabase/supabase-js';
+import { from, map, Observable } from 'rxjs';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@invenet/core';
+import type { LoginRequest, RegisterRequest } from './auth.models';
 
-const STORAGE_KEY = 'invenet.auth';
-const REFRESH_THRESHOLD_MS = 2 * 60 * 1000; // Refresh 2 minutes before expiry
+function throwIfError({ error }: { error: AuthError | null }): void {
+  if (error) throw error;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly http = inject(HttpClient);
-  private readonly apiBaseUrl = inject(API_BASE_URL);
-  private refreshInProgress = signal(false);
+  private readonly supabase: SupabaseClient = createClient(
+    inject(SUPABASE_URL),
+    inject(SUPABASE_ANON_KEY),
+  );
 
-  login(payload: LoginRequest) {
-    return this.http
-      .post<AuthResponse>(`${this.apiBaseUrl}/api/auth/login`, payload)
-      .pipe(tap((response) => this.storeTokens(response, payload.rememberMe)));
+  private readonly _session = signal<Session | null>(null);
+  readonly session = this._session.asReadonly();
+  readonly currentUser = computed(() => this._session()?.user ?? null);
+
+  constructor() {
+    this.supabase.auth.onAuthStateChange((_event, session) => {
+      this._session.set(session);
+    });
   }
 
-  register(payload: RegisterRequest) {
-    return this.http.post<MessageResponse>(
-      `${this.apiBaseUrl}/api/auth/register`,
-      payload,
-    );
-  }
-
-  logout() {
-    const tokens = this.getTokens();
-    if (!tokens) {
-      this.clearTokens();
-      return this.http.post<void>(`${this.apiBaseUrl}/api/auth/logout`, {
-        refreshToken: '',
-      });
-    }
-
-    const payload: LogoutRequest = { refreshToken: tokens.refreshToken };
-
-    return this.http
-      .post<void>(`${this.apiBaseUrl}/api/auth/logout`, payload)
-      .pipe(tap(() => this.clearTokens()));
-  }
-
-  refreshToken(): Observable<AuthResponse> {
-    const tokens = this.getTokens();
-    if (!tokens) {
-      return throwError(() => new Error('No refresh token available'));
-    }
-
-    if (this.refreshInProgress()) {
-      // Wait for ongoing refresh to complete
-      return timer(100).pipe(switchMap(() => this.refreshToken()));
-    }
-
-    this.refreshInProgress.set(true);
-
-    const payload: RefreshRequest = { refreshToken: tokens.refreshToken };
-
-    return this.http
-      .post<AuthResponse>(`${this.apiBaseUrl}/api/auth/refresh`, payload)
-      .pipe(
-        tap((response) => {
-          const useLocalStorage = this.isUsingLocalStorage();
-          this.storeTokens(response, useLocalStorage);
-          this.refreshInProgress.set(false);
-        }),
-        catchError((error) => {
-          this.refreshInProgress.set(false);
-          this.clearTokens();
-          return throwError(() => error);
-        }),
+  authStateChanges(): Observable<{
+    event: AuthChangeEvent;
+    session: Session | null;
+  }> {
+    return new Observable((subscriber) => {
+      const { data } = this.supabase.auth.onAuthStateChange(
+        (event, session) => subscriber.next({ event, session }),
       );
+      return () => data.subscription.unsubscribe();
+    });
   }
 
-  confirmEmail(email: string, token: string) {
-    const payload: ConfirmEmailRequest = { email, token };
-    return this.http
-      .post<AuthResponse>(`${this.apiBaseUrl}/api/auth/confirm-email`, payload)
-      .pipe(tap((response) => this.storeTokens(response, false)));
+  register(payload: RegisterRequest): Observable<void> {
+    return from(
+      this.supabase.auth.signUp({
+        email: payload.email,
+        password: payload.password,
+        options: {
+          data: { username: payload.username },
+          emailRedirectTo: `${window.location.origin}/auth/verify-email`,
+        },
+      }),
+    ).pipe(map(throwIfError));
   }
 
-  resendVerification(email: string) {
-    const payload: ResendVerificationRequest = { email };
-    return this.http.post<MessageResponse>(
-      `${this.apiBaseUrl}/api/auth/resend-verification`,
-      payload,
+  login(payload: LoginRequest): Observable<void> {
+    return from(
+      this.supabase.auth.signInWithPassword({
+        email: payload.email,
+        password: payload.password,
+      }),
+    ).pipe(map(throwIfError));
+  }
+
+  logout(): Observable<void> {
+    return from(this.supabase.auth.signOut()).pipe(
+      map(throwIfError),
     );
   }
 
-  forgotPassword(email: string) {
-    const payload: ForgotPasswordRequest = { email };
-    return this.http.post<MessageResponse>(
-      `${this.apiBaseUrl}/api/auth/forgot-password`,
-      payload,
-    );
+  forgotPassword(email: string): Observable<void> {
+    return from(
+      this.supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      }),
+    ).pipe(map(throwIfError));
   }
 
-  resetPassword(email: string, token: string, newPassword: string) {
-    const payload: ResetPasswordRequest = { email, token, newPassword };
-    return this.http.post<MessageResponse>(
-      `${this.apiBaseUrl}/api/auth/reset-password`,
-      payload,
-    );
+  updatePassword(newPassword: string): Observable<void> {
+    return from(
+      this.supabase.auth.updateUser({ password: newPassword }),
+    ).pipe(map(throwIfError));
   }
 
-  getAccessToken(): string | null {
-    return this.getTokens()?.accessToken ?? null;
-  }
-
-  getRefreshToken(): string | null {
-    return this.getTokens()?.refreshToken ?? null;
+  resendVerification(email: string): Observable<void> {
+    return from(
+      this.supabase.auth.resend({ type: 'signup', email }),
+    ).pipe(map(throwIfError));
   }
 
   isAuthenticated(): boolean {
-    const tokens = this.getTokens();
-    if (!tokens) return false;
-
-    return tokens.expiresAt > Date.now();
+    return this._session() !== null;
   }
 
-  shouldRefreshToken(): boolean {
-    const tokens = this.getTokens();
-    if (!tokens) return false;
-
-    const timeUntilExpiry = tokens.expiresAt - Date.now();
-    return timeUntilExpiry > 0 && timeUntilExpiry < REFRESH_THRESHOLD_MS;
+  async getAccessToken(): Promise<string | null> {
+    const { data } = await this.supabase.auth.getSession();
+    return data.session?.access_token ?? null;
   }
 
   clearTokens(): void {
-    localStorage.removeItem(STORAGE_KEY);
-    sessionStorage.removeItem(STORAGE_KEY);
-  }
-
-  private storeTokens(response: AuthResponse, useLocalStorage = false): void {
-    const expiresAt = new Date(response.expiresAt).getTime();
-    const tokens: AuthTokens = {
-      accessToken: response.accessToken,
-      refreshToken: response.refreshToken,
-      expiresAt,
-    };
-
-    const storage = useLocalStorage ? localStorage : sessionStorage;
-    storage.setItem(STORAGE_KEY, JSON.stringify(tokens));
-
-    // Remove from other storage
-    const otherStorage = useLocalStorage ? sessionStorage : localStorage;
-    otherStorage.removeItem(STORAGE_KEY);
-  }
-
-  private getTokens(): AuthTokens | null {
-    // Check localStorage first, then sessionStorage
-    const raw =
-      localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-
-    try {
-      return JSON.parse(raw) as AuthTokens;
-    } catch {
-      this.clearTokens();
-      return null;
-    }
-  }
-
-  private isUsingLocalStorage(): boolean {
-    return localStorage.getItem(STORAGE_KEY) !== null;
+    void this.supabase.auth.signOut();
   }
 }

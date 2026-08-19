@@ -9,7 +9,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import Nora from '@primeuix/themes/nora';
 import { appRoutes } from './app.routes';
-import { API_BASE_URL } from '@invenet/core';
+import { API_BASE_URL, SUPABASE_ANON_KEY, SUPABASE_URL } from '@invenet/core';
 import { authInterceptor } from '@invenet/shared-util-auth';
 
 export const appConfig: ApplicationConfig = {
@@ -23,5 +23,13 @@ export const appConfig: ApplicationConfig = {
       theme: { preset: Nora, options: { darkModeSelector: '.app-dark' } },
     }),
     { provide: API_BASE_URL, useValue: 'http://localhost:5256' },
+    {
+      provide: SUPABASE_URL,
+      useValue: 'https://afbbrzpkstrgnyagaavb.supabase.co',
+    },
+    {
+      provide: SUPABASE_ANON_KEY,
+      useValue: 'sb_publishable_T8IDv-ZAQNzun_6qhJkk3A_gZ4BHX0G',
+    },
   ],
 };

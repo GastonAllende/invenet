@@ -1,4 +1,3 @@
-using Invenet.Api.Modules.Auth.Domain;
 using Invenet.Api.Modules.Strategies.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -41,11 +40,6 @@ public class StrategyConfiguration : IEntityTypeConfiguration<Strategy>
         .IsUnique()
         .HasDatabaseName("ix_strategies_user_name_unique")
         .HasFilter("\"IsArchived\" = FALSE");
-
-    builder.HasOne<ApplicationUser>(s => s.User)
-        .WithMany()
-        .HasForeignKey(s => s.UserId)
-        .OnDelete(DeleteBehavior.Cascade);
 
     builder.HasMany(s => s.Versions)
         .WithOne(v => v.Strategy)

@@ -25,6 +25,7 @@
     "@ngrx/operators": "22.0.0-rc.0",
     "@ngrx/signals": "22.0.0-rc.0",
     "@primeuix/themes": "^3.0.0",
+    "@supabase/supabase-js": "^2.112.3",
     "express": "^4.21.2",
     "primeicons": "^7.0.0",
     "primeng": "^22.1.0",

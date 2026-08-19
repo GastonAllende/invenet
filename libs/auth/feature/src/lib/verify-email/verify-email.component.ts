@@ -1,7 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ToastModule } from 'primeng/toast';
@@ -11,7 +20,15 @@ import { AuthService } from '@invenet/auth-data-access';
 @Component({
   selector: 'lib-verify-email',
   standalone: true,
-  imports: [CardModule, MessageModule, ButtonModule, ProgressSpinnerModule, ToastModule],
+  imports: [
+    ReactiveFormsModule,
+    CardModule,
+    MessageModule,
+    ButtonModule,
+    InputTextModule,
+    ProgressSpinnerModule,
+    ToastModule,
+  ],
   providers: [MessageService],
   template: `
     <p-toast></p-toast>
@@ -33,69 +50,95 @@ import { AuthService } from '@invenet/auth-data-access';
           </div>
         } @else {
           <p-message severity="error">{{ errorMessage() }}</p-message>
-          <div class="mt-4 flex gap-2">
-            <button pButton (click)="resendEmail()" [loading]="isResending()">
-              Resend verification email
-            </button>
-            <button pButton severity="secondary" (click)="goToLogin()">
-              Back to login
-            </button>
-          </div>
+
+          <form
+            [formGroup]="resendForm"
+            (ngSubmit)="resendEmail()"
+            class="mt-4 flex flex-col gap-3"
+          >
+            <input
+              type="email"
+              pInputText
+              class="w-full"
+              formControlName="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+            />
+            <div class="flex gap-2">
+              <button
+                pButton
+                type="submit"
+                [disabled]="resendForm.invalid"
+                [loading]="isResending()"
+              >
+                Resend verification email
+              </button>
+              <button pButton severity="secondary" (click)="goToLogin()">
+                Back to login
+              </button>
+            </div>
+          </form>
         }
       </p-card>
     </div>
   `,
-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VerifyEmailComponent implements OnInit {
   private readonly authService = inject(AuthService);
-  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly messageService = inject(MessageService);
+  private readonly fb = inject(FormBuilder).nonNullable;
+  private readonly destroyRef = inject(DestroyRef);
+
+  readonly resendForm = this.fb.group({
+    email: this.fb.control('', {
+      validators: [Validators.required, Validators.email],
+    }),
+  });
 
   isLoading = signal(true);
   isSuccess = signal(false);
   isResending = signal(false);
   errorMessage = signal('');
-  email = signal('');
 
   ngOnInit(): void {
-    const token = this.route.snapshot.queryParamMap.get('token');
-    const email = this.route.snapshot.queryParamMap.get('email');
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const errorDescription = params.get('error_description');
 
-    if (!token || !email) {
+    if (errorDescription) {
+      this.isLoading.set(false);
+      this.errorMessage.set(errorDescription);
+      return;
+    }
+
+    if (!params.has('access_token')) {
       this.isLoading.set(false);
       this.errorMessage.set('Invalid verification link.');
       return;
     }
 
-    this.email.set(email);
-    this.confirmEmail(email, token);
-  }
-
-  private confirmEmail(email: string, token: string): void {
-    this.authService.confirmEmail(email, token).subscribe({
-      next: () => {
-        this.isSuccess.set(true);
-        this.isLoading.set(false);
-        setTimeout(() => {
-          void this.router.navigateByUrl('/');
-        }, 2000);
-      },
-      error: (error) => {
-        this.isLoading.set(false);
-        this.errorMessage.set(
-          error?.error?.message ||
-            'Email verification failed. The link may be invalid or expired.',
-        );
-      },
-    });
+    const subscription = this.authService
+      .authStateChanges()
+      .subscribe(({ event }) => {
+        if (event === 'SIGNED_IN') {
+          this.isSuccess.set(true);
+          this.isLoading.set(false);
+          setTimeout(() => void this.router.navigateByUrl('/'), 2000);
+        }
+      });
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   resendEmail(): void {
+    if (this.resendForm.invalid) {
+      this.resendForm.markAllAsTouched();
+      return;
+    }
+
+    const email = this.resendForm.getRawValue().email;
     this.isResending.set(true);
-    this.authService.resendVerification(this.email()).subscribe({
+    this.authService.resendVerification(email).subscribe({
       next: () => {
         this.isResending.set(false);
         this.messageService.add({

@@ -1,51 +1,21 @@
-using Invenet.Api.Modules.Auth.Domain;
-using Invenet.Api.Modules.Auth.Infrastructure.Email;
-using Invenet.Api.Modules.Shared.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Resend;
-using System.Text;
-using Invenet.Api.Modules.Shared.Infrastructure.Data;
+using Invenet.Api.Modules.Shared.Contracts;
 
 namespace Invenet.Api.Modules.Auth;
 
 /// <summary>
 /// Authentication and Authorization module.
-/// Handles user registration, login, email confirmation, password reset, and JWT token management.
+/// Validates JWTs issued by Supabase Auth; user management, sessions, and
+/// email flows are handled entirely by Supabase (frontend talks to it directly).
 /// </summary>
 public class AuthModule : IModule
 {
   public IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration)
   {
-    // Register Resend email client
-    services.AddOptions();
-    services.AddHttpClient<ResendClient>();
-    services.Configure<ResendClientOptions>(o =>
-    {
-      o.ApiToken = configuration["Resend:ApiKey"]!;
-    });
-    services.AddTransient<IResend, ResendClient>();
-    services.AddScoped<EmailService>();
+    var projectUrl = configuration["Supabase:Url"];
+    var authority = $"{projectUrl}/auth/v1";
 
-    // Configure Identity
-    services.AddIdentityCore<ApplicationUser>(options =>
-        {
-          options.User.RequireUniqueEmail = true;
-          options.SignIn.RequireConfirmedEmail = true;
-          options.Password.RequireDigit = true;
-          options.Password.RequireLowercase = true;
-          options.Password.RequireUppercase = true;
-          options.Password.RequireNonAlphanumeric = true;
-          options.Password.RequiredLength = 10;
-        })
-        .AddRoles<IdentityRole<Guid>>()
-        .AddEntityFrameworkStores<ModularDbContext>()
-        .AddSignInManager()
-        .AddDefaultTokenProviders();
-
-    // Configure JWT Authentication
     services.AddAuthentication(options =>
         {
           options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -53,24 +23,17 @@ public class AuthModule : IModule
         })
         .AddJwtBearer(options =>
         {
-          var jwtKey = configuration["Jwt:Key"];
-          var issuer = configuration["Jwt:Issuer"];
-          var audience = configuration["Jwt:Audience"];
-
-          if (!string.IsNullOrWhiteSpace(jwtKey))
+          options.Authority = authority;
+          options.MapInboundClaims = false;
+          options.TokenValidationParameters = new TokenValidationParameters
           {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-              ValidateIssuerSigningKey = true,
-              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-              ValidateIssuer = true,
-              ValidIssuer = issuer,
-              ValidateAudience = true,
-              ValidAudience = audience,
-              ValidateLifetime = true,
-              ClockSkew = TimeSpan.FromSeconds(30)
-            };
-          }
+            ValidateIssuer = true,
+            ValidIssuer = authority,
+            // TODO: flip on once confirmed against a real issued token (see plan notes)
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            NameClaimType = "sub",
+          };
         });
 
     services.AddAuthorization();
@@ -80,7 +43,6 @@ public class AuthModule : IModule
 
   public IEndpointRouteBuilder MapEndpoints(IEndpointRouteBuilder endpoints)
   {
-    // Endpoints are mapped via the AuthController
     return endpoints;
   }
 }

@@ -9,33 +9,15 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
 import { authInterceptor } from './auth.interceptor';
 import { AuthService } from '@invenet/auth-data-access';
 
 class AuthServiceStub {
   token: string | null = 'token-123';
-  refreshTokenValue: string | null = null;
   cleared = false;
 
   getAccessToken() {
-    return this.token;
-  }
-
-  getRefreshToken() {
-    return this.refreshTokenValue;
-  }
-
-  isAuthenticated() {
-    return !!this.token;
-  }
-
-  shouldRefreshToken() {
-    return false;
-  }
-
-  refreshToken(): Observable<unknown> {
-    return of({});
+    return Promise.resolve(this.token);
   }
 
   clearTokens() {
@@ -78,18 +60,30 @@ describe('authInterceptor', () => {
     httpMock.verify();
   });
 
-  it('adds authorization header when token exists', () => {
+  it('adds authorization header when token exists', async () => {
     http.get('/api/test').subscribe();
+    await Promise.resolve();
 
     const req = httpMock.expectOne('/api/test');
     expect(req.request.headers.get('Authorization')).toBe('Bearer token-123');
     req.flush({});
   });
 
-  it('clears tokens and redirects on 401', () => {
+  it('omits the header when there is no token', async () => {
+    authService.token = null;
+    http.get('/api/test').subscribe();
+    await Promise.resolve();
+
+    const req = httpMock.expectOne('/api/test');
+    expect(req.request.headers.has('Authorization')).toBe(false);
+    req.flush({});
+  });
+
+  it('clears tokens and redirects on 401', async () => {
     http.get('/api/secure').subscribe({
       error: () => undefined,
     });
+    await Promise.resolve();
 
     const req = httpMock.expectOne('/api/secure');
     req.flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });

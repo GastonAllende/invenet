@@ -76,7 +76,7 @@
     [tableStyle]="{ 'min-width': '70rem' }"
     styleClass="p-datatable-striped"
   >
-    <ng-template pTemplate="header">
+    <ng-template #header>
       <tr>
         <th pSortableColumn="openedAt">
           Date <p-sort-icon field="openedAt"></p-sort-icon>
@@ -96,7 +96,7 @@
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="body" let-trade>
+    <ng-template #body let-trade>
       <tr>
         <td>{{ trade.openedAt | date: 'short' }}</td>
         <td>

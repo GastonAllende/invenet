@@ -97,15 +97,6 @@
             {{ errorMessage() }}
           </p-message>
         }
-        @if (errorDetails().length) {
-          <div class="flex flex-col gap-2">
-            @for (detail of errorDetails(); track detail) {
-              <p-message severity="error" variant="simple" size="small">
-                {{ detail }}
-              </p-message>
-            }
-          </div>
-        }
 
         <p-button
           label="Create Account"

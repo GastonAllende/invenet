@@ -105,10 +105,9 @@ libs/
 - **Single `ModularDbContext`** — no typed `DbSet<>` properties; access entities via `_context.Set<T>()`; entity configurations use `IEntityTypeConfiguration<T>` per module
 - **`ApiControllerBase`** — shared base for controllers; provides `TryGetCurrentUserId(out Guid)` helper
 - **`BaseEntity`** — base class with `Id`, `CreatedAt`, `UpdatedAt`
-- **Identity**: ASP.NET Core Identity with `ApplicationUser : IdentityUser<Guid>`; JWT Bearer auth
-- **Email**: SendGrid via `EmailService`; HTML templates in `EmailTemplates/`
+- **Auth**: Supabase Auth — the API has no user/session endpoints of its own; it's a pure JWT resource server. `AuthModule` validates Supabase-issued access tokens via `AddJwtBearer` (`Authority` = Supabase project's `/auth/v1`, asymmetric ES256/JWKS, `sub` claim = user id)
 - **OpenAPI**: NSwag — Swagger UI available in development at `/swagger`
-- **Rate limiting** — auth endpoints: 10 req/min per IP; global: 300 req/min per user or IP
+- **Rate limiting** — global: 300 req/min per user or IP (disabled in development)
 
 #### Module Structure
 
@@ -125,22 +124,22 @@ Modules/<Name>/
 
 #### Conventions
 
-- All controllers use `[Authorize]` except Auth endpoints
-- Auth controller uses `[EnableRateLimiting("auth")]`
-- Route prefix: `api/<module>` (e.g., `api/trades`, `api/auth`)
+- All controllers use `[Authorize]`
+- Route prefix: `api/<module>` (e.g., `api/trades`, `api/accounts`)
 - Controllers verify resource ownership before any operation
+- User-owned entities (`Account.UserId`, `Strategy.UserId`) reference `auth.users(id)` (Supabase Auth) via a DB-level FK that isn't modeled in EF — there's no local `ApplicationUser`/`AspNetUsers` table
 
 ### Auth Flow
 
-1. `POST /api/auth/login` → returns `{ accessToken, refreshToken }`
-2. `AuthService` stores tokens in `localStorage`
-3. `authInterceptor` attaches `Authorization: Bearer <token>` to every request
-4. On 401, interceptor auto-refreshes via `POST /api/auth/refresh`, then retries the original request
-5. Proactive refresh triggers 2 minutes before token expiry
+1. The Angular app talks to Supabase Auth directly via `@supabase/supabase-js` (`AuthService` in `libs/auth/data-access`) — sign-up, login, logout, password reset, and session refresh never go through the .NET API
+2. Supabase's client manages session storage and automatic token refresh internally
+3. `authInterceptor` calls `AuthService.getAccessToken()` and attaches `Authorization: Bearer <token>` to every `/api/*` request
+4. The .NET API only validates the resulting JWT (`AuthModule`, JWKS/`Authority`-based) — it never issues or refreshes tokens itself
+5. On a 401 from the API, the interceptor clears the session and redirects to `/auth/login`
 
 ### Key Configuration
 
-- Backend secrets (DB connection string, JWT key, SendGrid) are managed via `dotnet user-secrets` — **not** committed; see `.env.example` for required keys
+- Backend secrets (DB connection string) are managed via `dotnet user-secrets` — **not** committed; see `.env.example` for required keys. The Supabase project URL is not a secret and is committed in `appsettings.json`/`app.config.ts`
 - CORS origin is configured in `appsettings.json`
 - Frontend points to the API via the `API_BASE_URL` injection token, set in `app.config.ts`
 

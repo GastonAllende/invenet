@@ -1,83 +1,96 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
 import { AuthService } from './auth.service';
-import { API_BASE_URL } from '@invenet/core';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@invenet/core';
 
-const baseUrl = 'http://localhost:5256';
+const mockAuth = {
+  onAuthStateChange: vi.fn(() => ({
+    data: { subscription: { unsubscribe: vi.fn() } },
+  })),
+  signInWithPassword: vi.fn(),
+  signUp: vi.fn(),
+  signOut: vi.fn(),
+  resetPasswordForEmail: vi.fn(),
+  updateUser: vi.fn(),
+  resend: vi.fn(),
+  getSession: vi.fn(),
+};
+
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(() => ({ auth: mockAuth })),
+}));
 
 describe('AuthService', () => {
   let service: AuthService;
-  let httpMock: HttpTestingController;
 
   beforeEach(() => {
-    localStorage.clear();
-    sessionStorage.clear();
+    vi.clearAllMocks();
+    mockAuth.onAuthStateChange.mockReturnValue({
+      data: { subscription: { unsubscribe: vi.fn() } },
+    });
+
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        { provide: API_BASE_URL, useValue: baseUrl },
+        { provide: SUPABASE_URL, useValue: 'https://test.supabase.co' },
+        { provide: SUPABASE_ANON_KEY, useValue: 'anon-key' },
       ],
     });
     service = TestBed.inject(AuthService);
-    httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => {
-    httpMock.verify();
-    localStorage.clear();
-    sessionStorage.clear();
+  it('resolves on successful login', async () => {
+    mockAuth.signInWithPassword.mockResolvedValue({ data: {}, error: null });
+
+    await expect(
+      new Promise((resolve, reject) =>
+        service
+          .login({ email: 'user@example.com', password: 'Password123!' })
+          .subscribe({ next: resolve, error: reject }),
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(mockAuth.signInWithPassword).toHaveBeenCalledWith({
+      email: 'user@example.com',
+      password: 'Password123!',
+    });
   });
 
-  it('stores tokens on login', () => {
-    service
-      .login({ email: 'user@example.com', password: 'Password123!' })
-      .subscribe();
-
-    const req = httpMock.expectOne(`${baseUrl}/api/auth/login`);
-    req.flush({
-      accessToken: 'access-token',
-      expiresInSeconds: 60,
-      refreshToken: 'refresh-token',
+  it('errors when Supabase returns an auth error', async () => {
+    const authError = { message: 'Invalid login credentials' };
+    mockAuth.signInWithPassword.mockResolvedValue({
+      data: {},
+      error: authError,
     });
 
-    const stored = sessionStorage.getItem('invenet.auth');
-    expect(localStorage.getItem('invenet.auth')).toBeNull();
-    expect(stored).toContain('access-token');
-    expect(stored).toContain('refresh-token');
+    await expect(
+      new Promise((resolve, reject) =>
+        service
+          .login({ email: 'user@example.com', password: 'wrong' })
+          .subscribe({ next: resolve, error: reject }),
+      ),
+    ).rejects.toBe(authError);
   });
 
-  it('returns false when token is expired', () => {
-    localStorage.setItem(
-      'invenet.auth',
-      JSON.stringify({
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
-        expiresAt: Date.now() - 1000,
-      }),
-    );
+  it('returns null access token when there is no session', async () => {
+    mockAuth.getSession.mockResolvedValue({ data: { session: null } });
 
-    expect(service.isAuthenticated()).toBe(false);
+    await expect(service.getAccessToken()).resolves.toBeNull();
   });
 
-  it('clears tokens on logout', () => {
-    localStorage.setItem(
-      'invenet.auth',
-      JSON.stringify({
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
-        expiresAt: Date.now() + 1000,
-      }),
+  it('returns the access token from the current session', async () => {
+    mockAuth.getSession.mockResolvedValue({
+      data: { session: { access_token: 'token-123' } },
+    });
+
+    await expect(service.getAccessToken()).resolves.toBe('token-123');
+  });
+
+  it('signs out on logout', async () => {
+    mockAuth.signOut.mockResolvedValue({ error: null });
+
+    await new Promise((resolve, reject) =>
+      service.logout().subscribe({ next: resolve, error: reject }),
     );
 
-    service.logout().subscribe();
-    const req = httpMock.expectOne(`${baseUrl}/api/auth/logout`);
-    req.flush(null);
-
-    expect(localStorage.getItem('invenet.auth')).toBeNull();
+    expect(mockAuth.signOut).toHaveBeenCalled();
   });
 });
