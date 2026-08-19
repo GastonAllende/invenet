@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
@@ -28,6 +28,7 @@ import { LayoutService } from './service/layout.service';
     FormsModule,
     AppConfigurator,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: ` <div class="layout-topbar">
     <div class="layout-topbar-logo-container">
       <button

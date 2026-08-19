@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AppTopbar } from './app.topbar';
@@ -18,6 +18,7 @@ import { QuickTradeModalComponent } from '@invenet/trade-ui';
     AppFooter,
     QuickTradeModalComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `<div class="layout-wrapper" [ngClass]="containerClass()">
     <lib-topbar></lib-topbar>
     <lib-sidebar></lib-sidebar>

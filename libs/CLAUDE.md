@@ -1,4 +1,4 @@
-# Frontend Development Guidelines — Angular 21
+# Frontend Development Guidelines — Angular 22
 
 ## Core Principles
 
@@ -29,10 +29,10 @@
 - No injected services, no business logic, no server calls, no state management
 - `ChangeDetectionStrategy.OnPush` always
 
-### Angular 21 specifics
+### Angular 22 specifics
 
 - **Standalone components only** — no NgModules
-- **Zoneless** — `provideExperimentalZonelessChangeDetection()`; rely on Signals for reactivity
+- **Zoneless** — `provideZonelessChangeDetection()`; rely on Signals for reactivity
 - **Signal APIs** — `signal()`, `computed()`, `effect()`, `input()`, `output()`, `linkedSignal()`, `rxResource()`
 - **Control flow** — `@if`, `@for`, `@switch` (not `*ngIf`/`*ngFor`)
 - **Reactive forms** with `FormBuilder`; sync signal inputs into forms via `effect()`
@@ -73,4 +73,4 @@
 - **Tailwind CSS v4** utility classes only — no component CSS, no `styles: [...]`
 - Dark mode via `dark:` prefix (`.app-dark` on `<html>`)
 - Use `tailwindcss-primeui` design tokens: `bg-surface-card`, `text-color`, `text-muted-color`, `bg-primary`, etc.
-- **PrimeNG 21** with Nora theme — import modules individually; use `pButton` directive on `<button>`; `class` for host, `styleClass` for inner element
+- **PrimeNG 22** with Nora theme — import modules individually; use `pButton` directive on `<button>`; `class` for host, `styleClass` for inner element

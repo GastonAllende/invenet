@@ -43,7 +43,7 @@ describe('AccountFormComponent', () => {
     const emitSpy = vi.spyOn(component.formSubmit, 'emit');
     const startDate = new Date('2025-02-01T00:00:00.000Z');
 
-    component.accountForm.patchValue({
+    component.form.patchValue({
       name: 'New Account',
       broker: 'Interactive Brokers',
       accountType: 'Personal',
@@ -76,7 +76,7 @@ describe('AccountFormComponent', () => {
     fixture.componentRef.setInput('account', existingAccount);
     fixture.detectChanges();
 
-    component.accountForm.patchValue({
+    component.form.patchValue({
       startDate: updatedStartDate,
       startingBalance: 5500,
     });

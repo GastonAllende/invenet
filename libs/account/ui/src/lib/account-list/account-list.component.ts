@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -24,6 +24,7 @@ import { GetAccountResponse } from '@invenet/account-data-access';
     TooltipModule,
   ],
   templateUrl: './account-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './account-list.component.css',
 })
 export class AccountListComponent {

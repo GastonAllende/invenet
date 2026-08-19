@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -82,6 +82,7 @@ import { filter } from 'rxjs/operators';
     '[class.active-menuitem]': 'isActive()',
     '[class.layout-root-menuitem]': 'root()',
   },
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [
     `
       .p-submenu-enter {
